@@ -250,6 +250,12 @@ export function TrainingGameSession({
     socket.on('training-result', (data: TrainingResult) => {
       setResult(data);
       setPhase('reveal');
+      // Play sound based on own result
+      const ownEntry = data.votes.find((v: any) => v.playerId === playerId);
+      if (ownEntry) {
+        if (ownEntry.correct) soundsRef.current.correct();
+        else soundsRef.current.wrong();
+      }
     });
 
     socket.on('training-transition', (data: TransitionData) => {
@@ -282,6 +288,7 @@ export function TrainingGameSession({
   const handleVote = useCallback(
     (answerId: string, confidenceZone: 1 | 2 | 3, clickX: number, clickY: number) => {
       if (!socket) return;
+      soundsRef.current.tick();
       const vote: Vote = { playerId, emoji, answerId, confidenceZone, clickX, clickY };
       setOwnVote(vote);
       socket.emit('training-vote', { sessionCode, playerId, answerId, confidenceZone, clickX, clickY });

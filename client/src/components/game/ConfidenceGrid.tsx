@@ -135,7 +135,7 @@ export function ConfidenceGrid({
               }}
             >
               {/* Option text */}
-              <span className="text-white font-semibold text-center text-sm md:text-base leading-tight drop-shadow-lg max-w-[90%] z-10 pointer-events-none">
+              <span className="text-white font-semibold text-center text-base md:text-lg leading-tight drop-shadow-lg max-w-[90%] z-10 pointer-events-none">
                 {option.text}
               </span>
 

@@ -352,6 +352,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     };
 
     socket.on('buzzer-players-update', handlePlayersUpdate);
+    socket.on('training-players-update', handlePlayersUpdate);
     socket.on('buzzer-state', handleBuzzerState);
     socket.on('buzzer-question', handleBuzzerQuestion);
     socket.on('buzz-registered', handleBuzzRegistered);
@@ -378,6 +379,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
 
     return () => {
       socket.off('buzzer-players-update', handlePlayersUpdate);
+      socket.off('training-players-update', handlePlayersUpdate);
       socket.off('buzzer-state', handleBuzzerState);
       socket.off('buzzer-question', handleBuzzerQuestion);
       socket.off('buzz-registered', handleBuzzRegistered);
@@ -978,12 +980,41 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                   {createdGameMode === 'training' && (
                     <div className="space-y-3">
                       {!gameStarted ? (
-                        <button
-                          onClick={handleStartTrainingGame}
-                          className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition-all"
-                        >
-                          🧠 Spiel starten
-                        </button>
+                        <>
+                          {/* Player list in lobby */}
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-teal-300 font-semibold">
+                                Spieler im Warteraum:
+                              </p>
+                              <span className="bg-teal-500/30 text-teal-300 px-3 py-1 rounded-full text-sm font-bold border border-teal-400/30">
+                                {joinedPlayers.length}
+                              </span>
+                            </div>
+                            {joinedPlayers.length === 0 ? (
+                              <div className="bg-white/5 rounded-lg p-4 text-center text-white/50 border border-teal-400/20 mb-2">
+                                <div className="animate-pulse">Warte auf Spieler...</div>
+                              </div>
+                            ) : (
+                              <div className="bg-white/5 rounded-lg border border-teal-400/20 max-h-32 overflow-y-auto mb-2">
+                                <div className="flex flex-wrap gap-2 p-3">
+                                  {joinedPlayers.map((player) => (
+                                    <span key={player.playerId} className="px-3 py-1 bg-teal-500/30 rounded-full text-sm text-white">
+                                      {player.emoji} {player.nickname}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={handleStartTrainingGame}
+                            disabled={joinedPlayers.length === 0}
+                            className="w-full bg-teal-600 hover:bg-teal-500 disabled:bg-gray-500/50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all"
+                          >
+                            🧠 Spiel starten {joinedPlayers.length > 0 && `(${joinedPlayers.length} Spieler)`}
+                          </button>
+                        </>
                       ) : (
                         <>
                           {gameStatus && gameStatus.gameState === 'question' && (

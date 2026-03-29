@@ -17,7 +17,7 @@ interface Particle {
   color: string;
 }
 
-const ANIM_DURATION = 3000;
+const ANIM_DURATION = 6000;
 
 export function TrainingReveal({ correctAnswerId, options, votes: _votes, containerRef, onComplete }: TrainingRevealProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -120,13 +120,13 @@ export function TrainingReveal({ correctAnswerId, options, votes: _votes, contai
         ctx.fillRect(0, 0, w, h);
       }
 
-      // Animate particles
-      if (elapsed < 1500) {
+      // Animate particles (first half of animation)
+      if (elapsed < 3000) {
         for (const p of particlesRef.current) {
           p.x += p.vx;
           p.y += p.vy;
           p.vy += 0.05;
-          p.alpha = Math.max(0, 1 - elapsed / 1200);
+          p.alpha = Math.max(0, 1 - elapsed / 2400);
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fillStyle = p.color;
