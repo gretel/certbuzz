@@ -73,7 +73,6 @@ export function TrainingGameSession({
   const navigate = useNavigate();
   const socket = getSocket();
   const { sounds } = useSounds();
-  const hasJoinedRef = useRef(false);
   const soundsRef = useRef(sounds);
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -161,24 +160,32 @@ export function TrainingGameSession({
   useEffect(() => {
     if (!socket) return;
 
-    if (!hasJoinedRef.current) {
+    // Join (or re-join) the session room. Must happen on every connect/reconnect
+    // because Socket.IO drops room membership when the underlying connection resets.
+    const joinRoom = () => {
       socket.emit('training-join-session', { sessionCode, playerId });
-      hasJoinedRef.current = true;
+    };
+
+    if (socket.connected) {
+      joinRoom();
     }
+    // Re-join on every reconnect (new server-side socket = no room membership)
+    socket.on('connect', joinRoom);
 
     socket.on('session-deleted', () => {
       setSessionDeleted(true);
     });
 
     socket.on('training-state', (state: any) => {
-      // Server sends 'phase' (mapped from gameState). Map server states to client
-      // phases; 'result' on server means we're past the question but don't have
-      // the result payload — show question (disabled) until next event.
+      // Server snapshot maps gameState → phase. 'result' on server means the round
+      // is closed but the snapshot doesn't include the full result payload (votes,
+      // correctAnswerId). Map it to 'question' (disabled grid) so the player sees
+      // the question until the next training-question event arrives.
       if (state.phase) {
         const serverToClient: Record<string, TrainingPhase> = {
           lobby: 'lobby',
           question: 'question',
-          result: 'result',
+          result: 'question',   // no result payload on reconnect → show disabled grid
           finished: 'finished',
         };
         const mapped = serverToClient[state.phase];
@@ -275,6 +282,7 @@ export function TrainingGameSession({
     });
 
     return () => {
+      socket.off('connect', joinRoom);
       socket.off('session-deleted');
       socket.off('training-state');
       socket.off('training-question');

@@ -344,8 +344,8 @@ export function setupSocketHandlers(io: Server) {
     socket.on('training-join-session', (data: { sessionCode: string; playerId: string }) => {
       const { sessionCode, playerId } = data;
 
-      if (socket.rooms.has(sessionCode)) return;
-
+      // Always (re-)join the room — Socket.IO drops room membership on reconnect.
+      // socket.join() is a no-op if already in the room.
       socket.join(sessionCode);
       socket.data.playerId = playerId;
       socket.data.sessionCode = sessionCode;
@@ -355,6 +355,7 @@ export function setupSocketHandlers(io: Server) {
         initTrainingGame(sessionCode);
       }
 
+      // Always send current state snapshot (idempotent — harmless on duplicate join)
       const state = getTrainingGameState(sessionCode);
       if (state) {
         socket.emit('training-state', state);
