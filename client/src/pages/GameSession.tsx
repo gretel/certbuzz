@@ -47,21 +47,21 @@ export function GameSession() {
   const [sessionDeleted, setSessionDeleted] = useState(false);
   const [hasPlayedStart, setHasPlayedStart] = useState(false);
 
-  // Try to restore player data from localStorage
-  // Priority: 1. Session-specific nickname, 2. Last used nickname globally
+  // Try to restore nickname: 1. From this tab's session, 2. Last used globally
   const [nickname, setNickname] = useState(() => {
-    const sessionNickname = localStorage.getItem(`session_${code}_nickname`);
+    const sessionNickname = sessionStorage.getItem(`session_${code}_nickname`);
     if (sessionNickname) return sessionNickname;
     const lastNickname = localStorage.getItem('lastNickname');
     return lastNickname || '';
   });
+  // Use sessionStorage (per-tab) instead of localStorage (shared across tabs).
+  // This prevents a second tab/window from hijacking another player's session.
+  // Each tab gets its own join flow; refreshing the same tab preserves the session.
   const [playerId, setPlayerId] = useState<string | null>(() => {
-    const stored = localStorage.getItem(`session_${code}_playerId`);
-    return stored || null;
+    return sessionStorage.getItem(`session_${code}_playerId`) || null;
   });
   const [emoji, setEmoji] = useState(() => {
-    const stored = localStorage.getItem(`session_${code}_emoji`);
-    return stored || '';
+    return sessionStorage.getItem(`session_${code}_emoji`) || '';
   });
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -194,9 +194,9 @@ export function GameSession() {
       }
 
       // Store in localStorage to persist across page reloads
-      localStorage.setItem(`session_${code}_playerId`, data.playerId);
-      localStorage.setItem(`session_${code}_nickname`, nickname.trim());
-      localStorage.setItem(`session_${code}_emoji`, data.emoji);
+      sessionStorage.setItem(`session_${code}_playerId`, data.playerId);
+      sessionStorage.setItem(`session_${code}_nickname`, nickname.trim());
+      sessionStorage.setItem(`session_${code}_emoji`, data.emoji);
       // Also store globally for quick re-use in future sessions
       localStorage.setItem('lastNickname', nickname.trim());
 
@@ -472,8 +472,8 @@ export function GameSession() {
             <button
               onClick={() => {
                 // Clear only playerId to trigger rejoin with same nickname
-                localStorage.removeItem(`session_${code}_playerId`);
-                localStorage.removeItem(`session_${code}_emoji`);
+                sessionStorage.removeItem(`session_${code}_playerId`);
+                sessionStorage.removeItem(`session_${code}_emoji`);
                 window.location.reload();
               }}
               className="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-xl transition-all text-center"
