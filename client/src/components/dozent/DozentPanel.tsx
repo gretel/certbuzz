@@ -191,14 +191,17 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     }
   };
 
-  // Hotkey: "R" advances to next question (training + buzzer)
+  // Hotkey: "R" — close round (during question) or advance to next question (during result/transition)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'r' || e.key === 'R') {
-        // Don't trigger when typing in inputs
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
         if (!socket || !sessionCode || !gameStatus) return;
-        if (gameStatus.gameState === 'result' || gameStatus.gameState === 'transition') {
+        if (gameStatus.gameState === 'question') {
+          if (createdGameMode === 'training') {
+            handleCloseTrainingRound();
+          }
+        } else if (gameStatus.gameState === 'result' || gameStatus.gameState === 'transition') {
           if (createdGameMode === 'training') {
             handleForceNextTrainingQuestion();
           } else if (createdGameMode === 'buzzer') {
@@ -1073,7 +1076,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                                 onClick={handleCloseTrainingRound}
                                 className="w-full bg-cb-primary hover:bg-cb-accent text-white font-bold py-3 rounded-xl transition-all"
                               >
-                                Runde schließen
+                                Runde schließen <span className="text-white/50 text-sm ml-1">(R)</span>
                               </button>
                             </div>
                           )}
