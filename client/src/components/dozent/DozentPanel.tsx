@@ -508,6 +508,8 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       setGameStatus(null);
       setJoinedPlayers([]);
       setShowNextRoundConfig(false);
+      // Sync with actual question count (may be less than requested if not enough qualifying questions)
+      if (data.actualQuestions) setQuestionCount(data.actualQuestions);
       await fetchSessions();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
@@ -599,6 +601,8 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     setGameStarted(session.gameState !== 'lobby');
     setShowNextRoundConfig(false);
     setTrainingVoteCount(null);
+    // Sync slider with session's actual question count
+    setQuestionCount(session.totalQuestions);
   };
 
   const copyToClipboard = (text: string, label: string) => {
