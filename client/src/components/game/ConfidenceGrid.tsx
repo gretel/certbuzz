@@ -195,7 +195,7 @@ export function ConfidenceGrid({
             transform: 'translate(-50%, -50%)',
           }}
         >
-          <div className="w-7 h-7 text-sm rounded-full flex items-center justify-center shadow-lg border-2 border-white/50 bg-black/30">
+          <div className="w-10 h-10 text-xl rounded-full flex items-center justify-center shadow-lg border-2 border-cyan-300/70 bg-cyan-900/40">
             {badge.emoji}
           </div>
           {badge.nickname && (

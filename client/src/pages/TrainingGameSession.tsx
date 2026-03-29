@@ -460,7 +460,14 @@ export function TrainingGameSession({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out; }
+      `}</style>
+      <div key={currentQuestionIndex} className="max-w-2xl mx-auto animate-fade-in-up">
         {/* Header */}
         <div className="bg-white/10 backdrop-blur-lg rounded-t-2xl border border-white/20 border-b-0 p-4">
           <div className="flex items-center justify-between mb-3">
@@ -468,7 +475,7 @@ export function TrainingGameSession({
               <span className="text-2xl">{emoji}</span>
               <span className="font-bold text-white">{nickname}</span>
               <span className="text-cb-accent font-bold">
-                {(leaderboard.find(p => p.nickname === nickname && p.emoji === emoji)?.score ?? 0)} Pkt
+                {(leaderboard.find(p => p.nickname === nickname && p.emoji === emoji)?.score ?? 0)} Punkte
               </span>
             </div>
             <div className="flex items-center gap-3">
