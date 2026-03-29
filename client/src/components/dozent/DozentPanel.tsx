@@ -933,21 +933,13 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                         </div>
                       </div>
 
-                      <div className="flex gap-3">
-                        <button
-                          onClick={handleContinueSession}
-                          disabled={loading || selectedCategories.length === 0}
-                          className="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500/50 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-                        >
-                          {loading ? 'Laden...' : '▶️ Runde starten'}
-                        </button>
-                        <button
-                          onClick={() => setShowNextRoundConfig(false)}
-                          className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white/80 rounded-lg transition-colors"
-                        >
-                          Abbrechen
-                        </button>
-                      </div>
+                      <button
+                        onClick={handleContinueSession}
+                        disabled={loading || selectedCategories.length === 0}
+                        className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500/50 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                      >
+                        {loading ? 'Laden...' : '▶️ Runde starten'}
+                      </button>
                     </div>
                   )}
 
