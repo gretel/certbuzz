@@ -66,6 +66,8 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
   const [joinedPlayers, setJoinedPlayers] = useState<Player[]>([]);
   const [gameStatus, setGameStatus] = useState<BuzzerGameStatus | null>(null);
   const [trainingVoteCount, setTrainingVoteCount] = useState<{ voted: number; total: number } | null>(null);
+  const [trainingCorrectAnswers, setTrainingCorrectAnswers] = useState<string[] | null>(null);
+  const [trainingQuestionOptions, setTrainingQuestionOptions] = useState<Array<{ id: string; text: string }>>([]);
   const [trainingResult, setTrainingResult] = useState<{
     correctAnswerId: string;
     question: { question?: string; options: Array<{ id: string; text: string }>; explanation?: string };
@@ -342,6 +344,12 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       setGameStarted(true);
       setTrainingVoteCount(null);
       setTrainingResult(null);
+      setTrainingCorrectAnswers(null);
+      setTrainingQuestionOptions(data.question?.options ?? []);
+    };
+
+    const handleTrainingQuestionAnswer = (data: any) => {
+      setTrainingCorrectAnswers(data.correctAnswers ?? []);
     };
 
     const handleTrainingResult = (data: any) => {
@@ -396,6 +404,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     socket.on('buzzer-game-over', handleBuzzerGameOver);
     socket.on('training-vote-count', handleTrainingVoteCount);
     socket.on('training-question', handleTrainingQuestion);
+    socket.on('training-question-answer', handleTrainingQuestionAnswer);
     socket.on('training-result', handleTrainingResult);
     socket.on('training-transition', handleTrainingTransition);
     socket.on('training-game-over', handleTrainingGameOver);
@@ -428,6 +437,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       socket.off('buzzer-game-over', handleBuzzerGameOver);
       socket.off('training-vote-count', handleTrainingVoteCount);
       socket.off('training-question', handleTrainingQuestion);
+      socket.off('training-question-answer', handleTrainingQuestionAnswer);
       socket.off('training-result', handleTrainingResult);
       socket.off('training-transition', handleTrainingTransition);
       socket.off('training-game-over', handleTrainingGameOver);
@@ -1066,6 +1076,27 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                         <>
                           {gameStatus && gameStatus.gameState === 'question' && (
                             <div className="space-y-3">
+                              {/* Show correct answer for dozent during question */}
+                              {trainingCorrectAnswers && trainingQuestionOptions.length > 0 && (
+                                <div className="p-3 bg-white/5 rounded-xl border border-teal-400/20 space-y-1">
+                                  {trainingQuestionOptions.map(opt => {
+                                    const isCorrect = trainingCorrectAnswers.includes(opt.id);
+                                    return (
+                                      <div
+                                        key={opt.id}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
+                                          isCorrect
+                                            ? 'bg-green-500/30 border border-green-400/40 text-green-200 font-semibold'
+                                            : 'bg-white/5 text-white/50'
+                                        }`}
+                                      >
+                                        <span>{isCorrect ? '✓' : '·'}</span>
+                                        <span>{opt.text}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
                               {trainingVoteCount && (
                                 <div className="p-3 bg-white/5 rounded-xl text-center">
                                   <span className="text-white font-bold text-2xl">{trainingVoteCount.voted}</span>

@@ -114,6 +114,12 @@ function showTrainingQuestion(io: Server, sessionCode: string, questionIndex: nu
     question: questionWithoutAnswer,
   });
 
+  // Send correct answer separately — only DozentPanel listens for this event
+  io.to(sessionCode).emit('training-question-answer', {
+    questionIndex,
+    correctAnswers,
+  });
+
   // 3-minute safety timeout — dozent normally closes manually
   state.timers.roundTimeout = setTimeout(() => {
     closeTrainingRound(io, sessionCode);
@@ -186,9 +192,10 @@ export function closeTrainingRound(io: Server, sessionCode: string) {
 
   for (const vote of state.votes.values()) {
     const correct = vote.answerId === correctAnswerId;
+    const PARTICIPATION_POINTS = 100;
     const points = correct
       ? Math.round(getBasePoints(question.difficulty) * getMultiplier(vote.confidenceZone))
-      : 0;
+      : PARTICIPATION_POINTS;
 
     const player = queries.getPlayer(vote.playerId);
     if (player) {
