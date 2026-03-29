@@ -100,8 +100,12 @@ export function ConfidenceGrid({
   // Other players' badges (never includes own)
   const otherBadges = otherVotes.filter(v => v.playerId !== ownPlayerId);
 
-  // Own emoji position: follow cursor while hovering, fall back to voted position
-  const ownBadgePos = !disabled && cursorPos
+  // Own emoji position:
+  // - No vote yet: follow cursor (cursor hidden, emoji IS the pointer)
+  // - Vote placed: stick at voted position; cursor restores to crosshair so
+  //   the player can aim a re-vote precisely
+  const followingCursor = !disabled && !ownVote && cursorPos !== null;
+  const ownBadgePos = followingCursor
     ? cursorPos
     : ownVote
       ? { nx: ownVote.clickX, ny: ownVote.clickY }
@@ -111,7 +115,7 @@ export function ConfidenceGrid({
     <div
       ref={containerRef}
       className="relative w-full select-none"
-      style={{ aspectRatio: '4/3', cursor: disabled ? 'default' : 'none' }}
+      style={{ aspectRatio: '4/3', cursor: disabled ? 'default' : ownVote ? 'crosshair' : 'none' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
@@ -209,7 +213,7 @@ export function ConfidenceGrid({
           <div className="w-10 h-10 text-xl rounded-full flex items-center justify-center shadow-lg border-2 border-white bg-black/40">
             {ownEmoji}
           </div>
-          {ownVote && !cursorPos && (
+          {!followingCursor && (
             <span className="text-xs text-white bg-black/60 rounded px-1 mt-0.5 font-bold">Du</span>
           )}
         </div>
