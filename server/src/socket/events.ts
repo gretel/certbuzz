@@ -1,9 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { queries } from '../db/queries.js';
 import { calculateScore, checkAnswer } from '../utils/helpers.js';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { getQuestion } from '../questions/questionBank.js';
 import {
   startBuzzerGame,
   handleBuzz,
@@ -14,42 +12,56 @@ import {
   getBuzzerGame,
   initBuzzerGame,
 } from './buzzerGame.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-interface Question {
-  id: string;
-  type: 'single' | 'multiple' | 'order';
-  correctAnswers: string[];
-}
-
-let questionsCache: Question[] | null = null;
-
-function loadQuestions(): Question[] {
-  if (questionsCache) return questionsCache;
-
-  const questionsPath = path.join(__dirname, '../../../questions.json');
-  const data = readFileSync(questionsPath, 'utf-8');
-  questionsCache = JSON.parse(data);
-  return questionsCache!;
-}
-
-function getQuestionById(id: string): Question | undefined {
-  const questions = loadQuestions();
-  return questions.find(q => q.id === id);
-}
+import {
+  startTrainingGame,
+  handleTrainingVote,
+  closeTrainingRound,
+  forceNextTrainingQuestion,
+  forceEndTrainingGame,
+  getTrainingGameState,
+  getTrainingGame,
+  initTrainingGame,
+} from './trainingGame.js';
 
 export function broadcastLeaderboard(io: Server, sessionCode: string) {
   const leaderboard = queries.getLeaderboard(sessionCode);
   io.to(sessionCode).emit('leaderboard-update', leaderboard);
 }
 
+function isDozent(socket: Socket): boolean {
+  return socket.data.isDozent === true;
+}
+
+function requireDozent(socket: Socket, event: string): boolean {
+  if (!isDozent(socket)) {
+    console.warn(`Unauthorized ${event} from ${socket.id}`);
+    socket.emit('error', { message: 'Nicht autorisiert' });
+    return false;
+  }
+  return true;
+}
+
 export function setupSocketHandlers(io: Server) {
   io.on('connection', (socket: Socket) => {
     console.log('Client connected:', socket.id);
 
+    // Dozent authenticates their socket with the password
+    socket.on('dozent-auth', (password: string, callback?: (ok: boolean) => void) => {
+      const ok = password === process.env.DOZENT_PASSWORD;
+      if (ok) {
+        socket.data.isDozent = true;
+        console.log(`Socket ${socket.id} authenticated as dozent`);
+      }
+      if (callback) callback(ok);
+    });
+
     socket.on('join-session', (sessionCode: string) => {
+      // Prevent duplicate joins from same socket
+      if (socket.rooms.has(sessionCode)) {
+        console.log(`Socket ${socket.id} already in session ${sessionCode}, skipping`);
+        return;
+      }
+
       socket.join(sessionCode);
       console.log(`Socket ${socket.id} joined session ${sessionCode}`);
 
@@ -67,7 +79,13 @@ export function setupSocketHandlers(io: Server) {
       try {
         const { sessionCode, playerId, questionId, selectedAnswers, timeSeconds } = data;
 
-        const question = getQuestionById(questionId);
+        const session = queries.getSession(sessionCode);
+        if (!session) {
+          socket.emit('error', { message: 'Session nicht gefunden' });
+          return;
+        }
+
+        const question = getQuestion(session.questionBank, questionId);
         if (!question) {
           socket.emit('error', { message: 'Frage nicht gefunden' });
           return;
@@ -125,6 +143,7 @@ export function setupSocketHandlers(io: Server) {
 
     // Dozent starts the buzzer game
     socket.on('buzzer-start-game', (sessionCode: string) => {
+      if (!requireDozent(socket, 'buzzer-start-game')) return;
       console.log(`Starting buzzer game for session ${sessionCode}`);
       const session = queries.getSession(sessionCode);
       if (!session || session.gameMode !== 'buzzer') {
@@ -166,12 +185,14 @@ export function setupSocketHandlers(io: Server) {
 
     // Dozent forces next question
     socket.on('buzzer-force-next', (sessionCode: string) => {
+      if (!requireDozent(socket, 'buzzer-force-next')) return;
       console.log(`Dozent forcing next question for session ${sessionCode}`);
       forceNextQuestion(io, sessionCode);
     });
 
     // Dozent forces game to end (works even after server restart)
     socket.on('buzzer-force-end', (sessionCode: string) => {
+      if (!requireDozent(socket, 'buzzer-force-end')) return;
       console.log(`Dozent forcing end of game for session ${sessionCode}`);
       forceEndGame(io, sessionCode);
     });
@@ -243,6 +264,8 @@ export function setupSocketHandlers(io: Server) {
       }
       
       socket.join(sessionCode);
+      socket.data.playerId = playerId;
+      socket.data.sessionCode = sessionCode;
       console.log(`Player ${playerId} joined buzzer session ${sessionCode}`);
 
       // Initialize game state if needed
@@ -269,8 +292,120 @@ export function setupSocketHandlers(io: Server) {
       });
     });
 
+    // ========== TRAINING MODE EVENTS ==========
+
+    socket.on('training-start-game', (sessionCode: string) => {
+      if (!requireDozent(socket, 'training-start-game')) return;
+      const session = queries.getSession(sessionCode);
+      if (!session || session.gameMode !== 'training') {
+        socket.emit('error', { message: 'Invalid session for training mode' });
+        return;
+      }
+      startTrainingGame(io, sessionCode);
+    });
+
+    socket.on('training-vote', (data: {
+      sessionCode: string;
+      playerId: string;
+      answerId: string;
+      confidenceZone: 1 | 2 | 3;
+      clickX: number;
+      clickY: number;
+    }) => {
+      const { sessionCode, playerId, answerId, confidenceZone, clickX, clickY } = data;
+      const player = queries.getPlayer(playerId);
+      if (!player) return;
+      handleTrainingVote(io, sessionCode, {
+        playerId,
+        nickname: player.nickname,
+        emoji: player.emoji,
+        answerId,
+        confidenceZone,
+        clickX,
+        clickY,
+      });
+    });
+
+    socket.on('training-close-round', (sessionCode: string) => {
+      if (!requireDozent(socket, 'training-close-round')) return;
+      closeTrainingRound(io, sessionCode);
+    });
+
+    socket.on('training-force-next', (sessionCode: string) => {
+      if (!requireDozent(socket, 'training-force-next')) return;
+      forceNextTrainingQuestion(io, sessionCode);
+    });
+
+    socket.on('training-force-end', (sessionCode: string) => {
+      if (!requireDozent(socket, 'training-force-end')) return;
+      forceEndTrainingGame(io, sessionCode);
+    });
+
+    socket.on('training-join-session', (data: { sessionCode: string; playerId: string }) => {
+      const { sessionCode, playerId } = data;
+
+      if (socket.rooms.has(sessionCode)) return;
+
+      socket.join(sessionCode);
+      socket.data.playerId = playerId;
+      socket.data.sessionCode = sessionCode;
+
+      const session = queries.getSession(sessionCode);
+      if (session && session.gameMode === 'training' && !getTrainingGame(sessionCode)) {
+        initTrainingGame(sessionCode);
+      }
+
+      const state = getTrainingGameState(sessionCode);
+      if (state) {
+        socket.emit('training-state', state);
+      }
+
+      const players = queries.getSessionPlayers(sessionCode);
+      io.to(sessionCode).emit('training-players-update', {
+        players: players.map(p => ({
+          playerId: p.playerId,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })),
+      });
+    });
+
+    socket.on('training-get-state', (sessionCode: string) => {
+      const state = getTrainingGameState(sessionCode);
+      if (state) {
+        socket.emit('training-state', state);
+      }
+
+      const players = queries.getSessionPlayers(sessionCode);
+      socket.emit('training-players-update', {
+        players: players.map(p => ({
+          playerId: p.playerId,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })),
+      });
+    });
+
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
+
+      // If this socket was a buzzer player who is currently answering, treat as timeout
+      const { playerId, sessionCode } = socket.data;
+      if (playerId && sessionCode) {
+        const game = getBuzzerGame(sessionCode);
+        if (game && game.currentAnswererIndex >= 0) {
+          const currentAnswerer = game.buzzes[game.currentAnswererIndex];
+          if (currentAnswerer && currentAnswerer.playerId === playerId) {
+            console.log(`Current answerer ${playerId} disconnected, treating as timeout`);
+            if (game.timers.answerTimeout) {
+              clearTimeout(game.timers.answerTimeout);
+            }
+            handleBuzzerAnswer(io, sessionCode, playerId, []);
+          }
+        }
+      }
     });
   });
 }

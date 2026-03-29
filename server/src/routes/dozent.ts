@@ -2,59 +2,40 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import { queries, GameMode } from '../db/queries.js';
 import { generateSessionCode, shuffleArray } from '../utils/helpers.js';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { getQuestions, getAvailableBanks, getCategories } from '../questions/questionBank.js';
+import { cleanupBuzzerGame } from '../socket/buzzerGame.js';
+import { cleanupTrainingGame } from '../socket/trainingGame.js';
 import { io } from '../server.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const router = Router();
 
-interface Question {
-  id: string;
-  category: string;
-  subcategory: string;
-  type: 'single' | 'multiple' | 'order';
-  difficulty: string;
-  question: string;
-  options: Array<{ id: string; text: string }>;
-  correctAnswers: string[];
-  explanation: string;
-  references?: string[];
-}
-
-let questionsCache: Question[] | null = null;
-
-function loadQuestions(): Question[] {
-  if (questionsCache) return questionsCache;
-
-  const questionsPath = path.join(__dirname, '../../../questions.json');
-  const data = readFileSync(questionsPath, 'utf-8');
-  questionsCache = JSON.parse(data);
-  return questionsCache!;
-}
-
 router.post('/create-session', authenticate, (req, res) => {
   try {
-    const { totalQuestions, categories, gameMode = 'racing' } = req.body;
+    const { totalQuestions, categories, gameMode = 'racing', questionBank } = req.body;
 
     if (!totalQuestions || totalQuestions < 5 || totalQuestions > 50) {
       return res.status(400).json({ error: 'Anzahl der Fragen muss zwischen 5 und 50 liegen' });
     }
 
     // Validate game mode
-    if (gameMode !== 'racing' && gameMode !== 'buzzer') {
+    if (gameMode !== 'racing' && gameMode !== 'buzzer' && gameMode !== 'training') {
       return res.status(400).json({ error: 'Ungültiger Spielmodus' });
     }
 
-    const allQuestions = loadQuestions();
+    const bankId = questionBank || 'azure-az104';
+    const allQuestions = getQuestions(bankId);
 
     // Filter questions by selected categories
     let filteredQuestions = allQuestions;
     if (categories && Array.isArray(categories) && categories.length > 0) {
       filteredQuestions = allQuestions.filter(q => categories.includes(q.category));
+    }
+
+    // For training mode: only use single-choice questions with exactly 4 options
+    if (gameMode === 'training') {
+      filteredQuestions = filteredQuestions.filter(
+        (q: any) => q.type === 'single' && q.options.length === 4
+      );
     }
 
     if (filteredQuestions.length === 0) {
@@ -74,8 +55,10 @@ router.post('/create-session', authenticate, (req, res) => {
       totalQuestions: actualQuestionCount,
       questionIds: JSON.stringify(selectedQuestions.map(q => q.id)),
       gameMode: gameMode as GameMode,
+      questionBank: bankId,
     });
 
+    io.emit('sessions-changed');
     res.json({ sessionCode, actualQuestions: actualQuestionCount, gameMode });
   } catch (error) {
     console.error('Error creating session:', error);
@@ -106,7 +89,12 @@ router.delete('/session/:sessionCode', authenticate, (req, res) => {
     // This notifies players at nickname screen, in-game, arena spectators, etc.
     io.to(sessionCode).emit('session-deleted', { sessionCode });
 
+    // Clean up in-memory buzzer game state
+    cleanupBuzzerGame(sessionCode);
+    cleanupTrainingGame(sessionCode);
+
     queries.deleteSession(sessionCode);
+    io.emit('sessions-changed');
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting session:', error);
@@ -118,7 +106,7 @@ router.delete('/session/:sessionCode', authenticate, (req, res) => {
 router.post('/session/:sessionCode/continue', authenticate, (req, res) => {
   try {
     const { sessionCode } = req.params;
-    const { totalQuestions, categories } = req.body;
+    const { totalQuestions, categories, questionBank } = req.body;
 
     const session = queries.getSession(sessionCode);
     if (!session) {
@@ -129,7 +117,8 @@ router.post('/session/:sessionCode/continue', authenticate, (req, res) => {
       return res.status(400).json({ error: 'Anzahl der Fragen muss zwischen 5 und 50 liegen' });
     }
 
-    const allQuestions = loadQuestions();
+    const bankId = questionBank || session.questionBank;
+    const allQuestions = getQuestions(bankId);
 
     // Filter questions by selected categories
     let filteredQuestions = allQuestions;
@@ -149,6 +138,7 @@ router.post('/session/:sessionCode/continue', authenticate, (req, res) => {
     queries.continueSession(sessionCode, {
       totalQuestions: actualQuestionCount,
       questionIds: JSON.stringify(selectedQuestions.map(q => q.id)),
+      questionBank: bankId,
     });
 
     // Reset all player scores for the new round
@@ -158,6 +148,33 @@ router.post('/session/:sessionCode/continue', authenticate, (req, res) => {
   } catch (error) {
     console.error('Error continuing session:', error);
     res.status(500).json({ error: 'Fehler beim Fortsetzen der Session' });
+  }
+});
+
+// Verify password without creating a session
+router.post('/verify', authenticate, (_req, res) => {
+  res.json({ success: true });
+});
+
+// Available question banks
+router.get('/question-banks', authenticate, (_req, res) => {
+  try {
+    const banks = getAvailableBanks();
+    res.json({ banks });
+  } catch (error) {
+    console.error('Error fetching question banks:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der Fragenbanken' });
+  }
+});
+
+// Categories for a specific bank
+router.get('/question-banks/:bankId/categories', authenticate, (req, res) => {
+  try {
+    const categories = getCategories(req.params.bankId);
+    res.json({ categories });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der Kategorien' });
   }
 });
 
