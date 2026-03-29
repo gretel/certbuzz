@@ -464,9 +464,12 @@ export function TrainingGameSession({
         {/* Header */}
         <div className="bg-white/10 backdrop-blur-lg rounded-t-2xl border border-white/20 border-b-0 p-4">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <span className="text-2xl">{emoji}</span>
               <span className="font-bold text-white">{nickname}</span>
+              <span className="text-cb-accent font-bold">
+                {(leaderboard.find(p => p.nickname === nickname && p.emoji === emoji)?.score ?? 0)} Pkt
+              </span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-sm text-white/60">
