@@ -319,9 +319,10 @@ export function TrainingGameSession({
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🧠</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Team Training</h1>
-          <p className="text-white/60">warte auf den Dozenten...</p>
+          <div className="text-7xl mb-4">{emoji}</div>
+          <h1 className="text-2xl font-bold text-white mb-1">{nickname}</h1>
+          <p className="text-white/50 text-sm mb-6">Team Training</p>
+          <p className="text-white/60">Warte auf den Dozenten...</p>
           <div className="flex items-center justify-center gap-3 mt-6">
             <div className="w-3 h-3 bg-cb-accent rounded-full animate-pulse" />
             <div className="w-3 h-3 bg-cb-accent rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
