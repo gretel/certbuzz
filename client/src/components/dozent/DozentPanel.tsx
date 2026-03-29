@@ -352,6 +352,36 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       setTrainingCorrectAnswers(data.correctAnswers ?? []);
     };
 
+    const handleTrainingState = (state: any) => {
+      if (!state) return;
+      const phase = state.transition ? 'transition' : state.phase;
+      if (phase && phase !== 'lobby') {
+        setGameStatus(prev => ({
+          ...prev!,
+          gameState: phase,
+          currentQuestionIndex: state.currentQuestionIndex ?? 0,
+          totalQuestions: state.totalQuestions ?? 0,
+          currentAnswerer: undefined,
+          buzzes: [],
+        }));
+        setGameStarted(true);
+      }
+      if (state.question?.options) {
+        setTrainingQuestionOptions(state.question.options);
+      }
+      if (state.correctAnswers) {
+        setTrainingCorrectAnswers(state.correctAnswers);
+      }
+      if (state.leaderboard) {
+        setJoinedPlayers(state.leaderboard.map((p: any) => ({
+          playerId: p.playerId || p.nickname,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })));
+      }
+    };
+
     const handleTrainingResult = (data: any) => {
       setGameStatus(prev => ({ ...prev!, gameState: 'result' }));
       setTrainingResult({
@@ -403,6 +433,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     socket.on('buzzer-transition', handleBuzzerTransition);
     socket.on('buzzer-game-over', handleBuzzerGameOver);
     socket.on('training-vote-count', handleTrainingVoteCount);
+    socket.on('training-state', handleTrainingState);
     socket.on('training-question', handleTrainingQuestion);
     socket.on('training-question-answer', handleTrainingQuestionAnswer);
     socket.on('training-result', handleTrainingResult);
@@ -436,6 +467,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       socket.off('buzzer-transition', handleBuzzerTransition);
       socket.off('buzzer-game-over', handleBuzzerGameOver);
       socket.off('training-vote-count', handleTrainingVoteCount);
+      socket.off('training-state', handleTrainingState);
       socket.off('training-question', handleTrainingQuestion);
       socket.off('training-question-answer', handleTrainingQuestionAnswer);
       socket.off('training-result', handleTrainingResult);

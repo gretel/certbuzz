@@ -349,14 +349,15 @@ export function getTrainingGameState(sessionCode: string) {
   // Include the current question so reconnecting players can restore UI without
   // waiting for the next training-question broadcast.
   let currentQuestion: ReturnType<typeof getQuestion> | null = null;
+  let correctAnswers: string[] | null = null;
   if (session.gameState === 'question' || session.gameState === 'result') {
     const questionId = session.questionIds[session.currentQuestionIndex];
     if (questionId) {
       const q = getQuestionForSession(sessionCode, questionId);
       if (q) {
-        // Strip correct answers regardless of game state
-        const { correctAnswers: _ca, ...questionWithoutAnswer } = q;
+        const { correctAnswers: ca, ...questionWithoutAnswer } = q;
         currentQuestion = questionWithoutAnswer as ReturnType<typeof getQuestion>;
+        correctAnswers = ca;
       }
     }
   }
@@ -368,6 +369,8 @@ export function getTrainingGameState(sessionCode: string) {
     currentQuestionIndex: session.currentQuestionIndex,
     totalQuestions: session.totalQuestions,
     question: currentQuestion,
+    // Dozent uses this to show the correct answer; players ignore it
+    correctAnswers,
     // Include transition data for reconnecting players during the 20-sec window
     transition: state?.transition ?? null,
     votes: state
