@@ -462,10 +462,10 @@ export function TrainingGameSession({
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 p-4 md:p-8">
       <style>{`
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(12px); }
+          from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out; }
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out; }
       `}</style>
       <div key={currentQuestionIndex} className="max-w-2xl mx-auto animate-fade-in-up">
         {/* Header */}

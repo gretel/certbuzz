@@ -118,6 +118,21 @@ export function TrainingReveal({ correctAnswerId, options, votes: _votes, contai
         grad.addColorStop(1, 'rgba(250, 204, 21, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
+
+        // Green checkmark on correct quadrant
+        const checkAlpha = Math.min((t - 0.1) * 3, 0.9);
+        const arm = Math.min(w, h) * 0.09;
+        ctx.globalAlpha = checkAlpha;
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = Math.max(3, Math.min(w, h) * 0.014);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(qx - arm * 0.6, qy);
+        ctx.lineTo(qx - arm * 0.1, qy + arm * 0.6);
+        ctx.lineTo(qx + arm * 0.8, qy - arm * 0.5);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
       }
 
       // Animate particles (first half of animation)
