@@ -30,7 +30,11 @@ export function checkAnswer(selected: string[], correct: string[], type: 'single
   return JSON.stringify(sortedSelected) === JSON.stringify(sortedCorrect);
 }
 
-const EMOJI_POOL = ['🚗', '🏎️', '🚙', '🚕', '🏍️', '🚛', '🚌', '🚐', '🚓', '🚑', '🚒', '🚜', '🛵', '🛺', '🚲'];
+const EMOJI_POOL = [
+  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯',
+  '🦁', '🐮', '🐷', '🐸', '🐵', '🦆', '🦅', '🦉', '🦋', '🐢',
+  '🐬', '🦈', '🐙', '🦄', '🐲', '🦓', '🦒', '🦘', '🦔', '🐧',
+];
 
 export function getRandomEmoji(): string {
   return EMOJI_POOL[Math.floor(Math.random() * EMOJI_POOL.length)];

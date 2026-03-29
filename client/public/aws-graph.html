@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Service-Landschaft (CLF-C02)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e0e0e0; overflow: hidden; }
+
+  #header { position: fixed; top: 0; left: 0; right: 0; z-index: 10; padding: 14px 24px;
+    background: linear-gradient(180deg, #0f1117 70%, transparent); display: flex; align-items: center; gap: 16px; }
+  #header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+  #header span { font-size: 13px; color: #555; }
+
+  #controls { position: fixed; top: 50px; left: 0; right: 0; z-index: 10; padding: 8px 24px;
+    background: linear-gradient(180deg, #0f1117 50%, transparent); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .chip {
+    padding: 5px 14px; border-radius: 20px; font-size: 11px; cursor: pointer;
+    border: 1px solid #2a2a35; background: #16171f; color: #666;
+    transition: all .35s cubic-bezier(.4,0,.2,1); user-select: none;
+  }
+  .chip:hover { background: #1e2030; color: #aaa; transform: translateY(-1px); }
+  .chip.active {
+    border-color: var(--c); color: #fff;
+    background: color-mix(in srgb, var(--c) 20%, #16171f);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--c) 30%, transparent);
+  }
+  .sep { width: 1px; height: 20px; background: #2a2a35; margin: 0 4px; }
+  .btn {
+    padding: 5px 14px; border-radius: 20px; font-size: 11px; cursor: pointer;
+    border: 1px solid #2a2a35; background: #16171f; color: #666;
+    transition: all .35s cubic-bezier(.4,0,.2,1); user-select: none;
+  }
+  .btn:hover { background: #1e2030; color: #aaa; transform: translateY(-1px); }
+  .btn.demo-active { border-color: #f9c74f; color: #f9c74f; background: #f9c74f15; }
+
+  svg { width: 100vw; height: 100vh; }
+
+  #tooltip {
+    position: fixed; display: none; background: #1a1b25; border: 1px solid #2d2e3f;
+    border-radius: 10px; padding: 14px 18px; max-width: 320px; font-size: 13px; line-height: 1.5;
+    color: #bbb; pointer-events: none; z-index: 100; box-shadow: 0 12px 40px rgba(0,0,0,.6);
+    opacity: 0; transition: opacity .25s ease;
+  }
+  #tooltip .tt-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  #tooltip .tt-icon { width: 36px; height: 36px; flex-shrink: 0; }
+  #tooltip .tt-icon img { width: 100%; height: 100%; object-fit: contain; }
+  #tooltip h3 { font-size: 15px; color: #fff; margin: 0; }
+  #tooltip .cat { font-size: 11px; margin-bottom: 6px; }
+  #tooltip .doc-hint { font-size: 10px; color: #555; margin-top: 6px; font-style: italic; }
+
+  #legend {
+    position: fixed; bottom: 16px; left: 16px; background: #13141cdd; border: 1px solid #2228;
+    border-radius: 10px; padding: 12px 16px; font-size: 11px; color: #666;
+    backdrop-filter: blur(8px); transition: opacity .3s;
+  }
+  #legend div { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+  #legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  #demo-info {
+    position: fixed; bottom: 20px; right: 20px; background: #13141cee; border: 1px solid #f9c74f44;
+    border-radius: 14px; padding: 20px 26px; font-size: 15px; color: #f9c74f; backdrop-filter: blur(10px);
+    opacity: 0; transition: opacity .4s ease; pointer-events: none; max-width: 420px; line-height: 1.5;
+  }
+  #demo-info.visible { opacity: 1; }
+  #demo-info .di-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  #demo-info .di-head img { width: 48px; height: 48px; object-fit: contain; }
+  #demo-info .di-head span { font-size: 20px; font-weight: 600; color: #fff; }
+  #demo-info .desc { color: #bbb; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>☁️ AWS Service-Landschaft (CLF-C02)</h1>
+  <span>Scroll/Pinch zum Zoomen · Klicke für Nachbarn · Rechtsklicken zur AWS-Doku</span>
+</div>
+<div id="controls"></div>
+<div id="tooltip"></div>
+<div id="legend"></div>
+<div id="demo-info"><div class="di-head"></div><div class="desc"></div></div>
+
+<svg></svg>
+
+<script>
+const CAT = {
+  compute:    { label: 'Compute',              color: '#ff6b6b' },
+  storage:    { label: 'Storage',              color: '#4ecdc4' },
+  database:   { label: 'Datenbank',            color: '#45b7d1' },
+  network:    { label: 'Netzwerk',             color: '#f9c74f' },
+  security:   { label: 'Sicherheit',           color: '#a78bfa' },
+  management: { label: 'Management & Support', color: '#f4845f' },
+  billing:    { label: 'Abrechnung',           color: '#7ec8e3' },
+};
+
+// ── Legend ──
+const legEl = document.getElementById('legend');
+Object.values(CAT).forEach(c => {
+  const d = document.createElement('div');
+  d.innerHTML = `<span class="dot" style="background:${c.color}"></span>${c.label}`;
+  legEl.appendChild(d);
+});
+// ── Icon + Doc config ──
+const ICON_BASE = 'https://cdn.jsdelivr.net/npm/aws-icons@3.3.0/icons/architecture-service/';
+const DOC_BASE = 'https://docs.aws.amazon.com/de_de/';
+
+// ── Data (nur echte AWS Services/Tools) ──
+// clf02: true = prüfungsrelevant für CLF-C02
+const nodesData = [
+  // Compute
+  { id: 'ec2', cat: 'compute', clf02: true, label: 'EC2', icon: 'AmazonEC2', doc: DOC_BASE+'ec2/', desc: 'Elastic Compute Cloud – Virtuelle Server (Instances) in der Cloud.' },
+  { id: 'lambda', cat: 'compute', clf02: true, label: 'Lambda', icon: 'AWSLambda', doc: DOC_BASE+'lambda/', desc: 'Serverless Functions – Code ohne Serververwaltung. Pay-per-Invocation.' },
+  { id: 'ecs', cat: 'compute', clf02: true, label: 'ECS', icon: 'AmazonElasticContainerService', doc: DOC_BASE+'AmazonECS/', desc: 'Elastic Container Service – Docker-Container orchestrieren auf AWS.' },
+  { id: 'fargate', cat: 'compute', clf02: true, label: 'Fargate', icon: 'AWSFargate', doc: DOC_BASE+'AmazonECS/latest/developerguide/AWS_Fargate.html', desc: 'Serverless Container – ECS/EKS ohne EC2-Instances verwalten.' },
+  { id: 'eb', cat: 'compute', clf02: true, label: 'Elastic Beanstalk', icon: 'AWSElasticBeanstalk', doc: DOC_BASE+'elasticbeanstalk/', desc: 'PaaS – App hochladen, AWS verwaltet Infrastruktur automatisch.' },
+  { id: 'lightsail', cat: 'compute', clf02: true, label: 'Lightsail', icon: 'AmazonLightsail', doc: DOC_BASE+'lightsail/', desc: 'Einfache virtuelle Server, Festpreis/Monat. Ideal für kleine Projekte.' },
+  { id: 'autoscaling', cat: 'compute', clf02: true, label: 'Auto Scaling', icon: 'AWSAutoScaling', doc: DOC_BASE+'autoscaling/', desc: 'Automatisch EC2-Instances skalieren nach Last.' },
+  // Storage
+  { id: 's3', cat: 'storage', clf02: true, label: 'S3', icon: 'AmazonSimpleStorageService', doc: DOC_BASE+'s3/', desc: 'Simple Storage Service – Objekt-Storage, 11x9 Durability.' },
+  { id: 'ebs', cat: 'storage', clf02: true, label: 'EBS', icon: 'AmazonElasticBlockStore', doc: DOC_BASE+'ebs/', desc: 'Elastic Block Store – Persistente Festplatten für EC2.' },
+  { id: 'efs', cat: 'storage', clf02: true, label: 'EFS', icon: 'AmazonEFS', doc: DOC_BASE+'efs/', desc: 'Elastic File System – Geteiltes NFS-Dateisystem für mehrere EC2.' },
+  { id: 'glacier', cat: 'storage', clf02: true, label: 'S3 Glacier', icon: 'AmazonSimpleStorageServiceGlacier', doc: DOC_BASE+'amazonglacier/', desc: 'Langzeit-Archivierung. Günstigste Storage-Klasse.' },
+  // Database
+  { id: 'rds', cat: 'database', clf02: true, label: 'RDS', icon: 'AmazonRDS', doc: DOC_BASE+'rds/', desc: 'Relational Database Service – Managed MySQL, PostgreSQL, etc.' },
+  { id: 'dynamodb', cat: 'database', clf02: true, label: 'DynamoDB', icon: 'AmazonDynamoDB', doc: DOC_BASE+'dynamodb/', desc: 'NoSQL Key-Value DB. Serverless, single-digit ms Latenz.' },
+  { id: 'aurora', cat: 'database', clf02: true, label: 'Aurora', icon: 'AmazonAurora', doc: DOC_BASE+'AmazonRDS/latest/AuroraUserGuide/', desc: 'MySQL/PostgreSQL-kompatibel, 5x schneller. AWS-eigene Engine.' },
+  { id: 'redshift', cat: 'database', clf02: true, label: 'Redshift', icon: 'AmazonRedshift', doc: DOC_BASE+'redshift/', desc: 'Data Warehouse – Petabyte-Scale Analytics mit SQL.' },
+  // Network
+  { id: 'vpc', cat: 'network', clf02: true, label: 'VPC', icon: 'AmazonVirtualPrivateCloud', doc: DOC_BASE+'vpc/', desc: 'Virtual Private Cloud – Isoliertes Netzwerk in AWS.' },
+  { id: 'cf', cat: 'network', clf02: true, label: 'CloudFront', icon: 'AmazonCloudFront', doc: DOC_BASE+'AmazonCloudFront/', desc: 'CDN – Inhalte global mit niedrigen Latenzen ausliefern.' },
+  { id: 'r53', cat: 'network', clf02: true, label: 'Route 53', icon: 'AmazonRoute53', doc: DOC_BASE+'route53/', desc: 'DNS-Service – Domain-Namen auflösen.' },
+  { id: 'elb', cat: 'network', clf02: true, label: 'ELB', icon: 'ElasticLoadBalancing', doc: DOC_BASE+'elasticloadbalancing/', desc: 'Elastic Load Balancing – Traffic verteilen.' },
+  { id: 'dx', cat: 'network', clf02: true, label: 'Direct Connect', icon: 'AWSDirectConnect', doc: DOC_BASE+'directconnect/', desc: 'Dedizierte Verbindung zu AWS, kein Internet.' },
+  // Security
+  { id: 'iam', cat: 'security', clf02: true, label: 'IAM', icon: 'AWSIdentityandAccessManagement', doc: DOC_BASE+'iam/', desc: 'Identity & Access Management – Benutzer, Gruppen, Rollen, Policies.' },
+  { id: 'waf', cat: 'security', clf02: true, label: 'WAF', icon: 'AWSWAF', doc: DOC_BASE+'waf/', desc: 'Web Application Firewall – SQL-Injection, XSS-Schutz.' },
+  { id: 'shield', cat: 'security', clf02: true, label: 'Shield', icon: 'AWSShield', doc: DOC_BASE+'waf/latest/developerguide/shield-chapter.html', desc: 'DDoS-Schutz. Standard (kostenlos) + Advanced.' },
+  { id: 'kms', cat: 'security', clf02: true, label: 'KMS', icon: 'AWSKeyManagementService', doc: DOC_BASE+'kms/', desc: 'Key Management Service – Verschlüsselungsschlüssel verwalten.' },
+  { id: 'guardduty', cat: 'security', clf02: true, label: 'GuardDuty', icon: 'AmazonGuardDuty', doc: DOC_BASE+'guardduty/', desc: 'ML-basierte Bedrohungserkennung.' },
+  { id: 'inspector', cat: 'security', clf02: true, label: 'Inspector', icon: 'AmazonInspector', doc: DOC_BASE+'inspector/', desc: 'Automatische Schwachstellen-Analyse.' },
+  // Management
+  { id: 'cw', cat: 'management', clf02: true, label: 'CloudWatch', icon: 'AmazonCloudWatch', doc: DOC_BASE+'cloudwatch/', desc: 'Monitoring – Metriken, Alarme, Dashboards, Logs.' },
+  { id: 'ct', cat: 'management', clf02: true, label: 'CloudTrail', icon: 'AWSCloudTrail', doc: DOC_BASE+'cloudtrail/', desc: 'Audit-Log – Wer hat was wann gemacht?' },
+  { id: 'config', cat: 'management', clf02: true, label: 'AWS Config', icon: 'AWSConfig', doc: DOC_BASE+'config/', desc: 'Konfigurations-Tracking & Compliance.' },
+  { id: 'ta', cat: 'management', clf02: true, label: 'Trusted Advisor', icon: 'AWSTrustedAdvisor', doc: DOC_BASE+'awssupport/latest/user/trusted-advisor.html', desc: 'Best-Practice-Empfehlungen: Kosten, Sicherheit, Performance.' },
+  { id: 'org', cat: 'management', clf02: true, label: 'Organizations', icon: 'AWSOrganizations', doc: DOC_BASE+'organizations/', desc: 'Multi-Account, SCPs, Consolidated Billing.' },
+  { id: 'cfn', cat: 'management', clf02: true, label: 'CloudFormation', icon: 'AWSCloudFormation', doc: DOC_BASE+'AWSCloudFormation/', desc: 'Infrastructure as Code – JSON/YAML Templates.' },
+  // Billing
+  { id: 'ce', cat: 'billing', clf02: true, label: 'Cost Explorer', icon: 'AWSCostExplorer', doc: DOC_BASE+'cost-management/', desc: 'Kostenanalyse & Visualisierung. Forecasts.' },
+  { id: 'budgets', cat: 'billing', clf02: true, label: 'Budgets', icon: 'AWSBudgets', doc: DOC_BASE+'cost-management/latest/userguide/budgets-managing-costs.html', desc: 'Budget-Alarme per Email/SNS.' },
+  { id: 'pricing', cat: 'billing', clf02: true, label: 'Pricing Calculator', icon: 'AWSPricingCalculator', doc: 'https://calculator.aws/#/', desc: 'AWS Pricing Calculator – Kosten vorab schätzen, TCO-Vergleich.' },
+  // ── Fehlende CLF-C02-Services ──
+  { id: 'sqs', cat: 'management', clf02: true, label: 'SQS', icon: 'AmazonSimpleQueueService', doc: DOC_BASE+'sqs/', desc: 'Simple Queue Service – Nachrichtenwarteschlange, entkoppelt Microservices.' },
+  { id: 'sns', cat: 'management', clf02: true, label: 'SNS', icon: 'AmazonSimpleNotificationService', doc: DOC_BASE+'sns/', desc: 'Simple Notification Service – Pub/Sub-Messaging, Push-Benachrichtigungen.' },
+  { id: 'apigw', cat: 'network', clf02: true, label: 'API Gateway', icon: 'AmazonAPIGateway', doc: DOC_BASE+'apigateway/', desc: 'REST/WebSocket-APIs erstellen, verwalten und sichern.' },
+  { id: 'cognito', cat: 'security', clf02: true, label: 'Cognito', icon: 'AmazonCognito', doc: DOC_BASE+'cognito/', desc: 'Benutzer-Authentifizierung & -Autorisierung für Web/Mobile-Apps.' },
+  { id: 'secrets', cat: 'security', clf02: true, label: 'Secrets Manager', icon: 'AWSSecretsManager', doc: DOC_BASE+'secretsmanager/', desc: 'Passwörter, API-Keys und Secrets sicher speichern und rotieren.' },
+  { id: 'elasticache', cat: 'database', clf02: true, label: 'ElastiCache', icon: 'AmazonElastiCache', doc: DOC_BASE+'AmazonElastiCache/', desc: 'In-Memory-Cache (Redis/Memcached). Millisekunden-Latenz.' },
+];
+
+const linksData = [
+  // Compute internal
+  { source: 'ec2', target: 'ebs', label: 'nutzt' },
+  { source: 'autoscaling', target: 'ec2', label: 'skaliert' },
+  { source: 'autoscaling', target: 'elb', label: 'verteilt via' },
+  { source: 'ecs', target: 'fargate', label: 'läuft auf' },
+  { source: 'eb', target: 'ec2', label: 'provisioniert' },
+  { source: 'ec2', target: 'efs', label: 'mountet' },
+  { source: 'lightsail', target: 'ec2', label: 'vereinfacht' },
+  { source: 'lightsail', target: 'r53', label: 'löst auf via' },
+  { source: 'lightsail', target: 's3', label: 'sichert' },
+  // Serverless
+  { source: 'lambda', target: 'dynamodb', label: 'liest/schreibt' },
+  { source: 's3', target: 'lambda', label: 'triggert' },
+  // Storage
+  { source: 's3', target: 'glacier', label: 'archiviert' },
+  { source: 'cf', target: 's3', label: 'liefert aus' },
+  // Network
+  { source: 'vpc', target: 'ec2', label: 'enthält' },
+  { source: 'vpc', target: 'rds', label: 'enthält' },
+  { source: 'r53', target: 'elb', label: 'löst auf' },
+  { source: 'r53', target: 'cf', label: 'löst auf' },
+  // Database
+  { source: 'aurora', target: 'rds', label: 'basiert auf' },
+  { source: 'redshift', target: 's3', label: 'lädt aus' },
+  { source: 'redshift', target: 'rds', label: 'extrahiert aus' },
+  // Security
+  { source: 'iam', target: 'ec2', label: 'autorisiert' },
+  { source: 'iam', target: 's3', label: 'regelt' },
+  { source: 'waf', target: 'cf', label: 'schützt' },
+  { source: 'shield', target: 'cf', label: 'schützt' },
+  { source: 'kms', target: 's3', label: 'verschlüsselt' },
+  { source: 'kms', target: 'ebs', label: 'verschlüsselt' },
+  { source: 'guardduty', target: 'ct', label: 'analysiert' },
+  { source: 'inspector', target: 'ec2', label: 'scannt' },
+  // Management
+  { source: 'cw', target: 'ec2', label: 'überwacht' },
+  { source: 'cw', target: 'lambda', label: 'überwacht' },
+  { source: 'ct', target: 'iam', label: 'loggt' },
+  { source: 'config', target: 'vpc', label: 'trackt' },
+  { source: 'ta', target: 'ce', label: 'empfiehlt' },
+  { source: 'org', target: 'budgets', label: 'bündeln' },
+  { source: 'cfn', target: 'ec2', label: 'provisioniert' },
+  { source: 'cfn', target: 'vpc', label: 'provisioniert' },
+  // Billing cross-links
+  { source: 'pricing', target: 'ce', label: 'vergleicht' },
+  { source: 'budgets', target: 'ce', label: 'basiert auf' },
+  // Additional cross-domain
+  { source: 'eb', target: 's3', label: 'speichert in' },
+  { source: 'eb', target: 'elb', label: 'nutzt' },
+  { source: 'dx', target: 'vpc', label: 'verbindet' },
+  // SQS
+  { source: 'lambda', target: 'sqs', label: 'pollt' },
+  { source: 'sns', target: 'sqs', label: 'leitet an' },
+  // SNS
+  { source: 'cw', target: 'sns', label: 'alarmiert über' },
+  { source: 'budgets', target: 'sns', label: 'benachrichtigt über' },
+  // API Gateway
+  { source: 'apigw', target: 'lambda', label: 'ruft auf' },
+  { source: 'r53', target: 'apigw', label: 'löst auf' },
+  { source: 'cognito', target: 'apigw', label: 'authentifiziert' },
+  // Cognito
+  { source: 'cognito', target: 'iam', label: 'integriert' },
+  // Secrets Manager
+  { source: 'secrets', target: 'rds', label: 'rotiert für' },
+  { source: 'lambda', target: 'secrets', label: 'liest aus' },
+  // ElastiCache
+  { source: 'elasticache', target: 'rds', label: 'beschleunigt' },
+  { source: 'vpc', target: 'elasticache', label: 'enthält' },
+];
+
+// ── Build neighbor map ──
+const neighborMap = new Map();
+nodesData.forEach(n => neighborMap.set(n.id, new Set()));
+linksData.forEach(l => {
+  const s = typeof l.source === 'object' ? l.source.id : l.source;
+  const t = typeof l.target === 'object' ? l.target.id : l.target;
+  neighborMap.get(s).add(t);
+  neighborMap.get(t).add(s);
+});
+
+const W = window.innerWidth, H = window.innerHeight;
+const ease = d3.easeCubicInOut;
+const DUR = 600;
+
+const svg = d3.select('svg');
+const defs = svg.append('defs');
+
+// Glow filter
+const glow = defs.append('filter').attr('id', 'glow');
+glow.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+glow.append('feMerge').selectAll('feMergeNode').data(['blur', 'SourceGraphic']).join('feMergeNode').attr('in', d => d);
+
+// Arrow markers — visible + dimmed variant (SVG markers ignore stroke-opacity)
+defs.append('marker').attr('id', 'arrow').attr('viewBox', '0 0 10 6').attr('refX', 28).attr('refY', 3)
+  .attr('markerWidth', 10).attr('markerHeight', 8).attr('orient', 'auto')
+  .append('path').attr('d', 'M0,0 L10,3 L0,6').attr('fill', '#5b9bd5');
+defs.append('marker').attr('id', 'arrow-dim').attr('viewBox', '0 0 10 6').attr('refX', 28).attr('refY', 3)
+  .attr('markerWidth', 10).attr('markerHeight', 8).attr('orient', 'auto')
+  .append('path').attr('d', 'M0,0 L10,3 L0,6').attr('fill', '#5b9bd508');
+
+const gRoot = svg.append('g');
+
+// Zoom
+const zoomBehavior = d3.zoom().scaleExtent([0.25, 5]).on('zoom', e => gRoot.attr('transform', e.transform));
+svg.call(zoomBehavior);
+
+// ── Simulation ──
+const sim = d3.forceSimulation(nodesData)
+  .force('link', d3.forceLink(linksData).id(d => d.id).distance(150).strength(0.35))
+  .force('charge', d3.forceManyBody().strength(-280))
+  .force('center', d3.forceCenter(W / 2, H / 2))
+  .force('collision', d3.forceCollide(45))
+  .force('x', d3.forceX(W / 2).strength(0.03))
+  .force('y', d3.forceY(H / 2).strength(0.03));
+
+// ── Links ──
+const linkG = gRoot.append('g');
+const link = linkG.selectAll('line').data(linksData).join('line')
+  .attr('stroke', '#ffffff').attr('stroke-opacity', 0).attr('stroke-width', 1)
+  .attr('marker-end', 'url(#arrow-dim)');
+
+const linkLabel = linkG.selectAll('text').data(linksData).join('text')
+  .text(d => d.label)
+  .attr('fill', '#5b9bd5').attr('font-size', '9px').attr('text-anchor', 'middle')
+  .attr('pointer-events', 'none').attr('opacity', 0)
+  .attr('paint-order', 'stroke').attr('stroke', '#0f1117').attr('stroke-width', '3px')
+  .attr('stroke-linejoin', 'round');
+
+// ── Nodes ──
+const nodeG = gRoot.append('g').selectAll('g').data(nodesData).join('g')
+  .attr('cursor', 'pointer').attr('opacity', 0)
+  .call(d3.drag()
+    .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
+    .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+    .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+  );
+
+// Ambient glow
+nodeG.append('circle')
+  .attr('r', 22)
+  .attr('fill', d => CAT[d.cat].color).attr('opacity', 0.06).attr('filter', 'url(#glow)');
+
+// Main circle
+nodeG.append('circle').attr('class', 'main-circle')
+  .attr('r', 16)
+  .attr('fill', d => CAT[d.cat].color + '20')
+  .attr('stroke', d => CAT[d.cat].color).attr('stroke-width', 2);
+
+// Label
+nodeG.append('text')
+  .text(d => d.label)
+  .attr('dy', 28)
+  .attr('fill', '#aaa').attr('font-size', '11px').attr('text-anchor', 'middle')
+  .attr('pointer-events', 'none');
+
+// ── Tick ──
+sim.on('tick', () => {
+  link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+  // Offset label perpendicular to edge so it doesn't overlap the line
+  linkLabel.each(function(d) {
+    const mx = (d.source.x + d.target.x) / 2;
+    const my = (d.source.y + d.target.y) / 2;
+    // perpendicular offset
+    const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+    const len = Math.sqrt(dx*dx + dy*dy) || 1;
+    const off = 8; // pixels offset
+    const ox = -dy/len * off, oy = dx/len * off;
+    d3.select(this).attr('x', mx + ox).attr('y', my + oy);
+  });
+  nodeG.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// ── Tooltip ──
+const tooltip = document.getElementById('tooltip');
+let ttVisible = false;
+
+function showTooltip(e, d) {
+  const c = CAT[d.cat];
+  const iconHtml = d.icon
+    ? `<div class="tt-icon"><img src="${ICON_BASE}${d.icon}.svg" alt="${d.label}" onerror="this.parentElement.style.display='none'"></div>`
+    : '';
+  tooltip.innerHTML = `<div class="tt-head">${iconHtml}<h3>${d.label}</h3></div>
+    <div class="cat" style="color:${c.color}">${c.label}</div>
+    <div>${d.desc}</div>
+    ${d.doc ? '<div class="doc-hint">Rechtsklick → AWS-Doku (DE) öffnen</div>' : ''}`;
+  tooltip.style.left = (e.clientX + 18) + 'px';
+  tooltip.style.top = (e.clientY + 18) + 'px';
+  tooltip.style.display = 'block';
+  requestAnimationFrame(() => { tooltip.style.opacity = '1'; });
+  ttVisible = true;
+}
+
+function hideTooltip() {
+  tooltip.style.opacity = '0';
+  setTimeout(() => { if (!ttVisible) tooltip.style.display = 'none'; }, 250);
+  ttVisible = false;
+}
+
+nodeG.on('mouseenter', (e, d) => {
+  if (demoRunning) return;
+  // Skip tooltip for dimmed nodes
+  if (!isNodeVisible(d)) return;
+  showTooltip(e, d);
+  d3.select(e.currentTarget).select('.main-circle')
+    .transition().duration(200).ease(ease).attr('stroke-width', 3.5)
+    .attr('fill', CAT[d.cat].color + '35');
+}).on('mousemove', e => {
+  if (!ttVisible) return;
+  tooltip.style.left = (e.clientX + 18) + 'px';
+  tooltip.style.top = (e.clientY + 18) + 'px';
+}).on('mouseleave', (e, d) => {
+  hideTooltip();
+  d3.select(e.currentTarget).select('.main-circle')
+    .transition().duration(300).ease(ease).attr('stroke-width', 2)
+    .attr('fill', CAT[d.cat].color + '20');
+});
+
+// ── Highlight helpers ──
+function highlightNode(id) {
+  applyView();
+  // Pulse the selected node
+  nodeG.filter(n => n.id === id).select('.main-circle')
+    .transition().duration(300).ease(ease).attr('stroke-width', 5).attr('fill', function() {
+      return CAT[d3.select(this.parentNode).datum().cat].color + '50';
+    })
+    .transition().duration(500).ease(ease).attr('stroke-width', 3).attr('fill', function() {
+      return CAT[d3.select(this.parentNode).datum().cat].color + '30';
+    });
+}
+
+function zoomToNode(d) {
+  svg.transition().duration(DUR * 1.2).ease(ease)
+    .call(zoomBehavior.transform,
+      d3.zoomIdentity.translate(W / 2, H / 2).scale(1.8).translate(-d.x, -d.y));
+}
+
+// ── Central visibility logic ──
+function isNodeVisible(d) {
+  if (activeCat && d.cat !== activeCat) return false;
+  if (selectedNode) {
+    const nb = neighborMap.get(selectedNode);
+    if (d.id !== selectedNode && !nb.has(d.id)) return false;
+  }
+  return true;
+}
+function isLinkVisible(l) {
+  return isNodeVisible(l.source) && isNodeVisible(l.target);
+}
+
+function applyView(dur) {
+  const d = dur != null ? dur : DUR;
+  const hasFilter = selectedNode || activeCat;
+  nodeG.transition().duration(d).ease(ease)
+    .attr('opacity', n => isNodeVisible(n) ? 1 : 0.04);
+  link.transition().duration(d).ease(ease)
+    .attr('stroke-opacity', l => isLinkVisible(l) ? (hasFilter ? 0.5 : 0.12) : 0.01)
+    .attr('marker-end', l => isLinkVisible(l) ? 'url(#arrow)' : 'url(#arrow-dim)');
+  linkLabel.transition().duration(d).ease(ease)
+    .attr('opacity', l => isLinkVisible(l) ? (hasFilter ? 1 : 0.85) : 0);
+  nodeG.selectAll('.main-circle').transition().duration(Math.min(d, 400)).ease(ease)
+    .attr('stroke-width', 2).attr('fill', function() {
+      return CAT[d3.select(this.parentNode).datum().cat].color + '20';
+    });
+}
+
+function resetView() {
+  selectedNode = null;
+  activeCat = null;
+  updateChips();
+  applyView();
+  svg.transition().duration(DUR).ease(ease)
+    .call(zoomBehavior.transform,
+      d3.zoomIdentity.translate(W / 2, H / 2).scale(0.85).translate(-W / 2, -H / 2));
+}
+
+// ── Click highlight ──
+let selectedNode = null;
+
+nodeG.on('click', function(e, d) {
+  e.stopPropagation();
+  if (demoRunning) stopDemo();
+  if (selectedNode === d.id) { resetView(); return; }
+  selectedNode = d.id;
+  activeCat = null;
+  updateChips();
+  highlightNode(d.id);
+  zoomToNode(d);
+});
+
+svg.on('click', () => { if (demoRunning) stopDemo(); resetView(); });
+
+// ── Category filter ──
+let activeCat = null;
+const ctrl = document.getElementById('controls');
+
+function makeChip(label, cat, color) {
+  const c = document.createElement('span');
+  c.className = 'chip' + (cat === null ? ' active' : '');
+  c.textContent = label;
+  c.dataset.cat = cat || 'all';
+  c.style.setProperty('--c', color);
+  c.onclick = () => {
+    if (demoRunning) stopDemo();
+    selectedNode = null;
+    if (activeCat === cat) { resetView(); return; }
+    activeCat = cat;
+    updateChips();
+    applyFilter(cat);
+  };
+  ctrl.appendChild(c);
+}
+
+function updateChips() {
+  document.querySelectorAll('.chip').forEach(ch => {
+    const isCat = ch.dataset.cat;
+    if (activeCat) ch.classList.toggle('active', isCat === activeCat);
+    else ch.classList.remove('active');
+  });
+}
+
+function applyFilter(cat) {
+  if (!cat) { resetView(); return; }
+
+  applyView();
+
+  // Zoom to visible category nodes
+  const catNodes = nodesData.filter(d => d.cat === cat && isNodeVisible(d));
+  if (catNodes.length > 0) {
+    const pad = 120;
+    const xs = catNodes.map(n => n.x), ys = catNodes.map(n => n.y);
+    const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad;
+    const x1 = Math.max(...xs) + pad, y1 = Math.max(...ys) + pad;
+    const scale = Math.min(W / (x1 - x0), H / (y1 - y0), 2.5) * 0.85;
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    svg.transition().duration(DUR * 1.2).ease(ease)
+      .call(zoomBehavior.transform,
+        d3.zoomIdentity.translate(W / 2, H / 2).scale(scale).translate(-cx, -cy));
+  }
+}
+
+// ── Action buttons (links) ──
+const resetBtn = document.createElement('span');
+resetBtn.className = 'btn';
+resetBtn.textContent = '↺ Reset';
+resetBtn.onclick = () => { if (demoRunning) stopDemo(); resetView(); };
+ctrl.appendChild(resetBtn);
+
+const demoBtn = document.createElement('span');
+demoBtn.className = 'btn';
+demoBtn.textContent = '▶ Demo';
+demoBtn.onclick = () => { demoRunning ? stopDemo() : startDemo(); };
+ctrl.appendChild(demoBtn);
+
+const sep1 = document.createElement('span');
+sep1.className = 'sep';
+ctrl.appendChild(sep1);
+
+// ── Category chips ──
+Object.entries(CAT).forEach(([k, v]) => makeChip(v.label, k, v.color));
+
+// ── Demo mode ──
+let demoRunning = false;
+let demoTimer = null;
+let demoIndex = 0;
+const demoInfoEl = document.getElementById('demo-info');
+
+// Curated demo order: walk through categories
+const demoOrder = [
+  'ec2', 'ebs', 'autoscaling', 'elb', 'lambda', 'dynamodb',
+  'eb', 'ecs', 'fargate', 'lightsail',
+  's3', 'glacier', 'efs', 'cf',
+  'rds', 'aurora', 'redshift', 'elasticache',
+  'vpc', 'r53', 'dx', 'apigw',
+  'iam', 'kms', 'waf', 'shield', 'guardduty', 'inspector', 'cognito', 'secrets',
+  'cw', 'ct', 'config', 'cfn', 'ta', 'org', 'sqs', 'sns',
+  'ce', 'budgets', 'pricing',
+];
+
+function startDemo() {
+  demoRunning = true;
+  demoIndex = 0;
+  demoBtn.classList.add('demo-active');
+  demoBtn.textContent = '■ Stop';
+  demoStep();
+}
+
+function stopDemo() {
+  demoRunning = false;
+  clearTimeout(demoTimer);
+  demoBtn.classList.remove('demo-active');
+  demoBtn.textContent = '▶ Demo';
+  demoInfoEl.classList.remove('visible');
+  resetView();
+}
+
+// Fisher-Yates shuffle
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function demoStep() {
+  if (!demoRunning) return;
+  if (demoIndex >= demoOrder.length) {
+    // Cycle complete → shuffle for next round
+    shuffleArray(demoOrder);
+    demoIndex = 0;
+  }
+
+  const id = demoOrder[demoIndex];
+  const d = nodesData.find(n => n.id === id);
+  if (!d) { demoIndex++; demoStep(); return; }
+
+  selectedNode = id;
+  activeCat = null;
+  updateChips();
+
+  // Highlight + zoom
+  highlightNode(id);
+  zoomToNode(d);
+
+  // Show info panel
+  const c = CAT[d.cat];
+  const iconImg = d.icon ? `<img src="${ICON_BASE}${d.icon}.svg" onerror="this.style.display='none'">` : '';
+  demoInfoEl.querySelector('.di-head').innerHTML = `${iconImg}<span style="color:${c.color}">${d.label}</span>`;
+  demoInfoEl.querySelector('.desc').textContent = d.desc;
+  demoInfoEl.classList.add('visible');
+
+  demoIndex++;
+  demoTimer = setTimeout(demoStep, 5000);
+}
+
+// ── Right-click → open AWS docs ──
+nodeG.on('contextmenu', (e, d) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (d.doc) window.open(d.doc, '_blank');
+});
+
+// ── Double-click zoom ──
+nodeG.on('dblclick', (e, d) => {
+  e.stopPropagation();
+  zoomToNode(d);
+});
+
+// ── Initial view with entrance animation ──
+svg.call(zoomBehavior.transform, d3.zoomIdentity.translate(W / 2, H / 2).scale(0.65).translate(-W / 2, -H / 2));
+
+// Wait for simulation to settle, then fade in
+setTimeout(() => {
+  applyView(1200);
+  svg.transition().duration(1400).ease(ease)
+    .call(zoomBehavior.transform,
+      d3.zoomIdentity.translate(W / 2, H / 2).scale(0.85).translate(-W / 2, -H / 2));
+}, 800);
+
+// Resize
+window.addEventListener('resize', () => {
+  sim.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+  sim.alpha(0.1).restart();
+});
+</script>
+</body>
+</html>

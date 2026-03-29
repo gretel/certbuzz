@@ -104,13 +104,17 @@ app.use('/api/session', sessionRoutes);
 
 // Import queries for public sessions endpoint
 import { queries } from './db/queries.js';
+import { getAvailableBanks } from './questions/questionBank.js';
 
 // Public sessions endpoint (no auth required - for players to browse available sessions)
 app.get('/api/sessions', (req, res) => {
   try {
     const sessions = queries.getAllSessions();
-    // Filter to only active sessions
-    const activeSessions = sessions.filter((s: { status: string }) => s.status === 'active');
+    const banks = getAvailableBanks();
+    const bankLabels = Object.fromEntries(banks.map(b => [b.bankId, b.label]));
+    const activeSessions = sessions
+      .filter((s: { status: string }) => s.status === 'active')
+      .map((s: any) => ({ ...s, questionBankLabel: bankLabels[s.questionBank] || s.questionBank }));
     res.json({ sessions: activeSessions });
   } catch (error) {
     console.error('Error fetching public sessions:', error);
@@ -137,7 +141,7 @@ app.get('/alive', (req, res) => {
 app.get('/api', (req, res) => {
   res.json({
     status: 'ok',
-    name: 'Azurelympics-104 API',
+    name: 'CertBuzz API',
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
@@ -161,7 +165,7 @@ if (!isDevelopment) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Azurelympics-104 Server</title>
+        <title>CertBuzz Server</title>
         <style>
           body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -170,7 +174,7 @@ if (!isDevelopment) {
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #0078D4 0%, #004578 100%);
+            background: linear-gradient(135deg, #4F46E5 0%, #312E81 100%);
             color: white;
           }
           .container {
@@ -179,14 +183,14 @@ if (!isDevelopment) {
           }
           h1 { font-size: 3rem; margin: 0 0 1rem 0; }
           p { font-size: 1.25rem; margin: 0.5rem 0; opacity: 0.9; }
-          .status { color: #50E6FF; font-weight: bold; }
-          a { color: #50E6FF; text-decoration: none; }
+          .status { color: #818CF8; font-weight: bold; }
+          a { color: #818CF8; text-decoration: none; }
           a:hover { text-decoration: underline; }
         </style>
       </head>
       <body>
         <div class="container">
-          <h1>🏎️ Azurelympics-104</h1>
+          <h1>🎓 CertBuzz</h1>
           <p class="status">Server läuft im Dev-Modus!</p>
           <p>Öffne den Client auf <a href="http://localhost:5173">http://localhost:5173</a></p>
           <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 2rem;">
@@ -226,5 +230,5 @@ httpServer.listen(PORT, HOST, () => {
     console.log(`[${new Date().toISOString()}]    Network: http://<your-ip>:${PORT}`);
   }
   console.log(`[${new Date().toISOString()}] Allowed origins: ${allowedOrigins.join(', ')}`);
-  console.log(`[${new Date().toISOString()}] 🏎️  Azurelympics-104 is ready!`);
+  console.log(`[${new Date().toISOString()}] 🎓 CertBuzz is ready!`);
 });

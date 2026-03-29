@@ -40,7 +40,7 @@ export function Leaderboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center">
         <div className="text-2xl font-semibold text-white/70">
           Laden...
         </div>
@@ -50,7 +50,7 @@ export function Leaderboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center">
         <div className="text-2xl font-semibold text-red-400">
           {error}
         </div>
@@ -59,14 +59,14 @@ export function Leaderboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-black text-white mb-2">
-            AZURELYMPICS
+            CERTBUZZ
           </h1>
-          <p className="text-xl text-azure-light">
+          <p className="text-xl text-cb-accent">
             Gesamt-Rangliste
           </p>
         </div>
@@ -87,7 +87,7 @@ export function Leaderboard() {
                   if (pos === 1) return { gradient: 'from-yellow-400 to-yellow-500', badge: 'bg-yellow-400 text-yellow-900' };
                   if (pos === 2) return { gradient: 'from-gray-300 to-gray-400', badge: 'bg-gray-300 text-gray-700' };
                   if (pos === 3) return { gradient: 'from-orange-400 to-orange-500', badge: 'bg-orange-300 text-orange-900' };
-                  return { gradient: 'from-azure-blue to-azure-light', badge: 'bg-white/10 text-white/60' };
+                  return { gradient: 'from-cb-primary to-cb-accent', badge: 'bg-white/10 text-white/60' };
                 };
 
                 const style = getPositionStyle(position);
@@ -105,7 +105,7 @@ export function Leaderboard() {
                           {entry.nickname}
                         </span>
                       </div>
-                      <span className="text-lg font-bold text-azure-light">
+                      <span className="text-lg font-bold text-cb-accent">
                         {Math.round(entry.totalScore)} pts
                       </span>
                     </div>

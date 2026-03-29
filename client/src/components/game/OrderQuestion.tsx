@@ -47,7 +47,7 @@ function SortableItem({ id, text, disabled }: { id: string; text: string; disabl
       {...attributes}
       {...listeners}
       className={`flex items-center gap-3 p-4 bg-white/10 border-2 border-white/30 rounded-lg ${
-        disabled ? 'cursor-not-allowed opacity-60' : 'cursor-move hover:border-azure-light hover:bg-white/15'
+        disabled ? 'cursor-not-allowed opacity-60' : 'cursor-move hover:border-cb-accent hover:bg-white/15'
       }`}
     >
       <span className="text-white/50 text-xl">☰</span>

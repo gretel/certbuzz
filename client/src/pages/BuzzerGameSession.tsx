@@ -104,8 +104,11 @@ export function BuzzerGameSession({
   const [lastResult, setLastResult] = useState<{
     correct: boolean;
     answerer?: Answerer;
+    questionText?: string;
+    options?: Array<{ id: string; text: string }>;
     correctAnswers?: string[];
     explanation?: string;
+    references?: string[];
     pointsAwarded?: number;
     basePoints?: number;
     speedBonus?: number;
@@ -141,11 +144,18 @@ export function BuzzerGameSession({
   useEffect(() => {
     if (!socket) return;
 
-    // Join buzzer session (only once)
+    // Join buzzer session (only once per mount)
     if (!hasJoinedRef.current) {
       socket.emit('buzzer-join-session', { sessionCode, playerId });
       hasJoinedRef.current = true;
     }
+
+    // Re-sync state on reconnect
+    const handleReconnect = () => {
+      socket.emit('buzzer-join-session', { sessionCode, playerId });
+      socket.emit('buzzer-get-state', sessionCode);
+    };
+    socket.on('connect', handleReconnect);
 
     // Initial state
     socket.on('buzzer-state', (state: any) => {
@@ -304,6 +314,7 @@ export function BuzzerGameSession({
       socket.off('buzzer-game-over');
       socket.off('buzzer-players-update');
       socket.off('session-deleted');
+      socket.off('connect', handleReconnect);
     };
   }, [socket, sessionCode, playerId]);
 
@@ -341,7 +352,7 @@ export function BuzzerGameSession({
   // Session deleted screen
   if (sessionDeleted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-white mb-2">
@@ -352,7 +363,7 @@ export function BuzzerGameSession({
           </p>
           <button
             onClick={() => navigate('/')}
-            className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-3 px-6 rounded-xl transition-all"
+            className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-3 px-6 rounded-xl transition-all"
           >
             Zur Startseite
           </button>
@@ -364,14 +375,14 @@ export function BuzzerGameSession({
   // Lobby screen
   if (gamePhase === 'lobby') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-black text-white mb-2">
-              AZURELYMPICS
+              CERTBUZZ
             </h1>
-            <p className="text-azure-light">
+            <p className="text-cb-accent">
               Buzzer-Modus
             </p>
           </div>
@@ -380,15 +391,15 @@ export function BuzzerGameSession({
           <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 mb-6">
             <div className="text-8xl mb-4">{emoji}</div>
             <h2 className="text-3xl font-bold text-white mb-2">{nickname}</h2>
-            <p className="text-azure-light">Du bist dabei!</p>
+            <p className="text-cb-accent">Du bist dabei!</p>
           </div>
 
           {/* Waiting indicator */}
           <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
             <div className="flex items-center justify-center gap-3 mb-3">
-              <div className="w-3 h-3 bg-azure-light rounded-full animate-pulse" />
-              <div className="w-3 h-3 bg-azure-light rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-              <div className="w-3 h-3 bg-azure-light rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+              <div className="w-3 h-3 bg-cb-accent rounded-full animate-pulse" />
+              <div className="w-3 h-3 bg-cb-accent rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+              <div className="w-3 h-3 bg-cb-accent rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
             </div>
             <p className="text-white text-lg">Warte auf Spielstart</p>
             <p className="text-white/50 text-sm mt-1">Der Dozent startet gleich...</p>
@@ -407,7 +418,6 @@ export function BuzzerGameSession({
         timeRemaining={transitionTimeRemaining}
         leaderboard={leaderboard}
         lastResult={lastResult}
-        questionOptions={currentQuestion?.options || []}
       />
     );
   }
@@ -418,20 +428,20 @@ export function BuzzerGameSession({
     const myScore = leaderboard.find(p => p.nickname === nickname)?.score || 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 p-8 max-w-2xl w-full">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">
               Spiel beendet! 🎉
             </h1>
-            <p className="text-xl text-azure-light">
+            <p className="text-xl text-cb-accent">
               {nickname} {emoji}
             </p>
           </div>
 
-          <div className="bg-azure-blue/20 rounded-2xl p-6 mb-6 text-center border border-azure-light/30">
+          <div className="bg-cb-primary/20 rounded-2xl p-6 mb-6 text-center border border-cb-accent/30">
             <p className="text-sm text-white/60 mb-2">Dein Ergebnis</p>
-            <div className="text-4xl font-bold text-azure-light mb-2">Platz {myRank}</div>
+            <div className="text-4xl font-bold text-cb-accent mb-2">Platz {myRank}</div>
             <div className="text-2xl font-bold text-white">{myScore} Punkte</div>
           </div>
 
@@ -445,7 +455,7 @@ export function BuzzerGameSession({
                 <li 
                   key={player.nickname}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg ${
-                    player.nickname === nickname ? 'bg-azure-blue/30 border border-azure-light/50' : 'bg-white/5'
+                    player.nickname === nickname ? 'bg-cb-primary/30 border border-cb-accent/50' : 'bg-white/5'
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -461,7 +471,7 @@ export function BuzzerGameSession({
                     <span className="font-medium text-white">{player.nickname}</span>
                   </div>
                   <div className="text-right">
-                    <span className="font-bold text-azure-light">{player.score}</span>
+                    <span className="font-bold text-cb-accent">{player.score}</span>
                     <span className="text-sm text-white/50 ml-2">({player.correct_answers} richtig)</span>
                   </div>
                 </li>
@@ -471,7 +481,7 @@ export function BuzzerGameSession({
 
           <a
             href="/"
-            className="w-full block bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-3 px-6 rounded-xl transition-all text-center"
+            className="w-full block bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-3 px-6 rounded-xl transition-all text-center"
           >
             Zur Startseite
           </a>
@@ -482,7 +492,7 @@ export function BuzzerGameSession({
 
   // Question/Answering/Result phases
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white/10 backdrop-blur-lg rounded-t-2xl border border-white/20 border-b-0 p-6">
@@ -498,7 +508,7 @@ export function BuzzerGameSession({
 
           <div className="w-full bg-white/20 rounded-full h-2">
             <div
-              className="bg-azure-light h-2 rounded-full transition-all duration-300"
+              className="bg-cb-accent h-2 rounded-full transition-all duration-300"
               style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
             />
           </div>
@@ -550,7 +560,7 @@ export function BuzzerGameSession({
             )}
 
             <div className="mb-2 flex items-center gap-2 flex-wrap">
-              <span className="inline-block px-3 py-1 bg-azure-blue/30 text-azure-light text-xs font-semibold rounded-full">
+              <span className="inline-block px-3 py-1 bg-cb-primary/30 text-cb-accent text-xs font-semibold rounded-full">
                 {currentQuestion.category}
               </span>
               <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
@@ -605,7 +615,7 @@ export function BuzzerGameSession({
                   <button
                     onClick={handleSubmitAnswer}
                     disabled={selectedAnswers.length === 0}
-                    className="w-full mt-6 bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-4 px-8 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full mt-6 bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-4 px-8 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Antwort absenden
                   </button>

@@ -7,9 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        'azure-blue': '#0078D4',
-        'azure-dark': '#004578',
-        'azure-light': '#50E6FF',
+        'cb-primary': '#4F46E5',
+        'cb-dark': '#312E81',
+        'cb-accent': '#818CF8',
       },
     },
   },

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getSocket } from '../hooks/useSocket';
 
 interface Session {
   sessionCode: string;
@@ -9,6 +10,8 @@ interface Session {
   playerCount: number;
   gameMode: 'racing' | 'buzzer';
   gameState: string;
+  questionBank: string;
+  questionBankLabel: string;
 }
 
 export function Home() {
@@ -16,27 +19,36 @@ export function Home() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const response = await fetch('/api/sessions');
-        if (response.ok) {
-          const data = await response.json();
-          setSessions(data.sessions || []);
-        }
-      } catch (err) {
-        console.error('Error fetching sessions:', err);
-      } finally {
-        setLoading(false);
+  const fetchSessions = useCallback(async () => {
+    try {
+      const response = await fetch('/api/sessions');
+      if (response.ok) {
+        const data = await response.json();
+        setSessions(data.sessions || []);
       }
-    };
-
-    fetchSessions();
-    
-    // Refresh every 5 seconds
-    const interval = setInterval(fetchSessions, 5000);
-    return () => clearInterval(interval);
+    } catch (err) {
+      console.error('Error fetching sessions:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchSessions();
+
+    // Poll as fallback
+    const interval = setInterval(fetchSessions, 10000);
+
+    // Instant refresh when a session is created or deleted
+    const socket = getSocket();
+    const refresh = () => fetchSessions();
+    socket?.on('sessions-changed', refresh);
+
+    return () => {
+      clearInterval(interval);
+      socket?.off('sessions-changed', refresh);
+    };
+  }, [fetchSessions]);
 
   const formatTimeAgo = (timestamp: number) => {
     const diff = Date.now() - timestamp;
@@ -62,15 +74,15 @@ export function Home() {
   const activeSessions = sessions.filter(s => s.status === 'active' && s.gameState !== 'finished');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-black text-white mb-2">
-            AZURELYMPICS
+            CERTBUZZ
           </h1>
-          <p className="text-xl text-azure-light">
-            Microsoft AZ-104 Quiz Challenge
+          <p className="text-xl text-cb-accent">
+            Certification Quiz Challenge
           </p>
         </div>
 
@@ -82,7 +94,7 @@ export function Home() {
 
           {loading ? (
             <div className="py-8 text-center text-white/60">
-              <div className="animate-spin h-8 w-8 border-4 border-azure-light border-t-transparent rounded-full mx-auto mb-3"></div>
+              <div className="animate-spin h-8 w-8 border-4 border-cb-accent border-t-transparent rounded-full mx-auto mb-3"></div>
               Lade Sessions...
             </div>
           ) : activeSessions.length === 0 ? (
@@ -97,7 +109,7 @@ export function Home() {
                 <button
                   key={session.sessionCode}
                   onClick={() => navigate(`/session/${session.sessionCode}`)}
-                  className="w-full p-4 bg-white/10 hover:bg-white/20 border border-white/10 hover:border-azure-light/50 rounded-2xl transition-all text-left group"
+                  className="w-full p-4 bg-white/10 hover:bg-white/20 border border-white/10 hover:border-cb-accent/50 rounded-2xl transition-all text-left group"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
@@ -105,7 +117,7 @@ export function Home() {
                         {session.gameMode === 'buzzer' ? '🔔' : '🏎️'}
                       </span>
                       <div>
-                        <code className="text-2xl font-mono font-black text-white group-hover:text-azure-light transition-colors">
+                        <code className="text-2xl font-mono font-black text-white group-hover:text-cb-accent transition-colors">
                           {session.sessionCode}
                         </code>
                         <div className="flex items-center gap-2 mt-1">
@@ -123,14 +135,14 @@ export function Home() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xl font-bold text-azure-light">
+                      <div className="text-xl font-bold text-cb-accent">
                         {session.playerCount}
                       </div>
                       <div className="text-xs text-white/50">Spieler</div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-white/40">
-                    <span>{session.totalQuestions} Fragen</span>
+                  <div className="flex items-center justify-between text-xs text-white/40 mt-1">
+                    <span>{session.questionBankLabel} · {session.totalQuestions} Fragen</span>
                     <span>{formatTimeAgo(session.createdAt)}</span>
                   </div>
                 </button>

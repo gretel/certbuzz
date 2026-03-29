@@ -60,7 +60,7 @@ interface TransitionData {
 const ZONE_LABELS: Record<1 | 2 | 3, string> = {
   1: 'Unsicher',
   2: 'Sicher',
-  3: 'Sehr sicher',
+  3: 'Garantiert',
 };
 
 export function TrainingGameSession({
@@ -435,19 +435,7 @@ export function TrainingGameSession({
     ? result.votes.find(v => v.playerId === playerId)
     : null;
 
-  const difficultyLabel =
-    currentQuestion.difficulty === 'easy'
-      ? '500 Punkte'
-      : currentQuestion.difficulty === 'medium'
-      ? '1000 Punkte'
-      : '1500 Punkte';
 
-  const difficultyColor =
-    currentQuestion.difficulty === 'easy'
-      ? 'bg-green-500/20 text-green-300'
-      : currentQuestion.difficulty === 'medium'
-      ? 'bg-yellow-500/20 text-yellow-300'
-      : 'bg-red-500/20 text-red-300';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 p-4 md:p-8">
@@ -485,31 +473,16 @@ export function TrainingGameSession({
 
         {/* Question card */}
         <div className="bg-white/10 backdrop-blur-lg border-x border-white/20 p-6">
-          <div className="flex items-center gap-2 flex-wrap mb-3">
-            <span className="inline-block px-3 py-1 bg-cb-primary/30 text-cb-accent text-xs font-semibold rounded-full">
-              {currentQuestion.category}
-            </span>
-            <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${difficultyColor}`}>
-              {difficultyLabel}
-            </span>
-          </div>
-
           <h2 className="text-xl font-bold text-white mb-4">{currentQuestion.question}</h2>
 
-          {/* Hint / vote status */}
-          {ownVote ? (
+          {/* Vote status */}
+          {ownVote && (
             <div className="bg-white/10 rounded-xl p-3 text-sm text-white/80">
               <span className="font-semibold">Deine Antwort:</span>{' '}
               {currentQuestion.options.find(o => o.id === ownVote.answerId)?.text ?? ownVote.answerId}
               {' — '}
               <span className="text-cb-accent font-medium">{ZONE_LABELS[ownVote.confidenceZone]}</span>
             </div>
-          ) : (
-            <p className="text-white/50 text-sm">
-              {isQuestionPhase
-                ? 'Klicke auf die richtige Antwort — näher an den Rand = sicherer'
-                : currentQuestion.hint ?? null}
-            </p>
           )}
         </div>
 

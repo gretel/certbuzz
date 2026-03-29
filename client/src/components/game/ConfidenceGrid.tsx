@@ -30,7 +30,7 @@ const QUADRANT_GRADIENTS = [
 const ZONE_LABELS: Record<1 | 2 | 3, string> = {
   1: 'Unsicher',
   2: 'Sicher',
-  3: 'Sehr sicher',
+  3: 'Garantiert',
 };
 
 // Thresholds for zone detection (normalized distance from center)
@@ -59,15 +59,16 @@ export function ConfidenceGrid({
 }: ConfidenceGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoverZone, setHoverZone] = useState<{ quadrant: number; zone: 1 | 2 | 3 } | null>(null);
+  // Cursor position for floating emoji
+  const [cursorPos, setCursorPos] = useState<{ nx: number; ny: number } | null>(null);
 
-  // Compute normalized coords and zone from a mouse event
   const getEventCoords = useCallback((e: React.MouseEvent) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return null;
     const nx = (e.clientX - rect.left) / rect.width;
     const ny = (e.clientY - rect.top) / rect.height;
-    const dist = Math.hypot((nx - 0.5) * 2, (ny - 0.5) * 2); // 0 at center, ~1.4 at corner
-    const normDist = Math.min(dist / 1.4, 1.0); // normalize to 0–1
+    const dist = Math.hypot((nx - 0.5) * 2, (ny - 0.5) * 2);
+    const normDist = Math.min(dist / 1.4, 1.0);
     const zone = getZone(normDist);
     const quadrant = getQuadrant(nx, ny);
     return { nx, ny, zone, quadrant };
@@ -78,11 +79,13 @@ export function ConfidenceGrid({
     const coords = getEventCoords(e);
     if (coords) {
       setHoverZone({ quadrant: coords.quadrant, zone: coords.zone });
+      setCursorPos({ nx: coords.nx, ny: coords.ny });
     }
   }, [disabled, getEventCoords]);
 
   const handleMouseLeave = useCallback(() => {
     setHoverZone(null);
+    setCursorPos(null);
   }, []);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
@@ -94,17 +97,21 @@ export function ConfidenceGrid({
     onVote(option.id, coords.zone, coords.nx, coords.ny);
   }, [disabled, getEventCoords, options, onVote]);
 
-  // All votes to render as badges (own + others)
-  const allBadges = [
-    ...(ownVote ? [{ ...ownVote, emoji: ownEmoji, isOwn: true }] : []),
-    ...otherVotes.filter(v => v.playerId !== ownPlayerId).map(v => ({ ...v, isOwn: false })),
-  ];
+  // Other players' badges (never includes own)
+  const otherBadges = otherVotes.filter(v => v.playerId !== ownPlayerId);
+
+  // Own emoji position: follow cursor while hovering, fall back to voted position
+  const ownBadgePos = !disabled && cursorPos
+    ? cursorPos
+    : ownVote
+      ? { nx: ownVote.clickX, ny: ownVote.clickY }
+      : null;
 
   return (
     <div
       ref={containerRef}
       className="relative w-full select-none"
-      style={{ aspectRatio: '4/3', cursor: disabled ? 'default' : 'crosshair' }}
+      style={{ aspectRatio: '4/3', cursor: disabled ? 'default' : 'none' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
@@ -120,7 +127,7 @@ export function ConfidenceGrid({
               className="relative flex flex-col items-center justify-center p-4 transition-all duration-150"
               style={{
                 background: QUADRANT_GRADIENTS[i],
-                opacity: disabled && !ownIsHere && hoverZone === null ? 0.7 : 1,
+                opacity: disabled && !ownIsHere ? 0.7 : 1,
               }}
             >
               {/* Option text */}
@@ -153,28 +160,27 @@ export function ConfidenceGrid({
 
       {/* Center dividers */}
       <div className="absolute inset-0 pointer-events-none z-10">
-        {/* Vertical line */}
         <div className="absolute top-0 bottom-0 left-1/2 w-1 bg-gray-900/60 -translate-x-1/2" />
-        {/* Horizontal line */}
         <div className="absolute left-0 right-0 top-1/2 h-1 bg-gray-900/60 -translate-y-1/2" />
-        {/* Center dot */}
         <div className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-gray-900/80 border-2 border-white/30 -translate-x-1/2 -translate-y-1/2" />
       </div>
 
-      {/* Zone boundary rings (visual hint) */}
-      {!disabled && (
-        <div className="absolute inset-0 pointer-events-none z-5">
-          {/* Inner ring at 35% */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15"
-            style={{ width: '35%', height: '35%' }} />
-          {/* Middle ring at 65% */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10"
-            style={{ width: '65%', height: '65%' }} />
-        </div>
-      )}
+      {/* Zone boundary rings — always visible, high contrast */}
+      <div className="absolute inset-0 pointer-events-none z-5">
+        {/* Inner ring ~35% */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/40"
+          style={{ width: '35%', height: '35%' }}
+        />
+        {/* Middle ring ~65% */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/25"
+          style={{ width: '65%', height: '65%' }}
+        />
+      </div>
 
-      {/* Player emoji badges */}
-      {allBadges.map((badge) => (
+      {/* Other players' emoji badges */}
+      {otherBadges.map((badge) => (
         <div
           key={badge.playerId}
           className="absolute pointer-events-none z-30 flex flex-col items-center"
@@ -184,20 +190,30 @@ export function ConfidenceGrid({
             transform: 'translate(-50%, -50%)',
           }}
         >
-          <div
-            className={`rounded-full flex items-center justify-center shadow-lg border-2 transition-all ${
-              badge.isOwn
-                ? 'w-10 h-10 text-xl border-white bg-black/40'
-                : 'w-7 h-7 text-sm border-white/50 bg-black/30'
-            }`}
-          >
+          <div className="w-7 h-7 text-sm rounded-full flex items-center justify-center shadow-lg border-2 border-white/50 bg-black/30">
             {badge.emoji}
           </div>
-          {badge.isOwn && (
+        </div>
+      ))}
+
+      {/* Own emoji — follows cursor, falls back to voted position */}
+      {ownBadgePos && (
+        <div
+          className="absolute pointer-events-none z-30 flex flex-col items-center"
+          style={{
+            left: `${ownBadgePos.nx * 100}%`,
+            top: `${ownBadgePos.ny * 100}%`,
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <div className="w-10 h-10 text-xl rounded-full flex items-center justify-center shadow-lg border-2 border-white bg-black/40">
+            {ownEmoji}
+          </div>
+          {ownVote && !cursorPos && (
             <span className="text-xs text-white bg-black/60 rounded px-1 mt-0.5 font-bold">Du</span>
           )}
         </div>
-      ))}
+      )}
     </div>
   );
 }

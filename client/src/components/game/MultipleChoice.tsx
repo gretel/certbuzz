@@ -37,7 +37,7 @@ export function MultipleChoice({ options, selected, onChange, disabled, eliminat
               isEliminated
                 ? 'border-red-400/50 bg-red-500/10 opacity-50 cursor-not-allowed'
                 : selected.includes(option.id)
-                  ? 'border-azure-light bg-azure-blue/20'
+                  ? 'border-cb-accent bg-cb-primary/20'
                   : 'border-white/30 bg-white/10 hover:border-white/50 hover:bg-white/15'
             } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
@@ -47,7 +47,7 @@ export function MultipleChoice({ options, selected, onChange, disabled, eliminat
               checked={selected.includes(option.id)}
               onChange={() => handleToggle(option.id)}
               disabled={disabled || isEliminated}
-              className="w-5 h-5 text-azure-blue focus:ring-azure-blue rounded accent-azure-light"
+              className="w-5 h-5 text-cb-primary focus:ring-cb-primary rounded accent-cb-accent"
             />
             <span className={`ml-3 ${isEliminated ? 'line-through text-red-400' : 'text-white'}`}>
               {option.text}

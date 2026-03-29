@@ -15,15 +15,10 @@ export function PasswordPrompt({ onAuthenticated }: PasswordPromptProps) {
     setError(null);
 
     try {
-      const response = await fetch('/api/dozent/create-session', {
+      const response = await fetch('/api/dozent/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          password, 
-          totalQuestions: 10,
-          categories: ['identity-governance', 'storage', 'compute', 'networking', 'monitoring'],
-          gameMode: 'racing'
-        }),
+        body: JSON.stringify({ password }),
       });
 
       if (response.status === 401) {
@@ -47,14 +42,14 @@ export function PasswordPrompt({ onAuthenticated }: PasswordPromptProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-black text-white mb-2">
-            AZURELYMPICS
+            CERTBUZZ
           </h1>
-          <p className="text-azure-light">
+          <p className="text-cb-accent">
             Dozenten-Bereich
           </p>
         </div>
@@ -72,7 +67,7 @@ export function PasswordPrompt({ onAuthenticated }: PasswordPromptProps) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-5 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/40 focus:border-azure-light focus:outline-none text-lg text-center tracking-widest"
+                className="w-full px-5 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/40 focus:border-cb-accent focus:outline-none text-lg text-center tracking-widest"
                 placeholder="••••••••"
                 required
                 autoFocus
@@ -88,7 +83,7 @@ export function PasswordPrompt({ onAuthenticated }: PasswordPromptProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg"
             >
               {loading ? 'Laden...' : 'Anmelden'}
             </button>

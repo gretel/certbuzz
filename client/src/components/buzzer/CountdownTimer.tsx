@@ -8,12 +8,12 @@ interface CountdownTimerProps {
   warningThreshold?: number; // seconds - when to show warning color
 }
 
-export function CountdownTimer({ 
-  durationMs, 
-  startTime, 
-  onTimeout, 
+export function CountdownTimer({
+  durationMs,
+  startTime,
+  onTimeout,
   label,
-  warningThreshold = 5 
+  warningThreshold = 5
 }: CountdownTimerProps) {
   const [remaining, setRemaining] = useState(durationMs);
 
@@ -38,17 +38,17 @@ export function CountdownTimer({
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-sm font-medium text-gray-600">{label}</span>
+        <span className="text-sm font-medium text-white/60">{label}</span>
         <span className={`text-lg font-mono font-bold ${
-          isWarning ? 'text-red-600 animate-pulse' : 'text-gray-800'
+          isWarning ? 'text-red-400 animate-pulse' : 'text-white'
         }`}>
           {seconds.toFixed(1)}s
         </span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+      <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-100 ${
-            isWarning ? 'bg-red-500' : 'bg-azure-blue'
+            isWarning ? 'bg-red-500' : 'bg-cb-primary'
           }`}
           style={{ width: `${percentage}%` }}
         />

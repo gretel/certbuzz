@@ -24,7 +24,7 @@ export function SingleChoice({ options, selected, onChange, disabled, eliminated
               isEliminated
                 ? 'border-red-400/50 bg-red-500/10 opacity-50 cursor-not-allowed'
                 : selected === option.id
-                  ? 'border-azure-light bg-azure-blue/20'
+                  ? 'border-cb-accent bg-cb-primary/20'
                   : 'border-white/30 bg-white/10 hover:border-white/50 hover:bg-white/15'
             } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
@@ -35,7 +35,7 @@ export function SingleChoice({ options, selected, onChange, disabled, eliminated
               checked={selected === option.id}
               onChange={() => !disabled && !isEliminated && onChange(option.id)}
               disabled={disabled || isEliminated}
-              className="w-5 h-5 text-azure-blue focus:ring-azure-blue accent-azure-light"
+              className="w-5 h-5 text-cb-primary focus:ring-cb-primary accent-cb-accent"
             />
             <span className={`ml-3 ${isEliminated ? 'line-through text-red-400' : 'text-white'}`}>
               {option.text}

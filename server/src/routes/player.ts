@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { queries } from '../db/queries.js';
 import { getRandomEmoji } from '../utils/helpers.js';
+import { io } from '../server.js';
 
 const router = Router();
 
@@ -33,6 +34,17 @@ router.post('/join', (req, res) => {
       nickname: nickname.trim(),
       emoji,
       lastActivity: Date.now(),
+    });
+
+    // Notify dozent panel / arena of updated player list
+    const players = queries.getSessionPlayers(sessionCode);
+    io.to(sessionCode).emit('buzzer-players-update', {
+      players: players.map(p => ({
+        playerId: p.playerId,
+        nickname: p.nickname,
+        emoji: p.emoji,
+        score: p.score,
+      })),
     });
 
     res.json({ playerId, emoji });

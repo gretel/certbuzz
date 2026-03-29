@@ -1,24 +1,7 @@
 import { Server } from 'socket.io';
 import { queries, GameState } from '../db/queries.js';
 import { checkAnswer, shuffleArray } from '../utils/helpers.js';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-interface Question {
-  id: string;
-  category: string;
-  type: 'single' | 'multiple' | 'order';
-  difficulty: 'easy' | 'medium' | 'hard';
-  question: string;
-  options: Array<{ id: string; text: string }>;
-  correctAnswers: string[];
-  explanation: string;
-  references?: string[];
-}
+import { getQuestion, type Question } from '../questions/questionBank.js';
 
 interface BuzzEntry {
   playerId: string;
@@ -35,6 +18,7 @@ interface BuzzerGameState {
   questionStartTime: number;
   answerStartTime: number | null;
   eliminatedAnswers: string[]; // answers that were wrong (crossed out for next buzzer)
+  answerProcessing: boolean; // guard against answer/timeout race
   timers: {
     buzzTimeout?: NodeJS.Timeout;
     enrollmentTimeout?: NodeJS.Timeout;
@@ -46,19 +30,10 @@ interface BuzzerGameState {
 // In-memory game state for active buzzer sessions
 const buzzerGames = new Map<string, BuzzerGameState>();
 
-let questionsCache: Question[] | null = null;
-
-function loadQuestions(): Question[] {
-  if (questionsCache) return questionsCache;
-  const questionsPath = path.join(__dirname, '../../../questions.json');
-  const data = readFileSync(questionsPath, 'utf-8');
-  questionsCache = JSON.parse(data);
-  return questionsCache!;
-}
-
-function getQuestionById(id: string): Question | undefined {
-  const questions = loadQuestions();
-  return questions.find(q => q.id === id);
+function getQuestionForSession(sessionCode: string, questionId: string): Question | undefined {
+  const session = queries.getSession(sessionCode);
+  if (!session) return undefined;
+  return getQuestion(session.questionBank, questionId);
 }
 
 // Scoring based on difficulty
@@ -95,6 +70,7 @@ export function initBuzzerGame(sessionCode: string): BuzzerGameState {
     questionStartTime: 0,
     answerStartTime: null,
     eliminatedAnswers: [],
+    answerProcessing: false,
     timers: {},
   };
   buzzerGames.set(sessionCode, gameState);
@@ -105,7 +81,7 @@ export function getBuzzerGame(sessionCode: string): BuzzerGameState | undefined 
   return buzzerGames.get(sessionCode);
 }
 
-function cleanupBuzzerGame(sessionCode: string) {
+export function cleanupBuzzerGame(sessionCode: string) {
   const gameState = buzzerGames.get(sessionCode);
   if (gameState) {
     clearGameTimers(gameState);
@@ -143,9 +119,10 @@ function showQuestion(io: Server, sessionCode: string, questionIndex: number) {
   gameState.questionStartTime = Date.now();
   gameState.answerStartTime = null;
   gameState.eliminatedAnswers = [];
+  gameState.answerProcessing = false;
 
   const questionId = session.questionIds[questionIndex];
-  const question = getQuestionById(questionId);
+  const question = getQuestionForSession(sessionCode, questionId);
   if (!question) return;
 
   // Update DB state
@@ -176,8 +153,8 @@ function showQuestion(io: Server, sessionCode: string, questionIndex: number) {
   }, 20000);
 }
 
-// Enrollment period duration (6 seconds)
-const ENROLLMENT_DURATION_MS = 6000;
+// Enrollment period duration (7 seconds)
+const ENROLLMENT_DURATION_MS = 7000;
 
 // Handle when a player buzzes
 export function handleBuzz(io: Server, sessionCode: string, playerId: string, clientTimestamp: number) {
@@ -325,12 +302,22 @@ export function handleBuzzerAnswer(
   const gameState = buzzerGames.get(sessionCode);
   if (!gameState) return;
 
+  // Guard against answer/timeout race — only process once per answerer slot
+  if (gameState.answerProcessing) return;
+  gameState.answerProcessing = true;
+
   const session = queries.getSession(sessionCode);
-  if (!session || session.gameState !== 'answering') return;
+  if (!session || session.gameState !== 'answering') {
+    gameState.answerProcessing = false;
+    return;
+  }
 
   // Verify this is the current answerer
   const currentAnswerer = gameState.buzzes[gameState.currentAnswererIndex];
-  if (!currentAnswerer || currentAnswerer.playerId !== playerId) return;
+  if (!currentAnswerer || currentAnswerer.playerId !== playerId) {
+    gameState.answerProcessing = false;
+    return;
+  }
 
   // Clear answer timeout
   if (gameState.timers.answerTimeout) {
@@ -338,7 +325,7 @@ export function handleBuzzerAnswer(
   }
 
   const questionId = session.questionIds[session.currentQuestionIndex];
-  const question = getQuestionById(questionId);
+  const question = getQuestionForSession(sessionCode, questionId);
   if (!question) return;
 
   const isCorrect = checkAnswer(selectedAnswers, question.correctAnswers, question.type);
@@ -373,6 +360,8 @@ export function handleBuzzerAnswer(
         nickname: currentAnswerer.nickname,
         emoji: currentAnswerer.emoji,
       },
+      questionText: question.question,
+      options: question.options,
       correctAnswers: question.correctAnswers,
       explanation: question.explanation,
       references: question.references,
@@ -416,6 +405,8 @@ export function handleBuzzerAnswer(
           emoji: currentAnswerer.emoji,
         },
         wrongAnswer: selectedAnswers,
+        questionText: question.question,
+        options: question.options,
         correctAnswers: question.correctAnswers,
         explanation: question.explanation,
         references: question.references,
@@ -437,13 +428,14 @@ function passToNextBuzzer(io: Server, sessionCode: string, wrongAnswer: string[]
   if (!session) return;
 
   const questionId = session.questionIds[session.currentQuestionIndex];
-  const question = getQuestionById(questionId);
+  const question = getQuestionForSession(sessionCode, questionId);
   if (!question) return;
 
   const previousAnswerer = gameState.buzzes[gameState.currentAnswererIndex];
   gameState.currentAnswererIndex++;
   const nextAnswerer = gameState.buzzes[gameState.currentAnswererIndex];
   gameState.answerStartTime = Date.now();
+  gameState.answerProcessing = false; // Reset for next answerer
 
   // Broadcast wrong answer and next answerer
   io.to(sessionCode).emit('buzzer-wrong-next', {
@@ -490,7 +482,7 @@ function handleNoBuzzes(io: Server, sessionCode: string) {
   if (!session) return;
 
   const questionId = session.questionIds[session.currentQuestionIndex];
-  const question = getQuestionById(questionId);
+  const question = getQuestionForSession(sessionCode, questionId);
   if (!question) return;
 
   // Update state to result
@@ -500,6 +492,8 @@ function handleNoBuzzes(io: Server, sessionCode: string) {
   io.to(sessionCode).emit('buzzer-result', {
     correct: false,
     noBuzzes: true,
+    questionText: question.question,
+    options: question.options,
     correctAnswers: question.correctAnswers,
     explanation: question.explanation,
     references: question.references,

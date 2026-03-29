@@ -293,7 +293,7 @@ export function BuzzerArena() {
   // Session deleted screen
   if (sessionDeleted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-white mb-2">
@@ -304,7 +304,7 @@ export function BuzzerArena() {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-3 px-6 rounded-xl transition-all"
+            className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-3 px-6 rounded-xl transition-all"
           >
             Zur Startseite
           </button>
@@ -316,15 +316,15 @@ export function BuzzerArena() {
   // Lobby screen
   if (gamePhase === 'lobby') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 text-white p-8 overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 text-white p-8 overflow-hidden">
         <div className="max-w-7xl mx-auto h-full flex flex-col">
           {/* Header */}
           <div className="text-center py-6">
-            <h1 className="text-6xl font-black mb-2 bg-gradient-to-r from-azure-light via-white to-azure-light bg-clip-text text-transparent">
-              AZURELYMPICS
+            <h1 className="text-6xl font-black mb-2 bg-gradient-to-r from-cb-accent via-white to-cb-accent bg-clip-text text-transparent">
+              CERTBUZZ
             </h1>
-            <p className="text-xl text-azure-light">
-              Microsoft AZ-104 Quiz Challenge
+            <p className="text-xl text-cb-accent">
+              Certification Quiz Challenge
             </p>
           </div>
 
@@ -337,7 +337,7 @@ export function BuzzerArena() {
                   <QRCode url={sessionUrl} size={180} />
                 </div>
                 <p className="text-lg font-medium text-white mb-1">Jetzt mitmachen!</p>
-                <p className="text-azure-light text-sm">QR-Code scannen</p>
+                <p className="text-cb-accent text-sm">QR-Code scannen</p>
               </div>
             </div>
 
@@ -368,7 +368,7 @@ export function BuzzerArena() {
 
           {/* Footer */}
           <div className="py-4 text-center">
-            <div className="inline-flex items-center gap-4 px-8 py-3 bg-gradient-to-r from-azure-blue/40 to-azure-light/40 rounded-full border border-azure-light/30">
+            <div className="inline-flex items-center gap-4 px-8 py-3 bg-gradient-to-r from-cb-primary/40 to-cb-accent/40 rounded-full border border-cb-accent/30">
               <div className="flex gap-1">
                 <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
                 <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
@@ -385,7 +385,7 @@ export function BuzzerArena() {
   // Finished screen
   if (gamePhase === 'finished') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 text-white p-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 text-white p-8">
         <ParticleEffects type="fireworks" duration={30000} />
         
         <div className="max-w-4xl mx-auto relative z-10">
@@ -393,7 +393,7 @@ export function BuzzerArena() {
             <h1 className="text-7xl font-black mb-4 bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
               SPIEL BEENDET!
             </h1>
-            <p className="text-xl text-azure-light">Herzlichen Glückwunsch an alle Teilnehmer!</p>
+            <p className="text-xl text-cb-accent">Herzlichen Glückwunsch an alle Teilnehmer!</p>
           </div>
 
           {/* Podium */}
@@ -450,7 +450,7 @@ export function BuzzerArena() {
                   <span className="text-3xl">{player.emoji}</span>
                   <span className="text-xl font-medium">{player.nickname}</span>
                 </div>
-                <span className="text-xl font-bold text-azure-light">{player.score}</span>
+                <span className="text-xl font-bold text-cb-accent">{player.score}</span>
               </div>
             ))}
           </div>
@@ -461,14 +461,14 @@ export function BuzzerArena() {
 
   // Main game view
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 text-white p-4 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 text-white p-4 overflow-hidden">
       <ParticleEffects type={getParticleEffect()} duration={5000} />
       
       <div className="max-w-7xl mx-auto h-screen flex flex-col relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between py-4 border-b border-white/20">
-          <span className="text-2xl font-black bg-gradient-to-r from-azure-light to-white bg-clip-text text-transparent">
-            AZURELYMPICS
+          <span className="text-2xl font-black bg-gradient-to-r from-cb-accent to-white bg-clip-text text-transparent">
+            CERTBUZZ
           </span>
           <div className="text-xl font-medium">
             Frage {currentQuestionIndex + 1} / {totalQuestions}
@@ -492,7 +492,7 @@ export function BuzzerArena() {
                      currentQuestion.difficulty === 'medium' ? '1000 Punkte' :
                      '1500 Punkte'}
                   </span>
-                  <span className="px-3 py-1 bg-azure-blue/30 rounded-full text-sm text-azure-light">
+                  <span className="px-3 py-1 bg-cb-primary/30 rounded-full text-sm text-cb-accent">
                     {currentQuestion.category}
                   </span>
                 </div>
@@ -520,8 +520,8 @@ export function BuzzerArena() {
                     bgColor = 'bg-red-500/20';
                     borderColor = 'border-red-400/50';
                   } else if (isSelected) {
-                    bgColor = 'bg-azure-blue/40';
-                    borderColor = 'border-azure-light';
+                    bgColor = 'bg-cb-primary/40';
+                    borderColor = 'border-cb-accent';
                   }
                   
                   return (
@@ -534,7 +534,7 @@ export function BuzzerArena() {
                       <div className="flex items-start gap-3">
                         <span className={`w-8 h-8 flex items-center justify-center rounded-lg font-bold ${
                           isCorrect ? 'bg-green-500 text-white' :
-                          isSelected ? 'bg-azure-blue text-white' :
+                          isSelected ? 'bg-cb-primary text-white' :
                           isEliminated ? 'bg-red-500/50 text-white line-through' :
                           'bg-white/10'
                         }`}>
@@ -544,7 +544,7 @@ export function BuzzerArena() {
                           {option.text}
                         </span>
                         {isSelected && !isEliminated && (
-                          <span className="text-azure-light animate-pulse">ausgewählt</span>
+                          <span className="text-cb-accent animate-pulse">ausgewählt</span>
                         )}
                         {isCorrect && (
                           <span className="text-green-400 text-xl">&#10003;</span>
@@ -582,7 +582,7 @@ export function BuzzerArena() {
                 <div className="text-center">
                   <div className="text-8xl mb-4 animate-bounce">&#128276;</div>
                   <div className="text-4xl font-bold">Drück den Buzzer!</div>
-                  <div className="text-6xl font-mono font-bold text-azure-light mt-4">
+                  <div className="text-6xl font-mono font-bold text-cb-accent mt-4">
                     {Math.ceil(buzzTimeRemaining)}s
                   </div>
                 </div>
@@ -606,12 +606,12 @@ export function BuzzerArena() {
           <div className="flex flex-col gap-4 min-h-0">
             {/* Current Answerer */}
             {gamePhase === 'answering' && currentAnswerer && (
-              <div className="bg-azure-blue/30 border-2 border-azure-light rounded-2xl p-6 animate-pulse-slow">
+              <div className="bg-cb-primary/30 border-2 border-cb-accent rounded-2xl p-6 animate-pulse-slow">
                 <div className="text-center">
-                  <div className="text-sm text-azure-light mb-2">ANTWORTET GERADE</div>
+                  <div className="text-sm text-cb-accent mb-2">ANTWORTET GERADE</div>
                   <div className="text-6xl mb-2">{currentAnswerer.emoji}</div>
                   <div className="text-2xl font-bold">{currentAnswerer.nickname}</div>
-                  <div className="text-4xl font-mono font-bold mt-4 text-azure-light">
+                  <div className="text-4xl font-mono font-bold mt-4 text-cb-accent">
                     {Math.ceil(answerTimeRemaining)}s
                   </div>
                 </div>
@@ -651,7 +651,7 @@ export function BuzzerArena() {
                   {transitionStartTime > 0 && (
                     <div className="mt-4 pt-4 border-t border-white/20">
                       <div className="text-sm text-gray-400">Nächste Frage in</div>
-                      <div className="text-3xl font-mono font-bold text-azure-light">
+                      <div className="text-3xl font-mono font-bold text-cb-accent">
                         {Math.ceil(transitionTimeRemaining)}s
                       </div>
                     </div>
@@ -675,7 +675,7 @@ export function BuzzerArena() {
                         key={buzz.nickname}
                         className={`flex items-center gap-3 p-2 rounded-lg ${
                           index === currentAnswererIndex 
-                            ? 'bg-azure-blue/40 border border-azure-light' 
+                            ? 'bg-cb-primary/40 border border-cb-accent' 
                             : index < currentAnswererIndex
                               ? 'opacity-40 line-through'
                               : 'bg-white/5'
@@ -713,7 +713,7 @@ export function BuzzerArena() {
                     </span>
                     <span className="text-lg">{player.emoji}</span>
                     <span className="flex-1 font-medium truncate">{player.nickname}</span>
-                    <span className="font-bold text-azure-light">{player.score}</span>
+                    <span className="font-bold text-cb-accent">{player.score}</span>
                   </div>
                 ))}
               </div>

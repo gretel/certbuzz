@@ -1,7 +1,7 @@
 {
-  "name": "azurelympics-104",
-  "version": "1.0.0",
-  "description": "Real-time multiplayer quiz system for Azure AZ-104 certification",
+  "name": "certbuzz",
+  "version": "2.0.0",
+  "description": "Real-time multiplayer quiz system for IT certification prep",
   "type": "module",
   "scripts": {
     "dev:server": "cd server && npm run dev",
@@ -12,12 +12,12 @@
     "install:all": "npm install && cd server && npm install && cd ../client && npm install"
   },
   "keywords": [
-    "azure",
-    "az-104",
+    "certification",
     "quiz",
     "multiplayer",
     "real-time",
-    "education"
+    "education",
+    "buzzer"
   ],
   "author": "",
   "license": "MIT",

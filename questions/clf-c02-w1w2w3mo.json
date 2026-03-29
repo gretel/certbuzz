@@ -1,0 +1,1939 @@
+{
+  "meta": {
+    "id": "clf-c02-w1w2w3mo",
+    "label": "CLF-C02 – Woche 1–3 (bis Montag)",
+    "description": "65 Fragen zu Cloud Concepts, Cloud Technology & Services, Shared Responsibility",
+    "exam": {
+      "passPercent": 70,
+      "totalQuestions": 65,
+      "info": "Die Prüfung umfasst 65 Fragen (50 gewertet + 15 ungewertet). Mindestpunktzahl: 700/1000 (ca. 70%). Fragetypen: Multiple Choice (1 richtig, 3 falsch) und Mehrfachantwort (2+ richtig aus 5+ Optionen). Raten ohne Abzüge möglich."
+    },
+    "categories": {
+      "cloud-concepts": {
+        "label": "Cloud Concepts",
+        "icon": "☁️"
+      },
+      "cloud-economics": {
+        "label": "Cloud Economics & Migration",
+        "icon": "💰"
+      },
+      "well-architected": {
+        "label": "Well-Architected Framework",
+        "icon": "🏗️"
+      },
+      "global-infra-compute": {
+        "label": "Globale Infrastruktur & Compute",
+        "icon": "🖥️"
+      },
+      "storage-databases": {
+        "label": "Storage & Datenbanken",
+        "icon": "💾"
+      },
+      "networking": {
+        "label": "Networking",
+        "icon": "🌐"
+      },
+      "services-ml": {
+        "label": "Management, AI/ML & Integration",
+        "icon": "🤖"
+      },
+      "shared-responsibility": {
+        "label": "Shared Responsibility Model",
+        "icon": "🔐"
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "cc-101",
+      "category": "cloud-concepts",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welches Cloud-Deployment-Modell kombiniert On-Premise-Infrastruktur mit Cloud-Ressourcen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Public Cloud"
+        },
+        {
+          "id": "b",
+          "text": "Private Cloud"
+        },
+        {
+          "id": "c",
+          "text": "Hybrid Cloud"
+        },
+        {
+          "id": "d",
+          "text": "Multi-Cloud"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Hybrid Cloud verbindet On-Premise-Infrastruktur mit Cloud-Ressourcen und ermöglicht Daten- und Anwendungstransfer zwischen beiden."
+    },
+    {
+      "id": "cc-102",
+      "category": "cloud-concepts",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher Vorteil von Cloud Computing beschreibt die Fähigkeit, Ressourcen innerhalb von Minuten weltweit bereitzustellen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Economies of Scale"
+        },
+        {
+          "id": "b",
+          "text": "Go global in minutes"
+        },
+        {
+          "id": "c",
+          "text": "Stop guessing capacity"
+        },
+        {
+          "id": "d",
+          "text": "Increase speed and agility"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Go global in minutes bedeutet, dass Anwendungen mit wenigen Klicks in mehreren AWS-Regionen weltweit bereitgestellt werden können."
+    },
+    {
+      "id": "cc-103",
+      "category": "cloud-concepts",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was unterscheidet PaaS von IaaS?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Bei PaaS verwaltet der Kunde das Betriebssystem selbst"
+        },
+        {
+          "id": "b",
+          "text": "Bei PaaS verwaltet der Anbieter die Laufzeitumgebung, der Kunde nur den Code"
+        },
+        {
+          "id": "c",
+          "text": "PaaS bietet nur Speicherdienste"
+        },
+        {
+          "id": "d",
+          "text": "PaaS ist immer teurer als IaaS"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Bei PaaS (z.B. Elastic Beanstalk) verwaltet AWS die Infrastruktur und Laufzeitumgebung. Der Kunde kümmert sich nur um den Anwendungscode."
+    },
+    {
+      "id": "cc-104",
+      "category": "cloud-concepts",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Aussage zu Elastizität in der Cloud ist korrekt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ressourcen werden einmal bereitgestellt und bleiben konstant"
+        },
+        {
+          "id": "b",
+          "text": "Ressourcen skalieren automatisch basierend auf der tatsächlichen Nachfrage"
+        },
+        {
+          "id": "c",
+          "text": "Elastizität bezieht sich nur auf Speicherkapazität"
+        },
+        {
+          "id": "d",
+          "text": "Elastizität erfordert immer manuelle Eingriffe"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Elastizität bedeutet, dass Ressourcen automatisch hoch- und herunterskalieren, um der aktuellen Nachfrage gerecht zu werden."
+    },
+    {
+      "id": "cc-105",
+      "category": "cloud-concepts",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Unternehmen möchte seine Anwendung gleichzeitig bei AWS und Azure betreiben, um Vendor Lock-in zu vermeiden. Welches Modell beschreibt das am besten?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Hybrid Cloud"
+        },
+        {
+          "id": "b",
+          "text": "Private Cloud"
+        },
+        {
+          "id": "c",
+          "text": "Multi-Cloud"
+        },
+        {
+          "id": "d",
+          "text": "Community Cloud"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Multi-Cloud bezeichnet die Nutzung mehrerer Cloud-Anbieter gleichzeitig. Hybrid Cloud hingegen kombiniert On-Premise mit Cloud."
+    },
+    {
+      "id": "ce-101",
+      "category": "cloud-economics",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher Begriff beschreibt den Wechsel von Investitionskosten (CapEx) zu variablen Betriebskosten (OpEx)?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Rightsizing"
+        },
+        {
+          "id": "b",
+          "text": "Trade capital expense for variable expense"
+        },
+        {
+          "id": "c",
+          "text": "Economy of Scale"
+        },
+        {
+          "id": "d",
+          "text": "Total Cost of Ownership"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Cloud Computing wandelt Vorab-Investitionen (Serveranschaffung) in variable Kosten (Pay-as-you-go) um."
+    },
+    {
+      "id": "ce-102",
+      "category": "cloud-economics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Migrationsstrategie beschreibt das Verlagern einer Anwendung 1:1 in die Cloud ohne Änderungen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Refactor"
+        },
+        {
+          "id": "b",
+          "text": "Replatform"
+        },
+        {
+          "id": "c",
+          "text": "Rehost (Lift and Shift)"
+        },
+        {
+          "id": "d",
+          "text": "Repurchase"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Rehost (Lift and Shift) bedeutet, Anwendungen ohne Änderungen auf AWS-Infrastruktur zu verschieben, z.B. VMs auf EC2."
+    },
+    {
+      "id": "ce-103",
+      "category": "cloud-economics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Perspektive des AWS Cloud Adoption Framework (CAF) behandelt Organisationsstruktur und Personalentwicklung?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Business"
+        },
+        {
+          "id": "b",
+          "text": "People"
+        },
+        {
+          "id": "c",
+          "text": "Governance"
+        },
+        {
+          "id": "d",
+          "text": "Platform"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Die People-Perspektive des CAF befasst sich mit Unternehmenskultur, Organisationsstruktur, Personalentwicklung und Change Management."
+    },
+    {
+      "id": "ce-104",
+      "category": "cloud-economics",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Unternehmen möchte 80 TB Daten physisch zu AWS übertragen. Der Upload über das Internet würde Wochen dauern. Welcher AWS-Service ist am besten geeignet?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Direct Connect"
+        },
+        {
+          "id": "b",
+          "text": "AWS Snowball"
+        },
+        {
+          "id": "c",
+          "text": "AWS Storage Gateway"
+        },
+        {
+          "id": "d",
+          "text": "Amazon S3 Transfer Acceleration"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Snowball ist ein physisches Gerät für große Datenmengen (bis 80 TB pro Gerät). Es wird verschickt, lokal beladen und zurückgeschickt."
+    },
+    {
+      "id": "ce-105",
+      "category": "cloud-economics",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI der 7 Migrationsstrategien (7 Rs) bedeuten, dass die Anwendung NICHT in die Cloud migriert wird?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Retire"
+        },
+        {
+          "id": "b",
+          "text": "Retain"
+        },
+        {
+          "id": "c",
+          "text": "Rehost"
+        },
+        {
+          "id": "d",
+          "text": "Refactor"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b"
+      ],
+      "explanation": "Retire bedeutet Abschalten (nicht mehr benötigt), Retain bedeutet Beibehalten on-premise (noch nicht bereit für Migration)."
+    },
+    {
+      "id": "wa-101",
+      "category": "well-architected",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Wie viele Säulen hat das AWS Well-Architected Framework?",
+      "options": [
+        {
+          "id": "a",
+          "text": "4"
+        },
+        {
+          "id": "b",
+          "text": "5"
+        },
+        {
+          "id": "c",
+          "text": "6"
+        },
+        {
+          "id": "d",
+          "text": "7"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Das WAF hat 6 Säulen: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization und Sustainability."
+    },
+    {
+      "id": "wa-102",
+      "category": "well-architected",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche WAF-Säule betont das Prinzip 'Design for Failure'?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Operational Excellence"
+        },
+        {
+          "id": "b",
+          "text": "Performance Efficiency"
+        },
+        {
+          "id": "c",
+          "text": "Reliability"
+        },
+        {
+          "id": "d",
+          "text": "Cost Optimization"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Reliability (Zuverlässigkeit) umfasst Design for Failure, automatische Recovery, Skalierung und Disaster Recovery."
+    },
+    {
+      "id": "wa-103",
+      "category": "well-architected",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche WAF-Säule empfiehlt Infrastructure as Code (IaC) und häufige, kleine Änderungen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Operational Excellence"
+        },
+        {
+          "id": "b",
+          "text": "Security"
+        },
+        {
+          "id": "c",
+          "text": "Reliability"
+        },
+        {
+          "id": "d",
+          "text": "Sustainability"
+        }
+      ],
+      "correctAnswers": [
+        "a"
+      ],
+      "explanation": "Operational Excellence betont Automatisierung (IaC), Monitoring, häufige kleine Änderungen und kontinuierliche Verbesserung."
+    },
+    {
+      "id": "wa-104",
+      "category": "well-architected",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welche WAF-Säule wurde als letzte hinzugefügt und befasst sich mit umweltbewusstem Cloud-Design?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Cost Optimization"
+        },
+        {
+          "id": "b",
+          "text": "Performance Efficiency"
+        },
+        {
+          "id": "c",
+          "text": "Sustainability"
+        },
+        {
+          "id": "d",
+          "text": "Reliability"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Sustainability wurde 2021 als sechste Säule hinzugefügt und behandelt die Minimierung der Umweltauswirkungen von Cloud-Workloads."
+    },
+    {
+      "id": "gi-101",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was ist eine AWS Region?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ein einzelnes Rechenzentrum"
+        },
+        {
+          "id": "b",
+          "text": "Ein geografischer Bereich mit mehreren, isolierten Availability Zones"
+        },
+        {
+          "id": "c",
+          "text": "Ein Cache-Standort für CloudFront"
+        },
+        {
+          "id": "d",
+          "text": "Ein VPN-Endpunkt"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Eine AWS Region ist ein geografischer Bereich (z.B. eu-central-1 in Frankfurt) mit mindestens 3 isolierten Availability Zones."
+    },
+    {
+      "id": "gi-102",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher AWS-Service bietet Serverless-Compute, bei dem Code nur bei Bedarf ausgeführt wird?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon EC2"
+        },
+        {
+          "id": "b",
+          "text": "AWS Lambda"
+        },
+        {
+          "id": "c",
+          "text": "Amazon ECS"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Lightsail"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Lambda führt Code serverless und event-driven aus. Man zahlt nur pro Aufruf und Ausführungsdauer."
+    },
+    {
+      "id": "gi-103",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Wie werden AWS Edge Locations primär genutzt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Zum Ausführen von EC2-Instances"
+        },
+        {
+          "id": "b",
+          "text": "Zum Speichern von S3-Objekten"
+        },
+        {
+          "id": "c",
+          "text": "Zum Caching von Inhalten über CloudFront"
+        },
+        {
+          "id": "d",
+          "text": "Zum Betreiben von Datenbanken"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Edge Locations sind Standorte für CloudFront (CDN) und Route 53, um Inhalte näher am Endnutzer zwischenzuspeichern."
+    },
+    {
+      "id": "gi-104",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welches Kriterium ist KEIN Faktor bei der Wahl einer AWS Region?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Datenschutz-Compliance (z.B. DSGVO)"
+        },
+        {
+          "id": "b",
+          "text": "Latenz zum Endnutzer"
+        },
+        {
+          "id": "c",
+          "text": "Verfügbare EC2-Instance-Typen"
+        },
+        {
+          "id": "d",
+          "text": "Die Programmiersprache der Anwendung"
+        }
+      ],
+      "correctAnswers": [
+        "d"
+      ],
+      "explanation": "Die Programmiersprache ist kein Kriterium für die Regionswahl. Compliance, Latenz, Kosten und Service-Verfügbarkeit sind die relevanten Faktoren."
+    },
+    {
+      "id": "gi-105",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher EC2-Instance-Typ ist für speicherintensive Workloads wie In-Memory-Datenbanken optimiert?",
+      "options": [
+        {
+          "id": "a",
+          "text": "General Purpose (t3, m5)"
+        },
+        {
+          "id": "b",
+          "text": "Compute Optimized (c5)"
+        },
+        {
+          "id": "c",
+          "text": "Memory Optimized (r5, x1)"
+        },
+        {
+          "id": "d",
+          "text": "Storage Optimized (i3, d2)"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Memory Optimized Instances (R-, X-Familie) bieten viel RAM für In-Memory-Datenbanken, Caching und Echtzeit-Analytics."
+    },
+    {
+      "id": "gi-106",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher AWS-Service ermöglicht Infrastructure as Code (IaC) durch deklarative Templates?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS CodePipeline"
+        },
+        {
+          "id": "b",
+          "text": "AWS CloudFormation"
+        },
+        {
+          "id": "c",
+          "text": "AWS Systems Manager"
+        },
+        {
+          "id": "d",
+          "text": "AWS CodeDeploy"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "CloudFormation verwendet JSON/YAML-Templates zur deklarativen Bereitstellung von AWS-Ressourcen (Infrastructure as Code)."
+    },
+    {
+      "id": "gi-107",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welcher AWS-Service vereinfacht das Deployment von Webanwendungen, ohne dass der Entwickler die Infrastruktur manuell verwalten muss?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon EC2"
+        },
+        {
+          "id": "b",
+          "text": "AWS Elastic Beanstalk"
+        },
+        {
+          "id": "c",
+          "text": "AWS CloudFormation"
+        },
+        {
+          "id": "d",
+          "text": "Amazon ECS"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Elastic Beanstalk ist eine PaaS-Lösung: Code hochladen, AWS kümmert sich um Provisioning, Load Balancing, Scaling und Monitoring."
+    },
+    {
+      "id": "gi-108",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Was ist der Hauptunterschied zwischen Amazon ECS und AWS Fargate?",
+      "options": [
+        {
+          "id": "a",
+          "text": "ECS ist für Docker, Fargate für Kubernetes"
+        },
+        {
+          "id": "b",
+          "text": "Bei Fargate muss man keine EC2-Instances verwalten, bei ECS auf EC2 schon"
+        },
+        {
+          "id": "c",
+          "text": "ECS ist serverless, Fargate nicht"
+        },
+        {
+          "id": "d",
+          "text": "Fargate ist nur in US-Regionen verfügbar"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Fargate ist ein serverless Compute-Engine für Container: keine EC2-Instance-Verwaltung nötig. ECS auf EC2 erfordert eigene Instance-Verwaltung."
+    },
+    {
+      "id": "gi-109",
+      "category": "global-infra-compute",
+      "type": "multiple",
+      "difficulty": "medium",
+      "question": "Welche ZWEI sind gültige Methoden, um AWS-Ressourcen bereitzustellen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Management Console"
+        },
+        {
+          "id": "b",
+          "text": "AWS CLI"
+        },
+        {
+          "id": "c",
+          "text": "Microsoft Azure Portal"
+        },
+        {
+          "id": "d",
+          "text": "SSH direkt in ein AWS-Rechenzentrum"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b"
+      ],
+      "explanation": "AWS-Ressourcen können über die Console, CLI, SDKs, CloudFormation oder CDK bereitgestellt werden. Azure Portal und SSH ins Rechenzentrum gehören nicht dazu."
+    },
+    {
+      "id": "sd-101",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher AWS-Service bietet Objekt-Speicher mit praktisch unbegrenzter Kapazität?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon EBS"
+        },
+        {
+          "id": "b",
+          "text": "Amazon S3"
+        },
+        {
+          "id": "c",
+          "text": "Amazon EFS"
+        },
+        {
+          "id": "d",
+          "text": "Amazon RDS"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Amazon S3 (Simple Storage Service) ist ein Objekt-Speicher mit praktisch unbegrenzter Kapazität. Einzelobjekte bis 5 TB."
+    },
+    {
+      "id": "sd-102",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welche S3 Storage Class ist für Daten geeignet, die selten abgerufen werden und eine Abrufzeit von Minuten bis Stunden akzeptabel ist?",
+      "options": [
+        {
+          "id": "a",
+          "text": "S3 Standard"
+        },
+        {
+          "id": "b",
+          "text": "S3 Intelligent-Tiering"
+        },
+        {
+          "id": "c",
+          "text": "S3 Glacier Flexible Retrieval"
+        },
+        {
+          "id": "d",
+          "text": "S3 One Zone-IA"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "S3 Glacier Flexible Retrieval ist für Archivdaten mit Abrufzeiten von Minuten bis Stunden gedacht, bei deutlich niedrigeren Kosten."
+    },
+    {
+      "id": "sd-103",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was ist Amazon EBS?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ein Objekt-Speicher wie S3"
+        },
+        {
+          "id": "b",
+          "text": "Block-Storage-Volumes für EC2-Instances"
+        },
+        {
+          "id": "c",
+          "text": "Ein verwalteter Datenbankservice"
+        },
+        {
+          "id": "d",
+          "text": "Ein Datei-Speicher für gemeinsamen Zugriff"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "EBS (Elastic Block Store) bietet persistente Block-Storage-Volumes, die an einzelne EC2-Instances angehängt werden."
+    },
+    {
+      "id": "sd-104",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Datenbank ist eine von AWS entwickelte, MySQL/PostgreSQL-kompatible Datenbank mit bis zu 5x besserer Performance?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon RDS"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Aurora"
+        },
+        {
+          "id": "c",
+          "text": "Amazon DynamoDB"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Redshift"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Amazon Aurora ist AWS-proprietär, MySQL- und PostgreSQL-kompatibel, bietet bis zu 5x bessere Performance und Serverless-Option."
+    },
+    {
+      "id": "sd-105",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Datenbankservice ist am besten für eine NoSQL-Key-Value-Datenbank mit Millisekunden-Latenz geeignet?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon RDS"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Aurora"
+        },
+        {
+          "id": "c",
+          "text": "Amazon DynamoDB"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Redshift"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "DynamoDB ist ein vollständig verwalteter NoSQL-Key-Value-Store mit einstelliger Millisekunden-Latenz und serverless Skalierung."
+    },
+    {
+      "id": "sd-106",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was ermöglicht ein RDS Read Replica?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Automatisches Failover bei Ausfall der primären Datenbank"
+        },
+        {
+          "id": "b",
+          "text": "Leselasten auf eine Kopie der Datenbank verteilen"
+        },
+        {
+          "id": "c",
+          "text": "Daten in einer anderen Region verschlüsseln"
+        },
+        {
+          "id": "d",
+          "text": "Die Datenbank ohne Downtime migrieren"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Read Replicas sind asynchrone Kopien der Datenbank für Lesezugriffe. Multi-AZ ist für Failover zuständig."
+    },
+    {
+      "id": "sd-107",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Unterschied besteht zwischen Amazon EFS und Amazon EBS?",
+      "options": [
+        {
+          "id": "a",
+          "text": "EFS ist Block-Storage, EBS ist File-Storage"
+        },
+        {
+          "id": "b",
+          "text": "EFS kann von mehreren EC2-Instances gleichzeitig gemountet werden, EBS nur von einer"
+        },
+        {
+          "id": "c",
+          "text": "EBS ist serverless, EFS nicht"
+        },
+        {
+          "id": "d",
+          "text": "EFS ist nur für Windows-Workloads"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "EFS (Elastic File System) ist ein NFS-File-System, das von vielen EC2-Instances gleichzeitig gemountet werden kann. EBS ist an eine Instance gebunden."
+    },
+    {
+      "id": "sd-108",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welcher AWS-Service wird für Data Warehousing und große Analyse-Abfragen verwendet?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon DynamoDB"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Redshift"
+        },
+        {
+          "id": "c",
+          "text": "Amazon ElastiCache"
+        },
+        {
+          "id": "d",
+          "text": "Amazon DocumentDB"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Amazon Redshift ist ein Data-Warehouse-Service für Petabyte-Scale-Analysen mit SQL-Abfragen."
+    },
+    {
+      "id": "sd-109",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Was bewirkt eine S3 Lifecycle Policy?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Sie verschlüsselt Objekte automatisch nach 30 Tagen"
+        },
+        {
+          "id": "b",
+          "text": "Sie verschiebt Objekte automatisch zwischen Storage Classes oder löscht sie nach definierten Regeln"
+        },
+        {
+          "id": "c",
+          "text": "Sie repliziert Objekte in eine andere Region"
+        },
+        {
+          "id": "d",
+          "text": "Sie erstellt automatisch Backups von EBS-Volumes"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Lifecycle Policies verschieben Objekte automatisch z.B. von Standard nach Glacier oder löschen sie nach einer definierten Zeit."
+    },
+    {
+      "id": "sd-110",
+      "category": "storage-databases",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI Aussagen zu Amazon RDS Multi-AZ sind korrekt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Multi-AZ erstellt eine synchrone Standby-Kopie in einer anderen Availability Zone"
+        },
+        {
+          "id": "b",
+          "text": "Multi-AZ verbessert die Lese-Performance"
+        },
+        {
+          "id": "c",
+          "text": "Multi-AZ bietet automatisches Failover bei Ausfall"
+        },
+        {
+          "id": "d",
+          "text": "Multi-AZ ist dasselbe wie Read Replicas"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "c"
+      ],
+      "explanation": "Multi-AZ erstellt eine synchrone Standby-Kopie für Hochverfügbarkeit mit automatischem Failover. Es verbessert NICHT die Lese-Performance (dafür sind Read Replicas da)."
+    },
+    {
+      "id": "nw-101",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was ist eine Amazon VPC?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ein physisches Rechenzentrum von AWS"
+        },
+        {
+          "id": "b",
+          "text": "Ein virtuelles privates Netzwerk in der AWS-Cloud"
+        },
+        {
+          "id": "c",
+          "text": "Ein VPN-Tunnel zu On-Premise"
+        },
+        {
+          "id": "d",
+          "text": "Ein DNS-Service"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "VPC (Virtual Private Cloud) ist ein logisch isoliertes Netzwerk in der AWS-Cloud, in dem Sie AWS-Ressourcen starten können."
+    },
+    {
+      "id": "nw-102",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was benötigt ein Public Subnet, damit Instances darin das Internet erreichen können?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Einen NAT Gateway"
+        },
+        {
+          "id": "b",
+          "text": "Ein Internet Gateway"
+        },
+        {
+          "id": "c",
+          "text": "Einen VPN-Tunnel"
+        },
+        {
+          "id": "d",
+          "text": "AWS Direct Connect"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Ein Internet Gateway wird an die VPC angehängt und ermöglicht bidirektionale Internetkommunikation für Ressourcen in Public Subnets."
+    },
+    {
+      "id": "nw-103",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Aussage zum Unterschied zwischen Security Groups und NACLs ist korrekt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Security Groups sind stateless, NACLs sind stateful"
+        },
+        {
+          "id": "b",
+          "text": "Security Groups sind stateful, NACLs sind stateless"
+        },
+        {
+          "id": "c",
+          "text": "Beide sind stateful"
+        },
+        {
+          "id": "d",
+          "text": "Beide sind stateless"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Security Groups sind stateful (Antwort-Traffic automatisch erlaubt). NACLs sind stateless (Inbound und Outbound müssen separat konfiguriert werden)."
+    },
+    {
+      "id": "nw-104",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher AWS-Service ist ein DNS-Webservice?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon CloudFront"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Route 53"
+        },
+        {
+          "id": "c",
+          "text": "Elastic Load Balancing"
+        },
+        {
+          "id": "d",
+          "text": "AWS Transit Gateway"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Route 53 ist der DNS-Service von AWS. Er bietet Domainregistrierung, DNS-Routing und Health Checks."
+    },
+    {
+      "id": "nw-105",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service wird verwendet, um Inhalte über Edge Locations weltweit näher am Nutzer zu cachen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon Route 53"
+        },
+        {
+          "id": "b",
+          "text": "Amazon CloudFront"
+        },
+        {
+          "id": "c",
+          "text": "AWS Global Accelerator"
+        },
+        {
+          "id": "d",
+          "text": "Elastic Load Balancing"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "CloudFront ist das CDN (Content Delivery Network) von AWS. Es cached Inhalte an Edge Locations weltweit."
+    },
+    {
+      "id": "nw-106",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Wofür wird ein NAT Gateway in einer VPC eingesetzt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Um Instances in einem Private Subnet Internetzugang für ausgehenden Traffic zu geben"
+        },
+        {
+          "id": "b",
+          "text": "Um DNS-Anfragen zu routen"
+        },
+        {
+          "id": "c",
+          "text": "Um eingehenden Traffic aus dem Internet zu ermöglichen"
+        },
+        {
+          "id": "d",
+          "text": "Um VPCs miteinander zu verbinden"
+        }
+      ],
+      "correctAnswers": [
+        "a"
+      ],
+      "explanation": "Ein NAT Gateway erlaubt Instances in Private Subnets, ausgehenden Internetzugang (z.B. für Updates), blockiert aber eingehenden Traffic."
+    },
+    {
+      "id": "nw-107",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welcher Service bietet eine dedizierte, private Netzwerkverbindung zwischen On-Premise und AWS?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS VPN"
+        },
+        {
+          "id": "b",
+          "text": "AWS Direct Connect"
+        },
+        {
+          "id": "c",
+          "text": "AWS Transit Gateway"
+        },
+        {
+          "id": "d",
+          "text": "Amazon VPC Peering"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Direct Connect bietet eine dedizierte, physische Verbindung zwischen On-Premise und AWS, unabhängig vom öffentlichen Internet."
+    },
+    {
+      "id": "nw-108",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Application Load Balancer (ALB) arbeitet auf welcher OSI-Schicht?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Schicht 3 (Netzwerk)"
+        },
+        {
+          "id": "b",
+          "text": "Schicht 4 (Transport)"
+        },
+        {
+          "id": "c",
+          "text": "Schicht 7 (Anwendung)"
+        },
+        {
+          "id": "d",
+          "text": "Schicht 2 (Data Link)"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "ALB arbeitet auf Schicht 7 (HTTP/HTTPS) und kann Routing-Entscheidungen basierend auf URL-Pfaden, Headern und Hostnames treffen."
+    },
+    {
+      "id": "nw-109",
+      "category": "networking",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welche Aussage zu Security Groups ist FALSCH?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Security Groups erlauben nur Allow-Regeln, keine Deny-Regeln"
+        },
+        {
+          "id": "b",
+          "text": "Security Groups werden auf Instance-Ebene angewendet"
+        },
+        {
+          "id": "c",
+          "text": "Security Groups können sowohl Allow- als auch Deny-Regeln enthalten"
+        },
+        {
+          "id": "d",
+          "text": "Rückfluss-Traffic wird automatisch erlaubt (stateful)"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Security Groups erlauben NUR Allow-Regeln. Alles, was nicht explizit erlaubt ist, wird blockiert. NACLs hingegen haben sowohl Allow- als auch Deny-Regeln."
+    },
+    {
+      "id": "nw-110",
+      "category": "networking",
+      "type": "multiple",
+      "difficulty": "medium",
+      "question": "Welche ZWEI Services können Traffic auf mehrere EC2-Instances verteilen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Application Load Balancer (ALB)"
+        },
+        {
+          "id": "b",
+          "text": "Network Load Balancer (NLB)"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Route 53"
+        },
+        {
+          "id": "d",
+          "text": "AWS WAF"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b"
+      ],
+      "explanation": "ALB (Schicht 7) und NLB (Schicht 4) verteilen eingehenden Traffic auf mehrere Targets. Route 53 ist DNS, WAF ist Web Application Firewall."
+    },
+    {
+      "id": "sm-101",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher AWS-Service überwacht Ressourcen und sammelt Metriken und Logs?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "id": "b",
+          "text": "Amazon CloudWatch"
+        },
+        {
+          "id": "c",
+          "text": "AWS Config"
+        },
+        {
+          "id": "d",
+          "text": "AWS X-Ray"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "CloudWatch sammelt Metriken, Logs und Alarme zur Überwachung von AWS-Ressourcen und Anwendungen."
+    },
+    {
+      "id": "sm-102",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher AWS-Service protokolliert alle API-Aufrufe in einem AWS-Account?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon CloudWatch"
+        },
+        {
+          "id": "b",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "id": "c",
+          "text": "AWS Config"
+        },
+        {
+          "id": "d",
+          "text": "Amazon GuardDuty"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "CloudTrail zeichnet alle API-Aufrufe auf (wer hat was wann getan?) und ermöglicht Audit-Logging und Compliance-Nachweise."
+    },
+    {
+      "id": "sm-103",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher AWS-Service erkennt automatisch Objekte und Szenen in Bildern?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon Comprehend"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Rekognition"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Polly"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Lex"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Amazon Rekognition analysiert Bilder und Videos: Objekterkennung, Gesichtserkennung, Text in Bildern und Content Moderation."
+    },
+    {
+      "id": "sm-104",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service wandelt Text in gesprochene Sprache um?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon Transcribe"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Translate"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Polly"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Comprehend"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Amazon Polly wandelt Text in natürlich klingende Sprache um (Text-to-Speech). Transcribe macht das Gegenteil (Speech-to-Text)."
+    },
+    {
+      "id": "sm-105",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service ermöglicht SQL-Abfragen direkt auf Daten in Amazon S3, ohne sie in eine Datenbank laden zu müssen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon Redshift"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Athena"
+        },
+        {
+          "id": "c",
+          "text": "Amazon QuickSight"
+        },
+        {
+          "id": "d",
+          "text": "Amazon EMR"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Amazon Athena ermöglicht serverless SQL-Abfragen direkt auf S3-Daten (z.B. CSV, JSON, Parquet). Man zahlt nur pro Abfrage."
+    },
+    {
+      "id": "sm-106",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher AWS-Service sendet Nachrichten im Pub/Sub-Modell an mehrere Empfänger gleichzeitig?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon SQS"
+        },
+        {
+          "id": "b",
+          "text": "Amazon SNS"
+        },
+        {
+          "id": "c",
+          "text": "Amazon EventBridge"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Kinesis"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "SNS (Simple Notification Service) verteilt Nachrichten per Pub/Sub an mehrere Subscriber (E-Mail, SMS, Lambda, SQS)."
+    },
+    {
+      "id": "sm-107",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was unterscheidet Amazon SQS von Amazon SNS?",
+      "options": [
+        {
+          "id": "a",
+          "text": "SQS ist für Streaming, SNS ist für Batch-Verarbeitung"
+        },
+        {
+          "id": "b",
+          "text": "SQS ist eine Message Queue (Pull), SNS ist Pub/Sub (Push)"
+        },
+        {
+          "id": "c",
+          "text": "SQS ist teurer als SNS"
+        },
+        {
+          "id": "d",
+          "text": "SQS kann nur mit Lambda genutzt werden"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "SQS ist eine Queue: Consumer holen (pull) Nachrichten ab. SNS ist Pub/Sub: Nachrichten werden an alle Subscriber gepusht."
+    },
+    {
+      "id": "sm-108",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Unternehmen möchte Echtzeit-Streaming-Daten von IoT-Geräten verarbeiten. Welcher Service ist dafür geeignet?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon SQS"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Kinesis"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Athena"
+        },
+        {
+          "id": "d",
+          "text": "AWS Batch"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Amazon Kinesis verarbeitet Echtzeit-Streaming-Daten in großem Umfang (Logs, IoT-Daten, Clickstreams)."
+    },
+    {
+      "id": "sm-109",
+      "category": "services-ml",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welcher AWS-Service verfolgt Konfigurationsänderungen an Ressourcen und prüft Compliance-Regeln?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "id": "b",
+          "text": "Amazon CloudWatch"
+        },
+        {
+          "id": "c",
+          "text": "AWS Config"
+        },
+        {
+          "id": "d",
+          "text": "AWS Systems Manager"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "AWS Config erfasst den aktuellen und historischen Konfigurationszustand von Ressourcen und prüft gegen Compliance-Regeln."
+    },
+    {
+      "id": "sm-110",
+      "category": "services-ml",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI AWS-Services gehören zur Kategorie AI/ML?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon SageMaker"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Comprehend"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Athena"
+        },
+        {
+          "id": "d",
+          "text": "Amazon SQS"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b"
+      ],
+      "explanation": "SageMaker (ML-Modelle trainieren und deployen) und Comprehend (Natural Language Processing) sind AI/ML-Services. Athena ist Analytics, SQS ist Messaging."
+    },
+    {
+      "id": "sr-101",
+      "category": "shared-responsibility",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Wofür ist AWS im Shared Responsibility Model verantwortlich?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Konfiguration von Security Groups"
+        },
+        {
+          "id": "b",
+          "text": "Physische Sicherheit der Rechenzentren"
+        },
+        {
+          "id": "c",
+          "text": "Verschlüsselung der Kundendaten"
+        },
+        {
+          "id": "d",
+          "text": "Verwaltung von IAM-Benutzern"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS ist für 'Security OF the Cloud' verantwortlich: physische Sicherheit, Hardware, Netzwerk-Infrastruktur der Rechenzentren."
+    },
+    {
+      "id": "sr-102",
+      "category": "shared-responsibility",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Wer ist im Shared Responsibility Model für das Patchen des Gastbetriebssystems auf einer EC2-Instance verantwortlich?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS"
+        },
+        {
+          "id": "b",
+          "text": "Der Kunde"
+        },
+        {
+          "id": "c",
+          "text": "AWS und der Kunde gemeinsam"
+        },
+        {
+          "id": "d",
+          "text": "Der Softwarehersteller"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Bei EC2 (IaaS) ist der Kunde für das OS-Patching verantwortlich. AWS verwaltet nur die darunterliegende Hardware und den Hypervisor."
+    },
+    {
+      "id": "sr-103",
+      "category": "shared-responsibility",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Bei welchem Service-Modell hat der Kunde die GERINGSTE Verantwortung für Infrastruktur-Management?",
+      "options": [
+        {
+          "id": "a",
+          "text": "IaaS (z.B. EC2)"
+        },
+        {
+          "id": "b",
+          "text": "PaaS (z.B. Elastic Beanstalk)"
+        },
+        {
+          "id": "c",
+          "text": "SaaS (z.B. Amazon WorkMail)"
+        },
+        {
+          "id": "d",
+          "text": "On-Premise"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Bei SaaS verwaltet AWS fast alles. Der Kunde ist nur für seine Daten und Zugangsberechtigungen verantwortlich."
+    },
+    {
+      "id": "sr-104",
+      "category": "shared-responsibility",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Aufgabe ist im Shared Responsibility Model immer die Verantwortung des Kunden, unabhängig vom Service?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Wartung der Netzwerk-Hardware"
+        },
+        {
+          "id": "b",
+          "text": "Verwaltung der eigenen Daten und Zugriffsberechtigungen"
+        },
+        {
+          "id": "c",
+          "text": "Betrieb der Hypervisoren"
+        },
+        {
+          "id": "d",
+          "text": "Physische Sicherheit der Server"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Datenverwaltung und Zugriffsberechtigungen sind IMMER Kundenverantwortung, egal ob IaaS, PaaS oder SaaS."
+    },
+    {
+      "id": "sr-105",
+      "category": "shared-responsibility",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Ein S3-Bucket ist versehentlich öffentlich zugänglich. Wer trägt die Verantwortung?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS, weil S3 ein AWS-Service ist"
+        },
+        {
+          "id": "b",
+          "text": "Der Kunde, weil Bucket-Policies Kundenverantwortung sind"
+        },
+        {
+          "id": "c",
+          "text": "AWS und der Kunde zu gleichen Teilen"
+        },
+        {
+          "id": "d",
+          "text": "Niemand, da S3 standardmäßig öffentlich ist"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "S3-Bucket-Policies und Access Control sind Kundenverantwortung (Security IN the Cloud). AWS stellt den Service bereit, der Kunde konfiguriert den Zugriff."
+    },
+    {
+      "id": "sr-106",
+      "category": "shared-responsibility",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Wie verändert sich die Kundenverantwortung beim Wechsel von EC2 (IaaS) zu RDS (Managed Service)?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Der Kunde hat bei RDS mehr Verantwortung"
+        },
+        {
+          "id": "b",
+          "text": "Die Verantwortung bleibt gleich"
+        },
+        {
+          "id": "c",
+          "text": "Der Kunde hat bei RDS weniger Verantwortung, da AWS OS-Patching und DB-Patching übernimmt"
+        },
+        {
+          "id": "d",
+          "text": "AWS übernimmt bei RDS keinerlei Verantwortung"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Bei RDS (Managed Service) übernimmt AWS OS-Patching, DB-Patching und Backups. Der Kunde bleibt für Daten, Netzwerkzugang und Verschlüsselungseinstellungen verantwortlich."
+    },
+    {
+      "id": "sr-107",
+      "category": "shared-responsibility",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welche Aussage beschreibt 'Security OF the Cloud' (AWS-Verantwortung) korrekt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Konfiguration von Firewall-Regeln in der VPC"
+        },
+        {
+          "id": "b",
+          "text": "Schutz der globalen Infrastruktur: Hardware, Software, Netzwerk und Einrichtungen"
+        },
+        {
+          "id": "c",
+          "text": "Aktivierung von MFA für IAM-Benutzer"
+        },
+        {
+          "id": "d",
+          "text": "Verschlüsselung von Kundendaten in S3"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "'Security OF the Cloud' umfasst den Schutz der physischen Infrastruktur, des Hypervisors, des Netzwerks und der Einrichtungen, die alle AWS-Services betreiben."
+    },
+    {
+      "id": "sr-108",
+      "category": "shared-responsibility",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI Aufgaben sind im Shared Responsibility Model Verantwortung des KUNDEN?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Firewall-Regeln (Security Groups) konfigurieren"
+        },
+        {
+          "id": "b",
+          "text": "Physische Server-Hardware austauschen"
+        },
+        {
+          "id": "c",
+          "text": "Daten verschlüsseln"
+        },
+        {
+          "id": "d",
+          "text": "Netzwerk-Infrastruktur der AWS-Region warten"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "c"
+      ],
+      "explanation": "Security Groups und Datenverschlüsselung sind Kundenverantwortung (Security IN the Cloud). Hardware und Netzwerk-Infrastruktur sind AWS-Verantwortung."
+    },
+    {
+      "id": "gi-110",
+      "category": "global-infra-compute",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was ist ein Amazon Machine Image (AMI)?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ein Backup einer RDS-Datenbank"
+        },
+        {
+          "id": "b",
+          "text": "Eine Vorlage mit OS, Konfiguration und Software zum Starten von EC2-Instances"
+        },
+        {
+          "id": "c",
+          "text": "Ein Container-Image für ECS"
+        },
+        {
+          "id": "d",
+          "text": "Ein Snapshot eines S3-Buckets"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Ein AMI (Amazon Machine Image) ist eine Vorlage, die das Betriebssystem, Anwendungen und Konfiguration enthält, um EC2-Instances zu starten."
+    },
+    {
+      "id": "sd-111",
+      "category": "storage-databases",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher Service bietet einen In-Memory-Cache, um Datenbankabfragen zu beschleunigen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon Redshift"
+        },
+        {
+          "id": "b",
+          "text": "Amazon ElastiCache"
+        },
+        {
+          "id": "c",
+          "text": "Amazon DynamoDB"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Aurora"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "ElastiCache ist ein verwalteter In-Memory-Caching-Service (Redis, Memcached) zur Beschleunigung von Datenbankabfragen und Session-Speicherung."
+    },
+    {
+      "id": "ce-106",
+      "category": "cloud-economics",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welche Migrationsstrategie beschreibt den Wechsel zu einem komplett anderen Produkt, z.B. von On-Premise-CRM zu Salesforce?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Rehost"
+        },
+        {
+          "id": "b",
+          "text": "Replatform"
+        },
+        {
+          "id": "c",
+          "text": "Repurchase"
+        },
+        {
+          "id": "d",
+          "text": "Refactor"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Repurchase (Drop and Shop) bedeutet den Wechsel zu einem neuen SaaS-Produkt, z.B. von eigenem CRM zu Salesforce oder von Exchange zu WorkMail."
+    },
+    {
+      "id": "wa-105",
+      "category": "well-architected",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Architekt soll sicherstellen, dass die Anwendung bei Ausfall einer kompletten Availability Zone weiterläuft. Welche WAF-Säule adressiert diese Anforderung?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Performance Efficiency"
+        },
+        {
+          "id": "b",
+          "text": "Cost Optimization"
+        },
+        {
+          "id": "c",
+          "text": "Reliability"
+        },
+        {
+          "id": "d",
+          "text": "Operational Excellence"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Reliability umfasst Hochverfügbarkeit über mehrere AZs, automatische Recovery und Disaster-Recovery-Strategien."
+    }
+  ]
+}

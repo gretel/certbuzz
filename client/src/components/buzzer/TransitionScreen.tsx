@@ -29,11 +29,12 @@ interface TransitionScreenProps {
     pointsAwarded?: number;
     noBuzzes?: boolean;
     noMoreBuzzers?: boolean;
+    questionText?: string;
+    options?: Option[];
     correctAnswers?: string[];
     explanation?: string;
     references?: string[];
   } | null;
-  questionOptions?: Option[];
 }
 
 // Helper to extract domain from URL for display
@@ -46,14 +47,14 @@ function getDomainFromUrl(url: string): string {
   }
 }
 
-export function TransitionScreen({ 
-  currentQuestionIndex, 
-  totalQuestions, 
+export function TransitionScreen({
+  currentQuestionIndex,
+  totalQuestions,
   timeRemaining,
   leaderboard,
   lastResult,
-  questionOptions = []
 }: TransitionScreenProps) {
+  const questionOptions = lastResult?.options ?? [];
   const effectType = lastResult?.correct ? 'fireworks' : 
                      lastResult?.noBuzzes ? 'none' : 
                      lastResult ? 'rain' : 'none';
@@ -61,7 +62,7 @@ export function TransitionScreen({
   const isLastQuestion = currentQuestionIndex + 1 >= totalQuestions;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 p-4 md:p-8">
       <ParticleEffects type={effectType} duration={18000} />
       
       <div className="max-w-6xl mx-auto relative z-10">
@@ -113,21 +114,30 @@ export function TransitionScreen({
               </div>
             )}
             
-            {/* Correct Answer(s) */}
-            {lastResult?.correctAnswers && lastResult.correctAnswers.length > 0 && (
-              <div className="bg-green-500/10 rounded-2xl p-4 mb-4 border border-green-400/20">
-                <p className="font-semibold text-green-300 mb-2">
-                  Richtige Antwort{lastResult.correctAnswers.length > 1 ? 'en' : ''}:
-                </p>
+            {/* Question + All Options */}
+            {lastResult?.questionText && (
+              <div className="bg-white/5 rounded-2xl p-4 mb-4 border border-white/10">
+                <p className="font-semibold text-white mb-3">{lastResult.questionText}</p>
                 <ul className="space-y-2">
-                  {lastResult.correctAnswers.map(answerId => {
-                    const option = questionOptions.find(opt => opt.id === answerId);
-                    return option ? (
-                      <li key={answerId} className="flex items-start gap-2 text-green-100">
-                        <span className="text-green-400 font-bold">✓</span>
-                        <span>{option.text}</span>
+                  {questionOptions.map(option => {
+                    const isCorrect = lastResult.correctAnswers?.includes(option.id);
+                    return (
+                      <li
+                        key={option.id}
+                        className={`flex items-start gap-2 px-3 py-2 rounded-lg ${
+                          isCorrect
+                            ? 'bg-green-500/20 border border-green-400/30'
+                            : 'bg-white/5 border border-white/5'
+                        }`}
+                      >
+                        <span className={`font-bold mt-0.5 ${isCorrect ? 'text-green-400' : 'text-white/30'}`}>
+                          {isCorrect ? '✓' : option.id.toUpperCase()}
+                        </span>
+                        <span className={isCorrect ? 'text-green-100 font-medium' : 'text-white/60'}>
+                          {option.text}
+                        </span>
                       </li>
-                    ) : null;
+                    );
                   })}
                 </ul>
               </div>
@@ -135,8 +145,8 @@ export function TransitionScreen({
             
             {/* Explanation */}
             {lastResult?.explanation && (
-              <div className="bg-azure-blue/10 rounded-2xl p-4 border border-azure-light/20">
-                <p className="font-semibold text-azure-light mb-2">Erklärung:</p>
+              <div className="bg-cb-primary/10 rounded-2xl p-4 border border-cb-accent/20">
+                <p className="font-semibold text-cb-accent mb-2">Erklärung:</p>
                 <MarkdownText className="text-white/80">{lastResult.explanation}</MarkdownText>
               </div>
             )}
@@ -172,7 +182,7 @@ export function TransitionScreen({
               <h2 className="text-lg font-bold text-white/80 mb-2">
                 {isLastQuestion ? 'Endergebnis in...' : 'Nächste Frage in...'}
               </h2>
-              <div className="text-7xl font-mono font-black text-azure-light">
+              <div className="text-7xl font-mono font-black text-cb-accent">
                 {Math.ceil(timeRemaining)}
               </div>
               <p className="text-white/50 mt-2">
@@ -206,7 +216,7 @@ export function TransitionScreen({
                       <span className="text-xl">{player.emoji}</span>
                       <span className="font-medium text-white">{player.nickname}</span>
                     </div>
-                    <span className="font-bold text-azure-light text-lg">{player.score}</span>
+                    <span className="font-bold text-cb-accent text-lg">{player.score}</span>
                   </div>
                 ))}
               </div>

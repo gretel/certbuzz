@@ -6,8 +6,10 @@ let socket: Socket | null = null;
 export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
 export function useSocket() {
-  const [isConnected, setIsConnected] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
+  const [isConnected, setIsConnected] = useState(socket?.connected ?? false);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
+    socket?.connected ? 'connected' : 'connecting'
+  );
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -74,4 +76,19 @@ export function useSocket() {
 
 export function getSocket(): Socket | null {
   return socket;
+}
+
+export function authenticateAsDozent(): void {
+  const password = localStorage.getItem('dozent-password');
+  if (!socket || !password) return;
+
+  const doAuth = () => {
+    socket!.emit('dozent-auth', password);
+  };
+
+  if (socket.connected) {
+    doAuth();
+  }
+  // Re-auth on every reconnect
+  socket.on('connect', doAuth);
 }

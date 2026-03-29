@@ -79,14 +79,33 @@ export function TrainingReveal({ correctAnswerId, options, votes: _votes, contai
       const w = canvas.width;
       const h = canvas.height;
 
-      // Darken wrong quadrants
+      // Darken wrong quadrants + draw red X
       const darkAlpha = Math.min(t * 1.8, 0.6);
+      const xAlpha = Math.min(t * 2.5, 0.85);
       for (let i = 0; i < 4; i++) {
         if (i === correctIdx) continue;
         const col = i % 2;
         const row = Math.floor(i / 2);
+        const qx1 = col === 0 ? 0 : w / 2;
+        const qy1 = row === 0 ? 0 : h / 2;
+        // Dark overlay
         ctx.fillStyle = `rgba(0, 0, 0, ${darkAlpha})`;
-        ctx.fillRect(col === 0 ? 0 : w / 2, row === 0 ? 0 : h / 2, w / 2, h / 2);
+        ctx.fillRect(qx1, qy1, w / 2, h / 2);
+        // Red X
+        const cx = qx1 + w / 4;
+        const cy = qy1 + h / 4;
+        const arm = Math.min(w, h) * 0.09;
+        ctx.globalAlpha = xAlpha;
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = Math.max(3, Math.min(w, h) * 0.012);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx - arm, cy - arm);
+        ctx.lineTo(cx + arm, cy + arm);
+        ctx.moveTo(cx + arm, cy - arm);
+        ctx.lineTo(cx - arm, cy + arm);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
       }
 
       // Glow pulse on correct quadrant
