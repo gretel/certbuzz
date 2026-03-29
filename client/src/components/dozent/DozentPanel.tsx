@@ -1112,7 +1112,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                               ? 'bg-purple-500/30 text-purple-300 border border-purple-400/30'
                               : 'bg-blue-500/30 text-blue-300 border border-blue-400/30'
                           }`}>
-                            {session.gameMode === 'buzzer' ? '🔔' : '🏎️'}
+                            {session.gameMode === 'buzzer' ? '🔔' : session.gameMode === 'training' ? '🧠' : '🏎️'}
                           </span>
                         </div>
                         <div className="text-xs text-white/50 mb-2">
