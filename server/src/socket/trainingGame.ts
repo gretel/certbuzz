@@ -233,6 +233,7 @@ function transitionToNextTrainingQuestion(io: Server, sessionCode: string) {
 
   if (nextIndex >= session.totalQuestions) {
     io.to(sessionCode).emit('training-transition', {
+      currentQuestionIndex: session.currentQuestionIndex,
       nextQuestionIndex: -1,
       nextQuestionIn: transitionMs,
       transitionStartedAt,
@@ -245,6 +246,7 @@ function transitionToNextTrainingQuestion(io: Server, sessionCode: string) {
     }, transitionMs);
   } else {
     io.to(sessionCode).emit('training-transition', {
+      currentQuestionIndex: session.currentQuestionIndex,
       nextQuestionIndex: nextIndex,
       nextQuestionIn: transitionMs,
       transitionStartedAt,

@@ -50,10 +50,11 @@ interface TrainingResult {
 
 interface TransitionData {
   currentQuestionIndex: number;
+  nextQuestionIndex: number;
   nextQuestionIn: number;
   transitionStartedAt: number;
+  isGameOver: boolean;
   leaderboard: Array<{ nickname: string; emoji: string; score: number; correct_answers: number }>;
-  lastResult?: TrainingResult | null;
 }
 
 const ZONE_LABELS: Record<1 | 2 | 3, string> = {
@@ -93,6 +94,12 @@ export function TrainingGameSession({
   const [timeLeft, setTimeLeft] = useState(180);
 
   const gridContainerRef = useRef<HTMLDivElement>(null);
+  // Ref to track current phase inside socket callbacks (avoid stale closure)
+  const phaseRef = useRef<TrainingPhase>('lobby');
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
+
+  // Live countdown for transition screen
+  const [transitionTimeLeft, setTransitionTimeLeft] = useState(20);
 
   // Countdown timer: start when phase becomes 'question'
   useEffect(() => {
@@ -125,6 +132,30 @@ export function TrainingGameSession({
       }
     };
   }, [phase]);
+
+  // Auto-advance from 'result' → 'transition' once transitionData is available.
+  // This fires when: reveal completes (setPhase('result')) AND transitionData is already set
+  // (training-transition arrived during reveal phase).
+  useEffect(() => {
+    if (phase !== 'result' || !transitionData) return;
+    const elapsed = Date.now() - transitionData.transitionStartedAt;
+    const remaining = Math.max(500, transitionData.nextQuestionIn - elapsed);
+    const timer = setTimeout(() => setPhase('transition'), remaining);
+    return () => clearTimeout(timer);
+  }, [phase, transitionData]);
+
+  // Live countdown for TransitionScreen
+  useEffect(() => {
+    if (phase !== 'transition' || !transitionData) return;
+    const tick = () => {
+      const elapsed = Date.now() - transitionData.transitionStartedAt;
+      const rem = Math.max(0, (transitionData.nextQuestionIn - elapsed) / 1000);
+      setTransitionTimeLeft(rem);
+    };
+    tick();
+    const interval = setInterval(tick, 250);
+    return () => clearInterval(interval);
+  }, [phase, transitionData]);
 
   // Socket events
   useEffect(() => {
@@ -207,7 +238,12 @@ export function TrainingGameSession({
     socket.on('training-transition', (data: TransitionData) => {
       setTransitionData(data);
       setLeaderboard(data.leaderboard ?? []);
-      setPhase('transition');
+      // Only advance immediately if we're already past the reveal animation.
+      // If we're in 'reveal', the auto-advance effect will handle it once
+      // handleRevealComplete fires.
+      if (phaseRef.current === 'result') {
+        setPhase('transition');
+      }
     });
 
     socket.on('training-game-over', (data: any) => {
@@ -281,25 +317,15 @@ export function TrainingGameSession({
 
   // --- Transition ---
   if (phase === 'transition' && transitionData) {
-    const timeRemaining =
-      transitionData.transitionStartedAt
-        ? Math.max(
-            0,
-            (transitionData.nextQuestionIn - (Date.now() - transitionData.transitionStartedAt)) / 1000
-          )
-        : transitionData.nextQuestionIn / 1000;
-
-    const lastResultForTransition = transitionData.lastResult
+    const lastResultForTransition = result
       ? {
-          correct: false, // training doesn't have a single correct-answerer concept
+          correct: false,
           noBuzzes: false,
-          questionText: transitionData.lastResult.question?.question,
-          options: transitionData.lastResult.question?.options,
-          correctAnswers: transitionData.lastResult.correctAnswerId
-            ? [transitionData.lastResult.correctAnswerId]
-            : undefined,
-          explanation: transitionData.lastResult.question?.explanation,
-          references: transitionData.lastResult.question?.references,
+          questionText: result.question?.question,
+          options: result.question?.options,
+          correctAnswers: result.correctAnswerId ? [result.correctAnswerId] : undefined,
+          explanation: result.question?.explanation,
+          references: result.question?.references,
         }
       : null;
 
@@ -307,7 +333,7 @@ export function TrainingGameSession({
       <TransitionScreen
         currentQuestionIndex={transitionData.currentQuestionIndex}
         totalQuestions={totalQuestions}
-        timeRemaining={timeRemaining}
+        timeRemaining={transitionTimeLeft}
         leaderboard={transitionData.leaderboard ?? []}
         lastResult={lastResultForTransition}
       />
