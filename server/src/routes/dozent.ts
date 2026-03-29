@@ -126,9 +126,20 @@ router.post('/session/:sessionCode/continue', authenticate, (req, res) => {
       filteredQuestions = allQuestions.filter(q => categories.includes(q.category));
     }
 
+    // Training mode: only single-choice questions with exactly 4 options
+    if (session.gameMode === 'training') {
+      filteredQuestions = filteredQuestions.filter(
+        (q: any) => q.type === 'single' && q.options.length === 4
+      );
+    }
+
     if (filteredQuestions.length === 0) {
       return res.status(400).json({ error: 'Keine Fragen in den ausgewählten Kategorien verfügbar' });
     }
+
+    // Cleanup stale in-memory game state (timers, votes) from previous round
+    cleanupBuzzerGame(sessionCode);
+    cleanupTrainingGame(sessionCode);
 
     // Select new questions
     const actualQuestionCount = Math.min(totalQuestions, filteredQuestions.length);

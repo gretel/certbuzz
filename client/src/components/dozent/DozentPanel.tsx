@@ -520,6 +520,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     setGameStarted(session.gameState !== 'lobby');
     hasJoinedRef.current = false;
     setShowNextRoundConfig(false);
+    setTrainingVoteCount(null);
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -1013,6 +1014,16 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                             className="w-full bg-teal-600 hover:bg-teal-500 disabled:bg-gray-500/50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all"
                           >
                             🧠 Spiel starten {joinedPlayers.length > 0 && `(${joinedPlayers.length} Spieler)`}
+                          </button>
+                        </>
+                      ) : gameStatus?.gameState === 'finished' ? (
+                        <>
+                          <h3 className="font-bold text-teal-300 mb-3">Training abgeschlossen!</h3>
+                          <button
+                            onClick={() => setShowNextRoundConfig(true)}
+                            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all text-lg shadow-lg"
+                          >
+                            Nächste Runde vorbereiten
                           </button>
                         </>
                       ) : (

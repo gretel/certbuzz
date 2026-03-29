@@ -12,9 +12,17 @@ export interface TrainingVote {
   clickY: number;
 }
 
+interface TransitionInfo {
+  nextQuestionIndex: number;
+  nextQuestionIn: number;
+  transitionStartedAt: number;
+  isGameOver: boolean;
+}
+
 interface TrainingGameState {
   sessionCode: string;
   votes: Map<string, TrainingVote>; // keyed by playerId
+  transition: TransitionInfo | null; // set during the 20-sec transition window
   timers: {
     roundTimeout?: NodeJS.Timeout;
     transitionTimeout?: NodeJS.Timeout;
@@ -49,6 +57,7 @@ export function initTrainingGame(sessionCode: string): TrainingGameState {
   const state: TrainingGameState = {
     sessionCode,
     votes: new Map(),
+    transition: null,
     timers: {},
   };
   trainingGames.set(sessionCode, state);
@@ -89,6 +98,7 @@ function showTrainingQuestion(io: Server, sessionCode: string, questionIndex: nu
   if (state.timers.roundTimeout) clearTimeout(state.timers.roundTimeout);
   if (state.timers.transitionTimeout) clearTimeout(state.timers.transitionTimeout);
   state.votes.clear();
+  state.transition = null;
 
   const questionId = session.questionIds[questionIndex];
   const question = getQuestionForSession(sessionCode, questionId);
@@ -233,30 +243,29 @@ function transitionToNextTrainingQuestion(io: Server, sessionCode: string) {
   const nextIndex = session.currentQuestionIndex + 1;
   const transitionMs = 20000;
   const transitionStartedAt = Date.now();
+  const isGameOver = nextIndex >= session.totalQuestions;
 
-  if (nextIndex >= session.totalQuestions) {
-    io.to(sessionCode).emit('training-transition', {
-      currentQuestionIndex: session.currentQuestionIndex,
-      nextQuestionIndex: -1,
-      nextQuestionIn: transitionMs,
-      transitionStartedAt,
-      isGameOver: true,
-      leaderboard: queries.getLeaderboard(sessionCode),
-    });
+  // Store transition metadata so reconnecting players get it from getTrainingGameState
+  state.transition = {
+    nextQuestionIndex: isGameOver ? -1 : nextIndex,
+    nextQuestionIn: transitionMs,
+    transitionStartedAt,
+    isGameOver,
+  };
 
+  const transitionPayload = {
+    currentQuestionIndex: session.currentQuestionIndex,
+    ...state.transition,
+    leaderboard: queries.getLeaderboard(sessionCode),
+  };
+
+  io.to(sessionCode).emit('training-transition', transitionPayload);
+
+  if (isGameOver) {
     state.timers.transitionTimeout = setTimeout(() => {
       endTrainingGame(io, sessionCode);
     }, transitionMs);
   } else {
-    io.to(sessionCode).emit('training-transition', {
-      currentQuestionIndex: session.currentQuestionIndex,
-      nextQuestionIndex: nextIndex,
-      nextQuestionIn: transitionMs,
-      transitionStartedAt,
-      isGameOver: false,
-      leaderboard: queries.getLeaderboard(sessionCode),
-    });
-
     state.timers.transitionTimeout = setTimeout(() => {
       showTrainingQuestion(io, sessionCode, nextIndex);
     }, transitionMs);
@@ -283,9 +292,7 @@ export function forceNextTrainingQuestion(io: Server, sessionCode: string) {
   const session = queries.getSession(sessionCode);
   if (!session) return;
 
-  // Guard: don't advance if we're already showing the next question (auto-advance
-  // timer already fired) or already finished. Without this, a dozent click racing
-  // the 20-sec transitionTimeout would overshoot by one question.
+  // Guard: don't advance if we're already showing the next question or already finished.
   if (session.gameState === 'question' || session.gameState === 'finished') return;
 
   let state = trainingGames.get(sessionCode);
@@ -296,7 +303,10 @@ export function forceNextTrainingQuestion(io: Server, sessionCode: string) {
     if (state.timers.transitionTimeout) clearTimeout(state.timers.transitionTimeout);
   }
 
-  const nextIndex = session.currentQuestionIndex + 1;
+  // Use the stored transition target if available (avoids TOCTOU with auto-advance).
+  // Fall back to DB-based computation.
+  const nextIndex = state.transition?.nextQuestionIndex ?? (session.currentQuestionIndex + 1);
+  state.transition = null;
   if (nextIndex >= session.totalQuestions) {
     endTrainingGame(io, sessionCode);
   } else {
@@ -344,11 +354,14 @@ export function getTrainingGameState(sessionCode: string) {
   }
 
   return {
-    // Use 'phase' to match what the client expects
-    phase: session.gameState,
+    // Use 'phase' to match what the client expects. If we have active transition
+    // data, report 'transition' so the client can show the countdown.
+    phase: state?.transition ? 'transition' : session.gameState,
     currentQuestionIndex: session.currentQuestionIndex,
     totalQuestions: session.totalQuestions,
     question: currentQuestion,
+    // Include transition data for reconnecting players during the 20-sec window
+    transition: state?.transition ?? null,
     votes: state
       ? Array.from(state.votes.values()).map(v => ({
           playerId: v.playerId,

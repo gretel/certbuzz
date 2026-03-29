@@ -57,12 +57,6 @@ interface TransitionData {
   leaderboard: Array<{ nickname: string; emoji: string; score: number; correct_answers: number }>;
 }
 
-const ZONE_LABELS: Record<1 | 2 | 3, string> = {
-  1: 'Unsicher',
-  2: 'Sicher',
-  3: 'Garantiert',
-};
-
 export function TrainingGameSession({
   sessionCode,
   totalQuestions,
@@ -177,24 +171,30 @@ export function TrainingGameSession({
     });
 
     socket.on('training-state', (state: any) => {
-      // Server snapshot maps gameState → phase. 'result' on server means the round
-      // is closed but the snapshot doesn't include the full result payload (votes,
-      // correctAnswerId). Map it to 'question' (disabled grid) so the player sees
-      // the question until the next training-question event arrives.
+      // Map server phase to client phase. 'result' without result payload → show
+      // disabled grid. 'transition' → restore transition countdown.
       if (state.phase) {
         const serverToClient: Record<string, TrainingPhase> = {
           lobby: 'lobby',
           question: 'question',
-          result: 'question',   // no result payload on reconnect → show disabled grid
+          result: 'question',      // no result payload on reconnect → disabled grid
+          transition: 'transition', // server sends this when transition data is active
           finished: 'finished',
         };
         const mapped = serverToClient[state.phase];
         if (mapped) setPhase(mapped);
       }
       if (state.currentQuestionIndex !== undefined) setCurrentQuestionIndex(state.currentQuestionIndex);
-      // Restore current question so reconnect doesn't show infinite spinner
       if (state.question) setCurrentQuestion(state.question);
       if (state.leaderboard) setLeaderboard(state.leaderboard);
+      // Restore transition data for countdown display on reconnect
+      if (state.transition) {
+        setTransitionData({
+          currentQuestionIndex: state.currentQuestionIndex ?? 0,
+          ...state.transition,
+          leaderboard: state.leaderboard ?? [],
+        });
+      }
       if (state.votes && Array.isArray(state.votes)) {
         const own = state.votes.find((v: any) => v.playerId === playerId);
         if (own) {
@@ -376,8 +376,9 @@ export function TrainingGameSession({
 
   // --- Finished ---
   if (phase === 'finished') {
-    const myScore = leaderboard.find(p => p.nickname === nickname)?.score ?? 0;
-    const myRank = leaderboard.findIndex(p => p.nickname === nickname) + 1;
+    const myEntry = leaderboard.find(p => p.nickname === nickname && p.emoji === emoji);
+    const myScore = myEntry?.score ?? 0;
+    const myRank = myEntry ? leaderboard.indexOf(myEntry) + 1 : 0;
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
@@ -507,17 +508,7 @@ export function TrainingGameSession({
 
         {/* Question card */}
         <div className="bg-white/10 backdrop-blur-lg border-x border-white/20 p-6">
-          <h2 className="text-xl font-bold text-white mb-4">{currentQuestion.question}</h2>
-
-          {/* Vote status */}
-          {ownVote && (
-            <div className="bg-white/10 rounded-xl p-3 text-sm text-white/80">
-              <span className="font-semibold">Deine Antwort:</span>{' '}
-              {currentQuestion.options.find(o => o.id === ownVote.answerId)?.text ?? ownVote.answerId}
-              {' — '}
-              <span className="text-cb-accent font-medium">{ZONE_LABELS[ownVote.confidenceZone]}</span>
-            </div>
-          )}
+          <h2 className="text-xl font-bold text-white">{currentQuestion.question}</h2>
         </div>
 
         {/* Grid container */}
