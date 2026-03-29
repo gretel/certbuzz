@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { getSocket, authenticateAsDozent } from '../../hooks/useSocket';
 
 interface DozentPanelProps {
@@ -73,7 +73,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
   } | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [showNextRoundConfig, setShowNextRoundConfig] = useState(false);
-  const hasJoinedRef = useRef(false);
+  // Note: room join is handled via socket.on('connect') in the session effect
 
   const currentBank = questionBanks.find(b => b.bankId === selectedBank);
   const categories = currentBank?.categories ?? [];
@@ -397,18 +397,23 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     socket.on('training-transition', handleTrainingTransition);
     socket.on('training-game-over', handleTrainingGameOver);
 
-    // Join the session room and request state AFTER listeners are set up
-    // This prevents race conditions where data arrives before handlers are ready
-    if (!hasJoinedRef.current) {
+    // Join (or re-join) the session room. Must fire on every connect/reconnect
+    // because Socket.IO drops room membership when the connection resets.
+    const joinAndSync = () => {
       socket.emit('join-session', sessionCode);
       socket.emit('buzzer-get-state', sessionCode);
       if (createdGameMode === 'training') {
         socket.emit('training-get-state', sessionCode);
       }
-      hasJoinedRef.current = true;
+    };
+
+    if (socket.connected) {
+      joinAndSync();
     }
+    socket.on('connect', joinAndSync);
 
     return () => {
+      socket.off('connect', joinAndSync);
       socket.off('buzzer-players-update', handlePlayersUpdate);
       socket.off('training-players-update', handlePlayersUpdate);
       socket.off('buzzer-state', handleBuzzerState);
@@ -434,8 +439,6 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
 
     setLoading(true);
     setError(null);
-    hasJoinedRef.current = false;
-
     try {
       const response = await fetch('/api/dozent/create-session', {
         method: 'POST',
@@ -549,7 +552,6 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     setSessionCode(session.sessionCode);
     setCreatedGameMode(session.gameMode);
     setGameStarted(session.gameState !== 'lobby');
-    hasJoinedRef.current = false;
     setShowNextRoundConfig(false);
     setTrainingVoteCount(null);
   };
@@ -1142,7 +1144,6 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                       setGameStarted(false);
                       setGameStatus(null);
                       setJoinedPlayers([]);
-                      hasJoinedRef.current = false;
                       setShowNextRoundConfig(false);
                       fetchSessions();
                     }}
