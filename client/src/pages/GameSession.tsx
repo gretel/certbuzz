@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSocket } from '../hooks/useSocket';
+import { useSounds } from '../hooks/useSounds';
 import { SingleChoice } from '../components/game/SingleChoice';
 import { MultipleChoice } from '../components/game/MultipleChoice';
 import { OrderQuestion } from '../components/game/OrderQuestion';
 import { BuzzerGameSession } from './BuzzerGameSession';
+import { TrainingGameSession } from './TrainingGameSession';
 import { MarkdownText } from '../components/shared/MarkdownText';
 
 interface Question {
   id: string;
   category: string;
-  subcategory: string;
   type: 'single' | 'multiple' | 'order';
   difficulty: string;
   question: string;
@@ -19,20 +20,32 @@ interface Question {
   references?: string[];
 }
 
+interface ExamInfo {
+  passPercent: number;
+  totalQuestions: number;
+  info: string;
+}
+
 interface SessionData {
   sessionCode: string;
   status: string;
   totalQuestions: number;
   questions: Question[];
-  gameMode: 'racing' | 'buzzer';
+  gameMode: 'racing' | 'buzzer' | 'training';
   gameState: string;
+  questionBank?: string;
+  examInfo?: ExamInfo;
 }
 
 export function GameSession() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const socket = getSocket();
+  const { sounds } = useSounds();
+  const soundsRef = useRef(sounds);
+  useEffect(() => { soundsRef.current = sounds; }, [sounds]);
   const [sessionDeleted, setSessionDeleted] = useState(false);
+  const [hasPlayedStart, setHasPlayedStart] = useState(false);
 
   // Try to restore player data from localStorage
   // Priority: 1. Session-specific nickname, 2. Last used nickname globally
@@ -120,8 +133,12 @@ export function GameSession() {
       setCorrectAnswers(data.correctAnswers);
       setShowFeedback(true);
 
+      // Play sound
       if (data.correct) {
+        soundsRef.current.correct();
         setTotalCorrect(prev => prev + 1);
+      } else {
+        soundsRef.current.wrong();
       }
       setTotalTime(prev => prev + (Date.now() - startTime) / 1000);
     });
@@ -171,6 +188,10 @@ export function GameSession() {
       setPlayerId(data.playerId);
       setEmoji(data.emoji);
       setStartTime(Date.now());
+      if (!hasPlayedStart) {
+        soundsRef.current.gameStart();
+        setHasPlayedStart(true);
+      }
 
       // Store in localStorage to persist across page reloads
       localStorage.setItem(`session_${code}_playerId`, data.playerId);
@@ -229,7 +250,7 @@ export function GameSession() {
   // Show session deleted message
   if (sessionDeleted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-white mb-2">
@@ -240,7 +261,7 @@ export function GameSession() {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-3 px-6 rounded-xl transition-all"
+            className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-3 px-6 rounded-xl transition-all"
           >
             Zur Startseite
           </button>
@@ -251,7 +272,7 @@ export function GameSession() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center">
         <div className="text-2xl font-semibold text-white/70">{'Laden...'}</div>
       </div>
     );
@@ -259,7 +280,7 @@ export function GameSession() {
 
   if (error || !sessionData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center">
         <div className="text-2xl font-semibold text-red-400">{error || 'Fehler'}</div>
       </div>
     );
@@ -267,17 +288,18 @@ export function GameSession() {
 
   if (!playerId) {
     const isBuzzerMode = sessionData.gameMode === 'buzzer';
+    const isTrainingMode = sessionData.gameMode === 'training';
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-black text-white mb-2">
-              AZURELYMPICS
+              CERTBUZZ
             </h1>
-            <p className="text-azure-light">
-              Microsoft AZ-104 Quiz Challenge
+            <p className="text-cb-accent">
+              Certification Quiz Challenge
             </p>
           </div>
 
@@ -285,16 +307,16 @@ export function GameSession() {
           <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
             <div className="text-center mb-6">
               <div className="text-6xl mb-4">
-                {isBuzzerMode ? '🔔' : '🏎️'}
+                {isBuzzerMode ? '🔔' : isTrainingMode ? '🧠' : '🏎️'}
               </div>
               <h2 className="text-2xl font-bold text-white">
-                {isBuzzerMode ? 'Buzzer-Modus' : 'Racing-Modus'}
+                {isBuzzerMode ? 'Buzzer-Modus' : isTrainingMode ? 'Team Training' : 'Racing-Modus'}
               </h2>
             </div>
 
             <form onSubmit={handleJoin} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-azure-light mb-2">
+                <label className="block text-sm font-medium text-cb-accent mb-2">
                   Wie heißt du?
                 </label>
                 <input
@@ -302,7 +324,7 @@ export function GameSession() {
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                   placeholder="Dein Name"
-                  className="w-full px-5 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/40 focus:border-azure-light focus:outline-none text-lg"
+                  className="w-full px-5 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-white placeholder-white/40 focus:border-cb-accent focus:outline-none text-lg"
                   required
                   maxLength={20}
                   autoFocus
@@ -316,7 +338,7 @@ export function GameSession() {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] text-lg shadow-lg shadow-azure-blue/30"
+                className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] text-lg shadow-lg shadow-cb-primary/30"
               >
                 Los geht's!
               </button>
@@ -340,6 +362,18 @@ export function GameSession() {
     );
   }
 
+  if (sessionData.gameMode === 'training') {
+    return (
+      <TrainingGameSession
+        sessionCode={code!}
+        totalQuestions={sessionData.totalQuestions}
+        playerId={playerId}
+        nickname={nickname}
+        emoji={emoji}
+      />
+    );
+  }
+
   if (currentQuestionIndex >= sessionData.totalQuestions) {
     const totalQuestions = sessionData.totalQuestions;
     // Use server stats if available, otherwise use frontend tracking
@@ -349,17 +383,18 @@ export function GameSession() {
     const percentageCorrect = (correctCount / totalQuestions) * 100;
     const avgTimePerQuestion = timeCount / totalQuestions;
 
-    // AZ-104 exam criteria: 700/1000 points = 70% to pass
-    const wouldPass = percentageCorrect >= 70;
+    const examInfo = sessionData.examInfo;
+    const passPercent = examInfo?.passPercent ?? 70;
+    const wouldPass = percentageCorrect >= passPercent;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 p-8 max-w-2xl w-full">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">
               {'Quiz beendet!'} 🎉
             </h1>
-            <p className="text-xl text-azure-light">
+            <p className="text-xl text-cb-accent">
               {nickname} {emoji}
             </p>
           </div>
@@ -377,15 +412,15 @@ export function GameSession() {
               </div>
             </div>
 
-            <div className="bg-azure-blue/20 border-2 border-azure-light/30 rounded-lg p-4">
+            <div className="bg-cb-primary/20 border-2 border-cb-accent/30 rounded-lg p-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-white/80">Genauigkeit</span>
-                <span className="text-lg font-bold text-azure-light">{percentageCorrect.toFixed(1)}%</span>
+                <span className="text-lg font-bold text-cb-accent">{percentageCorrect.toFixed(1)}%</span>
               </div>
               <div className="w-full bg-white/20 rounded-full h-3">
                 <div
                   className={`h-3 rounded-full transition-all ${
-                    percentageCorrect >= 70 ? 'bg-green-400' : 'bg-orange-400'
+                    percentageCorrect >= passPercent ? 'bg-green-400' : 'bg-orange-400'
                   }`}
                   style={{ width: `${percentageCorrect}%` }}
                 />
@@ -407,9 +442,9 @@ export function GameSession() {
               </div>
             </div>
 
-            <div className="bg-azure-blue/30 border border-azure-light/40 text-white rounded-lg p-4 text-center">
+            <div className="bg-cb-primary/30 border border-cb-accent/40 text-white rounded-lg p-4 text-center">
               <div className="text-sm text-white/70 mb-1">Finaler Score</div>
-              <div className="text-4xl font-bold text-azure-light">{finalScore.toFixed(0)}</div>
+              <div className="text-4xl font-bold text-cb-accent">{finalScore.toFixed(0)}</div>
             </div>
           </div>
 
@@ -424,24 +459,31 @@ export function GameSession() {
               <h3 className={`text-xl font-bold ${
                 wouldPass ? 'text-green-300' : 'text-orange-300'
               }`}>
-                {wouldPass ? 'AZ-104 Prognose: Bestanden' : 'AZ-104 Prognose: Nicht bestanden'}
+                {wouldPass ? 'Prognose: Bestanden' : 'Prognose: Nicht bestanden'}
               </h3>
             </div>
             <p className={`text-center text-sm ${
               wouldPass ? 'text-green-200/80' : 'text-orange-200/80'
             }`}>
               {wouldPass
-                ? `Mit ${percentageCorrect.toFixed(1)}% richtigen Antworten würdest du die AZ-104 Prüfung bestehen (≥70% erforderlich).`
-                : `Mit ${percentageCorrect.toFixed(1)}% richtigen Antworten würdest du die AZ-104 Prüfung nicht bestehen (≥70% erforderlich). Weiter üben!`
+                ? `Mit ${percentageCorrect.toFixed(1)}% richtigen Antworten hättest du bestanden (≥${passPercent}% erforderlich).`
+                : `Mit ${percentageCorrect.toFixed(1)}% richtigen Antworten hättest du nicht bestanden (≥${passPercent}% erforderlich). Weiter üben!`
               }
             </p>
           </div>
+
+          {/* Exam Info */}
+          {examInfo && (
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+              <p className="text-sm text-white/60">{examInfo.info}</p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex gap-4">
             <a
               href="/leaderboard"
-              className="flex-1 bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-3 px-6 rounded-xl transition-all text-center"
+              className="flex-1 bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-3 px-6 rounded-xl transition-all text-center"
             >
               Rangliste 🏆
             </a>
@@ -467,14 +509,14 @@ export function GameSession() {
   // Safety check in case currentQuestion is undefined
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center">
         <div className="text-2xl font-semibold text-white/70">Laden...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white/10 backdrop-blur-lg rounded-t-2xl border border-white/20 border-b-0 p-6">
@@ -490,7 +532,7 @@ export function GameSession() {
 
           <div className="w-full bg-white/20 rounded-full h-2">
             <div
-              className="bg-azure-light h-2 rounded-full transition-all duration-300"
+              className="bg-cb-accent h-2 rounded-full transition-all duration-300"
               style={{ width: `${((currentQuestionIndex + 1) / sessionData.totalQuestions) * 100}%` }}
             />
           </div>
@@ -499,7 +541,7 @@ export function GameSession() {
         {/* Question */}
         <div className="bg-white/10 backdrop-blur-lg border-x border-white/20 p-8 mb-0">
           <div className="mb-2 flex items-center gap-2">
-            <span className="inline-block px-3 py-1 bg-azure-blue/30 text-azure-light text-xs font-semibold rounded-full">
+            <span className="inline-block px-3 py-1 bg-cb-primary/30 text-cb-accent text-xs font-semibold rounded-full">
               {currentQuestion.category}
             </span>
             <span className="inline-block px-3 py-1 bg-white/10 text-white/60 text-xs font-mono rounded-full">
@@ -540,26 +582,44 @@ export function GameSession() {
 
           {showFeedback && (
             <div className={`mt-6 p-4 rounded-xl ${isCorrect ? 'bg-green-500/20 border-2 border-green-400/30' : 'bg-red-500/20 border-2 border-red-400/30'}`}>
-              <p className={`font-bold mb-2 ${isCorrect ? 'text-green-300' : 'text-red-300'}`}>
+              <p className={`font-bold mb-3 ${isCorrect ? 'text-green-300' : 'text-red-300'}`}>
                 {isCorrect ? 'Richtig! ✅' : 'Falsch ❌'}
               </p>
-              <div className="text-sm text-white/80 mb-2">
-                <strong className="text-white">Erklärung:</strong>
+
+              {/* All options with correct/wrong highlighting */}
+              <ul className="space-y-2 mb-4">
+                {currentQuestion.options.map(option => {
+                  const isCorrectOption = correctAnswers.includes(option.id);
+                  const wasSelected = selectedAnswers.includes(option.id);
+                  return (
+                    <li
+                      key={option.id}
+                      className={`flex items-start gap-2 px-3 py-2 rounded-lg ${
+                        isCorrectOption
+                          ? 'bg-green-500/20 border border-green-400/30'
+                          : wasSelected
+                            ? 'bg-red-500/10 border border-red-400/20'
+                            : 'bg-white/5 border border-white/5'
+                      }`}
+                    >
+                      <span className={`font-bold mt-0.5 ${
+                        isCorrectOption ? 'text-green-400' : wasSelected ? 'text-red-400' : 'text-white/30'
+                      }`}>
+                        {isCorrectOption ? '✓' : wasSelected ? '✗' : option.id.toUpperCase()}
+                      </span>
+                      <span className={
+                        isCorrectOption ? 'text-green-100 font-medium' : wasSelected ? 'text-red-200' : 'text-white/60'
+                      }>
+                        {option.text}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <div className="text-sm text-white/80">
                 <MarkdownText className="mt-1">{currentQuestion.explanation}</MarkdownText>
               </div>
-              {!isCorrect && (
-                <div className="text-sm text-white/70">
-                  <strong className="text-white/90">Richtige Antwort(en):</strong>
-                  <ul className="list-disc ml-5 mt-1">
-                    {correctAnswers.map(answerId => {
-                      const option = currentQuestion.options.find(opt => opt.id === answerId);
-                      return option ? (
-                        <li key={answerId}>{option.text}</li>
-                      ) : null;
-                    })}
-                  </ul>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -570,14 +630,14 @@ export function GameSession() {
             <button
               onClick={handleSubmitAnswer}
               disabled={selectedAnswers.length === 0}
-              className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-4 px-8 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-4 px-8 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {'Antwort absenden'}
             </button>
           ) : (
             <button
               onClick={handleNextQuestion}
-              className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-4 px-8 rounded-xl transition-all"
+              className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-4 px-8 rounded-xl transition-all"
             >
               {currentQuestionIndex < sessionData.totalQuestions - 1 ? 'Nächste Frage' : 'Fertig'}
             </button>

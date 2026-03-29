@@ -1,8 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { getSocket } from '../../hooks/useSocket';
+import { getSocket, authenticateAsDozent } from '../../hooks/useSocket';
 
 interface DozentPanelProps {
   onLogout: () => void;
+}
+
+interface QuestionBank {
+  bankId: string;
+  label: string;
+  description: string;
+  questionCount: number;
+  categories: Array<{ id: string; label: string; icon: string; count: number }>;
 }
 
 interface Session {
@@ -12,8 +20,9 @@ interface Session {
   status: 'active' | 'finished';
   totalQuestions: number;
   playerCount: number;
-  gameMode: 'racing' | 'buzzer';
+  gameMode: 'racing' | 'buzzer' | 'training';
   gameState: string;
+  questionBank?: string;
 }
 
 interface Player {
@@ -39,7 +48,7 @@ interface BuzzerGameStatus {
   }>;
 }
 
-type GameMode = 'racing' | 'buzzer';
+type GameMode = 'racing' | 'buzzer' | 'training';
 
 export function DozentPanel({ onLogout }: DozentPanelProps) {
   const socket = getSocket();
@@ -48,29 +57,29 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([
-    'identity-governance',
-    'storage',
-    'compute',
-    'networking',
-    'monitoring'
-  ]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [existingSessions, setExistingSessions] = useState<Session[]>([]);
   const [gameMode, setGameMode] = useState<GameMode>('buzzer');
+  const [questionBanks, setQuestionBanks] = useState<QuestionBank[]>([]);
+  const [selectedBank, setSelectedBank] = useState<string>('azure-az104');
   const [createdGameMode, setCreatedGameMode] = useState<GameMode>('racing');
   const [joinedPlayers, setJoinedPlayers] = useState<Player[]>([]);
   const [gameStatus, setGameStatus] = useState<BuzzerGameStatus | null>(null);
+  const [trainingVoteCount, setTrainingVoteCount] = useState<{ voted: number; total: number } | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [showNextRoundConfig, setShowNextRoundConfig] = useState(false);
   const hasJoinedRef = useRef(false);
 
-  const categories = [
-    { id: 'identity-governance', label: 'Identity & Governance', icon: '🔐' },
-    { id: 'storage', label: 'Storage', icon: '💾' },
-    { id: 'compute', label: 'Compute', icon: '🖥️' },
-    { id: 'networking', label: 'Networking', icon: '🌐' },
-    { id: 'monitoring', label: 'Monitoring', icon: '📊' }
-  ];
+  const currentBank = questionBanks.find(b => b.bankId === selectedBank);
+  const categories = currentBank?.categories ?? [];
+
+  const handleBankChange = (bankId: string) => {
+    setSelectedBank(bankId);
+    const bank = questionBanks.find(b => b.bankId === bankId);
+    if (bank) {
+      setSelectedCategories(bank.categories.map(c => c.id));
+    }
+  };
 
   const toggleCategory = (categoryId: string) => {
     setSelectedCategories(prev =>
@@ -78,6 +87,31 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
         ? prev.filter(c => c !== categoryId)
         : [...prev, categoryId]
     );
+  };
+
+  const fetchQuestionBanks = async () => {
+    try {
+      const password = localStorage.getItem('dozent-password');
+      const response = await fetch('/api/dozent/question-banks', {
+        headers: { 'X-Dozent-Password': password || '' },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setQuestionBanks(data.banks);
+        // Select all categories of current bank if none selected
+        if (data.banks.length > 0) {
+          const bank = data.banks.find((b: QuestionBank) => b.bankId === selectedBank) || data.banks[0];
+          if (selectedCategories.length === 0) {
+            setSelectedCategories(bank.categories.map((c: { id: string }) => c.id));
+          }
+          if (!data.banks.find((b: QuestionBank) => b.bankId === selectedBank)) {
+            setSelectedBank(bank.bankId);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching question banks:', err);
+    }
   };
 
   const fetchSessions = async () => {
@@ -154,6 +188,8 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
 
   useEffect(() => {
     fetchSessions();
+    fetchQuestionBanks();
+    authenticateAsDozent();
   }, []);
 
   // Listen for player updates and game status when a session is created
@@ -262,6 +298,59 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       }
     };
 
+    const handleTrainingVoteCount = (data: { voted: number; total: number }) => {
+      setTrainingVoteCount(data);
+    };
+
+    const handleTrainingQuestion = (data: any) => {
+      setGameStatus(prev => ({
+        ...prev!,
+        gameState: 'question',
+        currentQuestionIndex: data.questionIndex,
+        totalQuestions: data.totalQuestions,
+        currentAnswerer: undefined,
+        buzzes: [],
+      }));
+      setGameStarted(true);
+      setTrainingVoteCount(null);
+    };
+
+    const handleTrainingResult = (data: any) => {
+      setGameStatus(prev => ({ ...prev!, gameState: 'result' }));
+      if (data.leaderboard) {
+        setJoinedPlayers(data.leaderboard.map((p: any) => ({
+          playerId: p.playerId || p.nickname,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })));
+      }
+    };
+
+    const handleTrainingTransition = (data: any) => {
+      setGameStatus(prev => ({ ...prev!, gameState: 'transition' }));
+      if (data.leaderboard) {
+        setJoinedPlayers(data.leaderboard.map((p: any) => ({
+          playerId: p.playerId || p.nickname,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })));
+      }
+    };
+
+    const handleTrainingGameOver = (data: any) => {
+      setGameStatus(prev => ({ ...prev!, gameState: 'finished' }));
+      if (data.leaderboard) {
+        setJoinedPlayers(data.leaderboard.map((p: any) => ({
+          playerId: p.playerId || p.nickname,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })));
+      }
+    };
+
     socket.on('buzzer-players-update', handlePlayersUpdate);
     socket.on('buzzer-state', handleBuzzerState);
     socket.on('buzzer-question', handleBuzzerQuestion);
@@ -270,12 +359,20 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     socket.on('buzzer-result', handleBuzzerResult);
     socket.on('buzzer-transition', handleBuzzerTransition);
     socket.on('buzzer-game-over', handleBuzzerGameOver);
+    socket.on('training-vote-count', handleTrainingVoteCount);
+    socket.on('training-question', handleTrainingQuestion);
+    socket.on('training-result', handleTrainingResult);
+    socket.on('training-transition', handleTrainingTransition);
+    socket.on('training-game-over', handleTrainingGameOver);
 
     // Join the session room and request state AFTER listeners are set up
     // This prevents race conditions where data arrives before handlers are ready
     if (!hasJoinedRef.current) {
       socket.emit('join-session', sessionCode);
       socket.emit('buzzer-get-state', sessionCode);
+      if (createdGameMode === 'training') {
+        socket.emit('training-get-state', sessionCode);
+      }
       hasJoinedRef.current = true;
     }
 
@@ -288,6 +385,11 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       socket.off('buzzer-result', handleBuzzerResult);
       socket.off('buzzer-transition', handleBuzzerTransition);
       socket.off('buzzer-game-over', handleBuzzerGameOver);
+      socket.off('training-vote-count', handleTrainingVoteCount);
+      socket.off('training-question', handleTrainingQuestion);
+      socket.off('training-result', handleTrainingResult);
+      socket.off('training-transition', handleTrainingTransition);
+      socket.off('training-game-over', handleTrainingGameOver);
     };
   }, [socket, sessionCode]);
 
@@ -310,6 +412,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
           totalQuestions: questionCount,
           categories: selectedCategories,
           gameMode: gameMode,
+          questionBank: selectedBank,
         }),
       });
 
@@ -349,6 +452,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
         body: JSON.stringify({
           totalQuestions: questionCount,
           categories: selectedCategories,
+          questionBank: selectedBank,
         }),
       });
 
@@ -382,6 +486,29 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     if (!socket || !sessionCode) return;
     if (confirm('Spiel wirklich beenden?')) {
       socket.emit('buzzer-force-end', sessionCode);
+    }
+  };
+
+  const handleStartTrainingGame = () => {
+    if (!socket || !sessionCode) return;
+    socket.emit('training-start-game', sessionCode);
+    setGameStarted(true);
+  };
+
+  const handleCloseTrainingRound = () => {
+    if (!socket || !sessionCode) return;
+    socket.emit('training-close-round', sessionCode);
+  };
+
+  const handleForceNextTrainingQuestion = () => {
+    if (!socket || !sessionCode) return;
+    socket.emit('training-force-next', sessionCode);
+  };
+
+  const handleEndTrainingGame = () => {
+    if (!socket || !sessionCode) return;
+    if (confirm('Spiel wirklich beenden?')) {
+      socket.emit('training-force-end', sessionCode);
     }
   };
 
@@ -429,15 +556,15 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
     : '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-azure-dark to-gray-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white/10 backdrop-blur rounded-2xl p-4 mb-6 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-black text-white">
-              AZURELYMPICS
+              CERTBUZZ
             </h1>
-            <span className="px-3 py-1 bg-azure-blue/30 text-azure-light text-sm font-medium rounded-full">
+            <span className="px-3 py-1 bg-cb-primary/30 text-cb-accent text-sm font-medium rounded-full">
               Dozenten-Panel
             </span>
           </div>
@@ -475,19 +602,46 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
               {!sessionCode ? (
                 <>
                   <h2 className="text-2xl font-bold text-white mb-6">Neue Session erstellen</h2>
-                  
+
+                  {/* Question Bank Selection */}
+                  {questionBanks.length > 1 && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-white/70 mb-3">
+                        Fragenbank
+                      </label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {questionBanks.map(bank => (
+                          <button
+                            key={bank.bankId}
+                            type="button"
+                            onClick={() => handleBankChange(bank.bankId)}
+                            className={`p-4 rounded-xl border-2 transition-all text-left ${
+                              selectedBank === bank.bankId
+                                ? 'border-cb-accent bg-cb-primary/30 shadow-lg'
+                                : 'border-white/20 bg-white/5 hover:border-white/40'
+                            }`}
+                          >
+                            <div className="font-bold text-white">{bank.label}</div>
+                            <div className="text-sm text-white/60 mt-1">{bank.description}</div>
+                            <div className="text-xs text-white/40 mt-2">{bank.questionCount} Fragen</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Game Mode Selection */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-white/70 mb-3">
                       Spielmodus
                     </label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <button
                         type="button"
                         onClick={() => setGameMode('racing')}
                         className={`p-4 rounded-xl border-2 transition-all text-left ${
                           gameMode === 'racing'
-                            ? 'border-azure-light bg-azure-blue/30 shadow-lg'
+                            ? 'border-cb-accent bg-cb-primary/30 shadow-lg'
                             : 'border-white/20 bg-white/5 hover:border-white/40'
                         }`}
                       >
@@ -512,6 +666,21 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                           Wer zuerst buzzert, darf antworten.
                         </div>
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setGameMode('training')}
+                        className={`p-4 rounded-xl border-2 transition-all text-left ${
+                          gameMode === 'training'
+                            ? 'border-teal-400 bg-teal-500/30 shadow-lg'
+                            : 'border-white/20 bg-white/5 hover:border-white/40'
+                        }`}
+                      >
+                        <div className="text-3xl mb-2">🧠</div>
+                        <div className="font-bold text-white">Team Training</div>
+                        <div className="text-sm text-white/60 mt-1">
+                          Gemeinsam abstimmen mit Konfidenz-Tipp.
+                        </div>
+                      </button>
                     </div>
                   </div>
 
@@ -526,11 +695,11 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                       max="50"
                       value={questionCount}
                       onChange={(e) => setQuestionCount(Number(e.target.value))}
-                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-azure-light"
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-cb-accent"
                     />
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-sm text-white/50">5</span>
-                      <span className="text-2xl font-bold text-azure-light">{questionCount}</span>
+                      <span className="text-2xl font-bold text-cb-accent">{questionCount}</span>
                       <span className="text-sm text-white/50">50</span>
                     </div>
                   </div>
@@ -547,7 +716,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                           onClick={() => toggleCategory(category.id)}
                           className={`p-3 rounded-lg text-left transition-all ${
                             selectedCategories.includes(category.id)
-                              ? 'bg-azure-blue text-white shadow-md'
+                              ? 'bg-cb-primary text-white shadow-md'
                               : 'bg-white/10 text-white/70 hover:bg-white/20'
                           }`}
                         >
@@ -570,7 +739,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                   <button
                     onClick={handleCreateSession}
                     disabled={loading || selectedCategories.length === 0}
-                    className="w-full bg-gradient-to-r from-azure-blue to-azure-light hover:from-azure-light hover:to-azure-blue text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg"
+                    className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg"
                   >
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -581,7 +750,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                         Erstelle Session...
                       </span>
                     ) : (
-                      `${gameMode === 'buzzer' ? '🔔' : '🏎️'} Session starten`
+                      `${gameMode === 'buzzer' ? '🔔' : gameMode === 'training' ? '🧠' : '🏎️'} Session starten`
                     )}
                   </button>
                 </>
@@ -592,14 +761,14 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <span className="text-3xl">
-                          {createdGameMode === 'buzzer' ? '🔔' : '🏎️'}
+                          {createdGameMode === 'buzzer' ? '🔔' : createdGameMode === 'training' ? '🧠' : '🏎️'}
                         </span>
                         <div>
                           <p className="text-green-300 font-bold text-lg">
                             Session aktiv
                           </p>
                           <p className="text-green-400/70 text-sm">
-                            {createdGameMode === 'buzzer' ? 'Buzzer-Modus' : 'Racing-Modus'}
+                            {createdGameMode === 'buzzer' ? 'Buzzer-Modus' : createdGameMode === 'training' ? 'Team Training' : 'Racing-Modus'}
                           </p>
                         </div>
                       </div>
@@ -653,7 +822,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                     <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <div className="text-2xl font-bold text-azure-light">
+                          <div className="text-2xl font-bold text-cb-accent">
                             {gameStatus.currentQuestionIndex + 1}/{gameStatus.totalQuestions}
                           </div>
                           <div className="text-xs text-white/50">Frage</div>
@@ -805,6 +974,53 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                     </div>
                   )}
 
+                  {/* Training Mode Controls */}
+                  {createdGameMode === 'training' && (
+                    <div className="space-y-3">
+                      {!gameStarted ? (
+                        <button
+                          onClick={handleStartTrainingGame}
+                          className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition-all"
+                        >
+                          🧠 Spiel starten
+                        </button>
+                      ) : (
+                        <>
+                          {gameStatus && gameStatus.gameState === 'question' && (
+                            <div className="space-y-3">
+                              {trainingVoteCount && (
+                                <div className="p-3 bg-white/5 rounded-xl text-center">
+                                  <span className="text-white font-bold text-2xl">{trainingVoteCount.voted}</span>
+                                  <span className="text-white/50"> / {trainingVoteCount.total} haben abgestimmt</span>
+                                </div>
+                              )}
+                              <button
+                                onClick={handleCloseTrainingRound}
+                                className="w-full bg-cb-primary hover:bg-cb-accent text-white font-bold py-3 rounded-xl transition-all"
+                              >
+                                Runde schließen
+                              </button>
+                            </div>
+                          )}
+                          {gameStatus && (gameStatus.gameState === 'result' || gameStatus.gameState === 'transition') && (
+                            <button
+                              onClick={handleForceNextTrainingQuestion}
+                              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all"
+                            >
+                              Nächste Frage →
+                            </button>
+                          )}
+                          <button
+                            onClick={handleEndTrainingGame}
+                            className="w-full bg-red-600/70 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition-all"
+                          >
+                            Spiel beenden
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+
                   {/* Quick Links */}
                   {createdGameMode === 'buzzer' && (
                     <a
@@ -862,7 +1078,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                       </span>
                       <span className="text-lg">{player.emoji}</span>
                       <span className="flex-1 font-medium text-sm truncate text-white">{player.nickname}</span>
-                      <span className="font-bold text-azure-light">{player.score || 0}</span>
+                      <span className="font-bold text-cb-accent">{player.score || 0}</span>
                     </div>
                   ))}
                 </div>
@@ -901,6 +1117,9 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                         </div>
                         <div className="text-xs text-white/50 mb-2">
                           {session.playerCount} Spieler • {session.totalQuestions} Fragen • {formatTimeAgo(session.createdAt)}
+                          {session.questionBank && session.questionBank !== 'azure-az104' && (
+                            <> • {questionBanks.find(b => b.bankId === session.questionBank)?.label || session.questionBank}</>
+                          )}
                         </div>
                         <div className="flex gap-2">
                           <button
