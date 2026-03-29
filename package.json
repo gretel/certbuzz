@@ -1,0 +1,27 @@
+{
+  "name": "azurelympics-104",
+  "version": "1.0.0",
+  "description": "Real-time multiplayer quiz system for Azure AZ-104 certification",
+  "type": "module",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "azure",
+    "az-104",
+    "quiz",
+    "multiplayer",
+    "real-time",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

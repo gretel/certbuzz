@@ -1,0 +1,3359 @@
+[
+  {
+    "id": "ig-001",
+    "category": "identity-governance",
+    "subcategory": "Manage Microsoft Entra Users and Groups",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Welche Rolle benötigt ein Benutzer mindestens, um neue Benutzer in Microsoft Entra ID zu erstellen?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Global Reader"
+      },
+      {
+        "id": "b",
+        "text": "User Administrator"
+      },
+      {
+        "id": "c",
+        "text": "Helpdesk Administrator"
+      },
+      {
+        "id": "d",
+        "text": "Security Administrator"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Die Rolle **User Administrator** ermöglicht das Erstellen und Verwalten von Benutzern und Gruppen in Microsoft Entra ID.\n\nWarum die anderen Optionen falsch sind:\n- **Global Reader**: Besitzt nur Leserechte auf Directory-Objekte\n- **Helpdesk Administrator**: Kann nur Passwörter für Nicht-Admins zurücksetzen\n- **Security Administrator**: Verwaltet Sicherheitseinstellungen, aber keine Benutzererstellung\n\n*Prüfungstipp*: **User Administrator** ist die minimale Rolle für Benutzerverwaltung – **Global Administrator** wäre überprivilegiert.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference"
+    ]
+  },
+  {
+    "id": "ig-002",
+    "category": "identity-governance",
+    "subcategory": "Manage Subscriptions and Governance",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Aussagen über Azure Resource Locks sind korrekt? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "ReadOnly-Locks verhindern Änderungen an Ressourcen"
+      },
+      {
+        "id": "b",
+        "text": "Delete-Locks verhindern das Löschen von Ressourcen"
+      },
+      {
+        "id": "c",
+        "text": "Locks werden an Child-Ressourcen vererbt"
+      },
+      {
+        "id": "d",
+        "text": "Nur Owner können Locks erstellen"
+      },
+      {
+        "id": "e",
+        "text": "Locks überschreiben RBAC-Berechtigungen"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Resource Locks** bieten zwei Schutzmodi:\n\n- **ReadOnly**: Verhindert alle Änderungen (PUT, PATCH, POST)\n- **Delete**: Verhindert nur das Löschen (DELETE)\n\nLocks werden automatisch von Parent- zu Child-Ressourcen *vererbt*.\n\nWarum die anderen Optionen falsch sind:\n- Nicht nur **Owner**, auch **User Access Administrator** können Locks verwalten\n- Locks *ergänzen* RBAC, überschreiben es aber nicht – sie gelten für alle Benutzer unabhängig von deren Rollen\n\n*Wichtig*: Locks schützen vor versehentlichen Änderungen, nicht vor böswilligen Akteuren mit ausreichenden Berechtigungen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources"
+    ]
+  },
+  {
+    "id": "ig-003",
+    "category": "identity-governance",
+    "subcategory": "Manage Microsoft Entra ID",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Entra ID-Edition wird für Conditional Access benötigt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Free"
+      },
+      {
+        "id": "b",
+        "text": "Microsoft 365 Apps"
+      },
+      {
+        "id": "c",
+        "text": "Premium P1"
+      },
+      {
+        "id": "d",
+        "text": "Premium P2"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "**Conditional Access Policies** sind ein Feature von **Entra ID Premium P1** (und P2).\n\nDie verschiedenen Editionen im Überblick:\n- **Free**: Nur Basis-Security-Defaults (keine granularen Policies)\n- **Microsoft 365 Apps**: Keine Conditional Access Policies\n- **Premium P1**: Conditional Access, Self-Service Password Reset, Dynamic Groups\n- **Premium P2**: Zusätzlich Identity Protection und Privileged Identity Management (PIM)\n\n*Prüfungstipp*: Für die AZ-104 ist wichtig zu wissen, dass **P1** für Conditional Access ausreicht, **P2** aber für erweiterte Identity-Features wie PIM benötigt wird.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview"
+    ]
+  },
+  {
+    "id": "ig-004",
+    "category": "identity-governance",
+    "subcategory": "Manage RBAC",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Welche Aussagen über Azure RBAC Custom Roles sind korrekt? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Custom Roles können auf Management Group-Ebene erstellt werden"
+      },
+      {
+        "id": "b",
+        "text": "Actions können mit Wildcards (*) definiert werden"
+      },
+      {
+        "id": "c",
+        "text": "NotActions überschreiben Actions"
+      },
+      {
+        "id": "d",
+        "text": "DataActions gelten für Data Plane-Operationen"
+      }
+    ],
+    "correctAnswers": [
+      "b",
+      "d"
+    ],
+    "explanation": "**Custom Roles** in Azure RBAC bieten flexible Berechtigungssteuerung:\n\n- **Wildcards (*)** werden in Actions unterstützt, z.B. `Microsoft.Storage/*/read`\n- **DataActions** definieren Berechtigungen für die **Data Plane** (z.B. Blob-Zugriff)\n- **Actions** gelten für die **Control Plane** (z.B. Storage Account erstellen)\n\nWarum die anderen Optionen falsch sind:\n- Custom Roles können mittlerweile auch auf **Management Group-Ebene** erstellt werden (früher nur Subscription oder niedriger)\n- **NotActions** sind *Ausnahmen* von Actions, überschreiben sie aber nicht vollständig – sie werden von den Actions subtrahiert\n\n*Prüfungstipp*: Unterscheide immer zwischen **Control Plane** (Ressourcenverwaltung) und **Data Plane** (Datenzugriff).",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles"
+    ]
+  },
+  {
+    "id": "ig-005",
+    "category": "identity-governance",
+    "subcategory": "Manage Azure Policy",
+    "type": "order",
+    "difficulty": "medium",
+    "question": "Sortieren Sie die Schritte zur Implementierung einer Azure Policy in der richtigen Reihenfolge:",
+    "options": [
+      {
+        "id": "a",
+        "text": "Policy Definition erstellen oder auswählen"
+      },
+      {
+        "id": "b",
+        "text": "Policy Assignment erstellen und Scope festlegen"
+      },
+      {
+        "id": "c",
+        "text": "Non-compliant Resources identifizieren"
+      },
+      {
+        "id": "d",
+        "text": "Remediation Task erstellen (optional)"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "explanation": "Der **Azure Policy** Workflow besteht aus vier Schritten:\n\n1. **Policy Definition** erstellen oder eine Built-in Definition auswählen (definiert die Compliance-Regel)\n2. **Policy Assignment** erstellen und den Scope festlegen (Subscription, Resource Group oder Management Group)\n3. **Non-compliant Resources** identifizieren – Azure evaluiert Ressourcen und zeigt nicht-konforme im Compliance-Dashboard\n4. **Remediation Task** erstellen (optional) – korrigiert bestehende Ressourcen automatisch\n\n*Wichtig*: Neue Ressourcen werden sofort evaluiert, bestehende Ressourcen benötigen einen Remediation Task oder werden bei der nächsten Compliance-Evaluation geprüft.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/governance/policy/overview"
+    ]
+  },
+  {
+    "id": "storage-001",
+    "category": "storage",
+    "subcategory": "Configure Azure Storage",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Redundanzoptionen bieten Schutz vor Rechenzentrumsausfällen? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "LRS (Locally Redundant Storage)"
+      },
+      {
+        "id": "b",
+        "text": "ZRS (Zone Redundant Storage)"
+      },
+      {
+        "id": "c",
+        "text": "GRS (Geo-Redundant Storage)"
+      },
+      {
+        "id": "d",
+        "text": "RA-GRS (Read-Access Geo-Redundant Storage)"
+      }
+    ],
+    "correctAnswers": [
+      "b",
+      "c"
+    ],
+    "explanation": "**Storage Redundancy** zum Schutz vor Rechenzentrumsausfällen:\n\n**ZRS (Zone Redundant Storage):**\n- Repliziert Daten *synchron* über drei **Availability Zones** in der primären Region\n- Schützt vor Ausfall eines einzelnen Rechenzentrums\n- Daten bleiben in derselben Region\n\n**GRS (Geo-Redundant Storage):**\n- Repliziert Daten *asynchron* in eine sekundäre Region (Paired Region)\n- Schützt vor regionalen Katastrophen\n- Kombiniert LRS in beiden Regionen\n\n**Warum LRS nicht schützt:**\n- **LRS** repliziert nur dreimal *innerhalb eines* Rechenzentrums\n\n**Hinweis zu RA-GRS:**\n- RA-GRS ist wie GRS, erlaubt aber zusätzlich *Lesezugriff* auf die sekundäre Region – schützt also ebenfalls vor Rechenzentrumsausfällen, war aber nicht in den korrekten Antworten gefordert.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy"
+    ]
+  },
+  {
+    "id": "storage-002",
+    "category": "storage",
+    "subcategory": "Configure Azure Blob Storage",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Welche Access Tier in Azure Blob Storage hat die höchsten Speicherkosten, aber niedrigsten Zugriffskosten?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Hot"
+      },
+      {
+        "id": "b",
+        "text": "Cool"
+      },
+      {
+        "id": "c",
+        "text": "Cold"
+      },
+      {
+        "id": "d",
+        "text": "Archive"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "Die **Access Tiers** in Azure Blob Storage im Überblick:\n\n**Hot Tier:**\n- Höchste Speicherkosten, niedrigste Zugriffskosten\n- Keine Mindestaufbewahrung\n- Optimiert für *häufig* zugegriffene Daten\n\n**Cool Tier:**\n- Mittlere Speicher- und Zugriffskosten\n- Mindestaufbewahrung: 30 Tage\n\n**Cold Tier:**\n- Niedrige Speicherkosten, höhere Zugriffskosten\n- Mindestaufbewahrung: 90 Tage\n\n**Archive Tier:**\n- Niedrigste Speicherkosten, höchste Zugriffskosten\n- Mindestaufbewahrung: 180 Tage\n\n*Prüfungstipp*: Bei der Tier-Auswahl ist das Zugriffspattern entscheidend – häufiger Zugriff → Hot, seltener Zugriff → Cool/Cold, Langzeitarchivierung → Archive.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview"
+    ]
+  },
+  {
+    "id": "storage-003",
+    "category": "storage",
+    "subcategory": "Configure Azure Files",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welches Protokoll wird für Azure Files mit Entra Domain Services-Integration verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "NFS 3.0"
+      },
+      {
+        "id": "b",
+        "text": "NFS 4.1"
+      },
+      {
+        "id": "c",
+        "text": "SMB 2.1"
+      },
+      {
+        "id": "d",
+        "text": "SMB 3.0"
+      }
+    ],
+    "correctAnswers": [
+      "d"
+    ],
+    "explanation": "**Azure Files** mit Entra Domain Services-Integration verwendet **SMB 3.0** (oder höher).\n\n**SMB (Server Message Block):**\n- Unterstützt Windows ACLs und NTFS-Permissions\n- Identity-based Authentication über Entra DS oder On-Premises AD DS\n- Verschlüsselung in Transit standardmäßig aktiviert\n\n**NFS (Network File System):**\n- Verfügbar für Premium Files\n- Unterstützt *keine* Entra-Integration\n- Primär für Linux-Workloads\n\n*Prüfungstipp*: Für Windows-basierte Workloads mit Identity-Integration ist **SMB 3.0** die richtige Wahl. NFS wird für Linux-Workloads ohne Windows-ACL-Anforderungen verwendet.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-auth-active-directory-enable"
+    ]
+  },
+  {
+    "id": "storage-004",
+    "category": "storage",
+    "subcategory": "Configure Storage Security",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Welche Methoden können verwendet werden, um Zugriff auf Azure Blob Storage zu autorisieren? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Shared Access Signature (SAS)"
+      },
+      {
+        "id": "b",
+        "text": "Azure AD RBAC"
+      },
+      {
+        "id": "c",
+        "text": "Storage Account Keys"
+      },
+      {
+        "id": "d",
+        "text": "Network Security Group"
+      },
+      {
+        "id": "e",
+        "text": "Azure Policy"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Azure Blob Storage** unterstützt drei Hauptmethoden zur Autorisierung:\n\n1. **Shared Access Signature (SAS):**\n   - Zeitlich begrenzte, granulare Zugriffsrechte\n   - Ohne Weitergabe des Account Keys\n   - Ideal für temporären Zugriff externer Anwendungen\n\n2. **Entra ID RBAC:**\n   - Identity-based Authorization\n   - Built-in-Rollen wie *Storage Blob Data Contributor*\n   - Empfohlene Methode für interne Anwendungen\n\n3. **Storage Account Keys:**\n   - Vollständiger Zugriff mit beiden Schlüsseln (key1/key2)\n   - *Nicht empfohlen* für Produktion (zu weitreichende Rechte)\n\n**Warum die anderen Optionen falsch sind:**\n- **Network Security Groups**: Steuern Netzwerk-Traffic, keine Storage-Autorisierung\n- **Azure Policy**: Definiert Governance-Regeln, keine direkte Autorisierung",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-data-access"
+    ]
+  },
+  {
+    "id": "storage-005",
+    "category": "storage",
+    "subcategory": "Implement Storage Lifecycle Management",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Nach wie vielen Tagen kann ein Blob frühestens per Lifecycle Management automatisch in den Archive Tier verschoben werden?",
+    "options": [
+      {
+        "id": "a",
+        "text": "0 Tage (sofort)"
+      },
+      {
+        "id": "b",
+        "text": "30 Tage"
+      },
+      {
+        "id": "c",
+        "text": "90 Tage"
+      },
+      {
+        "id": "d",
+        "text": "180 Tage"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "**Lifecycle Management** kann Blobs *sofort* (0 Tage) in den **Archive Tier** verschieben.\n\n**Wichtige Unterscheidung:**\n- *Verschieben* in Archive: Jederzeit möglich (auch sofort)\n- *Early Deletion Fee*: Wenn ein Blob vor Ablauf der Mindestaufbewahrung gelöscht oder in einen anderen Tier verschoben wird, fallen Gebühren für die restlichen Tage an\n\n**Mindestaufbewahrungszeiten (Early Deletion):**\n- Cool Tier: 30 Tage\n- Cold Tier: 90 Tage\n- Archive Tier: 180 Tage\n\n*Prüfungstipp*: Die 180 Tage beziehen sich auf die *Mindestaufbewahrung* nach dem Verschieben, nicht auf eine Wartezeit vor dem Verschieben.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview"
+    ]
+  },
+  {
+    "id": "compute-001",
+    "category": "compute",
+    "subcategory": "Configure Virtual Machines",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was passiert mit einer Azure VM, wenn Sie diese im Portal 'Stoppen'?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Die VM wird gestoppt, aber weiterhin berechnet"
+      },
+      {
+        "id": "b",
+        "text": "Die VM wird gestoppt und freigegeben (deallocated)"
+      },
+      {
+        "id": "c",
+        "text": "Die VM wird neu gestartet"
+      },
+      {
+        "id": "d",
+        "text": "Die VM wird gelöscht"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Beim **Stoppen einer VM im Azure Portal** wird die VM *deallocated* (Stop + Freigabe der Compute-Ressourcen).\n\n**Status: Stopped (deallocated):**\n- VM ist heruntergefahren\n- Compute-Ressourcen sind freigegeben\n- *Keine Compute-Kosten* mehr (nur Storage-Kosten für Disks)\n- Dynamische IP-Adresse geht *verloren*\n\n**Unterschied zu \"Stopped\" (ohne Deallocation):**\n- Via PowerShell/CLI möglich: `Stop-AzVM -StayProvisioned`\n- Compute-Kosten laufen *weiter*\n- IP-Adresse bleibt erhalten\n\n*Prüfungstipp*: Im Portal gibt es nur \"Stop\" (= deallocated). Für den Erhalt der dynamischen IP muss die VM über CLI/PowerShell mit `-StayProvisioned` gestoppt werden, oder eine *statische IP* verwendet werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/states-billing"
+    ]
+  },
+  {
+    "id": "compute-002",
+    "category": "compute",
+    "subcategory": "Configure Azure App Service",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Features sind nur in App Service Standard-Plänen oder höher verfügbar? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Custom Domains"
+      },
+      {
+        "id": "b",
+        "text": "Deployment Slots"
+      },
+      {
+        "id": "c",
+        "text": "Auto-Scaling"
+      },
+      {
+        "id": "d",
+        "text": "VNet Integration"
+      },
+      {
+        "id": "e",
+        "text": "SSL/TLS Bindings"
+      }
+    ],
+    "correctAnswers": [
+      "b",
+      "c"
+    ],
+    "explanation": "**App Service Plan Features** nach Tier:\n\n**Free/Shared Plan:**\n- Keine Custom Domains\n- Keine SSL/TLS Bindings\n- Keine Deployment Slots\n- Kein Auto-Scaling\n\n**Basic Plan:**\n- Custom Domains ✓\n- SSL/TLS Bindings ✓\n- Keine Deployment Slots\n- Kein Auto-Scaling\n\n**Standard Plan und höher:**\n- Custom Domains ✓\n- SSL/TLS Bindings ✓\n- **Deployment Slots** ✓\n- **Auto-Scaling** ✓\n\n**VNet Integration:** Erfordert **Premium V2/V3** oder **Isolated** Plan.\n\n*Prüfungstipp*: Deployment Slots und Auto-Scaling sind die Hauptfeatures, die Standard von Basic unterscheiden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans"
+    ]
+  },
+  {
+    "id": "compute-003",
+    "category": "compute",
+    "subcategory": "Configure VM Availability",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist der Haupt-Unterschied zwischen Availability Sets und Availability Zones?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Availability Sets bieten höhere SLA als Zones"
+      },
+      {
+        "id": "b",
+        "text": "Availability Zones schützen vor Datacenter-Ausfällen"
+      },
+      {
+        "id": "c",
+        "text": "Availability Sets kosten extra, Zones sind kostenlos"
+      },
+      {
+        "id": "d",
+        "text": "Availability Zones gibt es in allen Regions"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Der Hauptunterschied zwischen **Availability Sets** und **Availability Zones**:\n\n**Availability Zones:**\n- *Physisch getrennte* Datacenter innerhalb einer Azure Region\n- Eigene Stromversorgung, Kühlung, Netzwerk\n- Schützt vor *Datacenter-Ausfällen*\n- **SLA: 99,99%**\n\n**Availability Sets:**\n- Schützt vor *Rack-/Server-Ausfällen* innerhalb eines Datacenters\n- Nutzt **Fault Domains** (physische Racks) und **Update Domains** (Wartungsgruppen)\n- **SLA: 99,95%**\n\n**Tradeoffs:**\n- Zones: Höhere SLA, aber potenziell höhere Netzwerk-Latenz zwischen VMs\n- Sets: Niedrigere Latenz, aber kein Schutz vor Datacenter-Ausfällen\n\n*Prüfungstipp*: Availability Zones sind nicht in allen Regionen verfügbar – in Regionen ohne Zones sind Availability Sets die beste Option.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview"
+    ]
+  },
+  {
+    "id": "compute-004",
+    "category": "compute",
+    "subcategory": "Configure VM Extensions",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche VM-Extension wird für das automatische Patching von Windows-VMs verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Azure Monitor Agent"
+      },
+      {
+        "id": "b",
+        "text": "Custom Script Extension"
+      },
+      {
+        "id": "c",
+        "text": "Update Management Extension"
+      },
+      {
+        "id": "d",
+        "text": "Desired State Configuration"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "Die **Update Management Extension** (bzw. **Azure Update Manager**) ermöglicht automatisches Patch Management.\n\n**Funktionen:**\n- Unterstützt Windows und Linux VMs\n- Patch Assessment (Übersicht fehlender Updates)\n- Scheduled Deployments (geplante Patch-Fenster)\n- Compliance Reporting\n\n**Andere VM Extensions:**\n- **Azure Monitor Agent**: Sammelt Telemetrie-Daten\n- **Custom Script Extension**: Führt Skripte nach Deployment aus\n- **Desired State Configuration**: Konfigurationsverwaltung (PowerShell DSC)\n\n*Prüfungstipp*: Azure Update Manager ist der Nachfolger von Update Management (Log Analytics-basiert) und bietet native Azure-Integration.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/update-manager/overview"
+    ]
+  },
+  {
+    "id": "compute-005",
+    "category": "compute",
+    "subcategory": "Configure Azure Container Instances",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Aussagen über Azure Container Instances (ACI) sind korrekt? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "ACI bietet Orchestrierung für Multi-Container Deployments"
+      },
+      {
+        "id": "b",
+        "text": "ACI unterstützt sowohl Linux als auch Windows Container"
+      },
+      {
+        "id": "c",
+        "text": "ACI kann in VNets integriert werden"
+      },
+      {
+        "id": "d",
+        "text": "ACI ist günstiger als AKS für große Workloads"
+      }
+    ],
+    "correctAnswers": [
+      "b",
+      "c"
+    ],
+    "explanation": "**Azure Container Instances (ACI)** – wichtige Eigenschaften:\n\n**Korrekte Aussagen:**\n- Unterstützt sowohl **Linux** als auch **Windows** Container\n- Kann in **Azure Virtual Networks** integriert werden (für private Konnektivität)\n\n**Warum die anderen Optionen falsch sind:**\n\n- **\"Orchestrierung für Multi-Container\"**: ACI ist ein *serverloser* Container-Service *ohne* eingebaute Orchestrierung. Für komplexe Szenarien → **Azure Kubernetes Service (AKS)**\n- **\"Günstiger als AKS für große Workloads\"**: Bei dauerhaft laufenden, großen Workloads ist AKS oft günstiger\n\n**Ideale Anwendungsfälle für ACI:**\n- Schnell startende Container\n- Batch Jobs, Event-driven Tasks\n- CI/CD Build Agents\n\n*Prüfungstipp*: ACI = Einfach und schnell. AKS = Komplex aber mächtig (Orchestrierung).",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/container-instances/container-instances-overview"
+    ]
+  },
+  {
+    "id": "network-001",
+    "category": "networking",
+    "subcategory": "Configure Virtual Networks",
+    "type": "order",
+    "difficulty": "hard",
+    "question": "Sortieren Sie die Schritte zum Erstellen einer VNet-zu-VNet-VPN-Verbindung in der richtigen Reihenfolge:",
+    "options": [
+      {
+        "id": "a",
+        "text": "Erstellen Sie zwei Virtual Networks mit nicht-überlappenden Address Spaces"
+      },
+      {
+        "id": "b",
+        "text": "Erstellen Sie Gateway-Subnetze in beiden VNets (Name: GatewaySubnet)"
+      },
+      {
+        "id": "c",
+        "text": "Erstellen Sie VPN Gateways in beiden VNets"
+      },
+      {
+        "id": "d",
+        "text": "Konfigurieren Sie die VNet-zu-VNet-Connections in beiden Gateways"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "explanation": "**VNet-zu-VNet VPN Gateway Connection** – Schritte:\n\n1. **Zwei VNets erstellen** mit nicht-überlappenden Address Spaces\n   - z.B. VNet1: 10.1.0.0/16, VNet2: 10.2.0.0/16\n\n2. **GatewaySubnet erstellen** in beiden VNets\n   - Name *muss* exakt \"GatewaySubnet\" sein\n   - Mindestens /27 (empfohlen: /27 oder größer)\n\n3. **VPN Gateways erstellen** in beiden VNets\n   - Dauert ca. 30-45 Minuten\n   - SKU je nach Bandbreitenbedarf wählen\n\n4. **VNet-zu-VNet Connections konfigurieren**\n   - Jedes Gateway benötigt eine Connection zum anderen\n   - Shared Key muss übereinstimmen\n\n**Alternative:**\n**VNet Peering** ist einfacher und schneller für VNet-to-VNet innerhalb Azure (kein Gateway nötig, keine Kosten pro Connection).\n\n*Prüfungstipp*: VPN Gateway für Hybrid-Szenarien (On-Premises), VNet Peering für Azure-zu-Azure.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-howto-vnet-vnet-resource-manager-portal"
+    ]
+  },
+  {
+    "id": "network-002",
+    "category": "networking",
+    "subcategory": "Configure Network Security Groups",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist die Standard-Priorität, die Azure für die erste benutzerdefinierte NSG-Regel vorschlägt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "100"
+      },
+      {
+        "id": "b",
+        "text": "1000"
+      },
+      {
+        "id": "c",
+        "text": "4096"
+      },
+      {
+        "id": "d",
+        "text": "65000"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "**NSG-Regel Prioritäten** – Grundlagen:\n\n**Standard-Vorschlag für erste Custom Rule:**\n- Azure schlägt **100** als erste Priorität vor\n\n**Prioritäts-Bereich:**\n- Custom Rules: **100 - 4096**\n- Default Rules: 65000 - 65500 (können nicht gelöscht, nur überschrieben werden)\n\n**Evaluierung:**\n- *Niedrigere* Zahl = *höhere* Priorität\n- Erste matchende Rule wird angewendet\n\n**Best Practice:**\n- Regeln in 100er-Schritten nummerieren (100, 200, 300...)\n- Ermöglicht spätere Einfügungen ohne Umnummerierung\n\n*Prüfungstipp*: Deny-Rules mit niedriger Priorität (z.B. 100) überschreiben Allow-Rules mit höherer Priorität (z.B. 200).",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview"
+    ]
+  },
+  {
+    "id": "network-003",
+    "category": "networking",
+    "subcategory": "Configure Azure Load Balancer",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welcher Load Balancer SKU wird für Availability Zone-resilienten Traffic benötigt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Basic"
+      },
+      {
+        "id": "b",
+        "text": "Standard"
+      },
+      {
+        "id": "c",
+        "text": "Gateway"
+      },
+      {
+        "id": "d",
+        "text": "Premium"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Der **Standard Load Balancer SKU** wird für **Zone-redundanten** Traffic benötigt.\n\n**Standard Load Balancer:**\n- Zone-redundant by default\n- Backend-VMs über mehrere **Availability Zones** verteilen\n- Bis zu 1000 Instanzen (vs. 300 bei Basic)\n- **SLA: 99,99%**\n- Erweiterte Diagnose-Features\n\n**Basic Load Balancer:**\n- *Deprecated* – sollte nicht mehr verwendet werden\n- Keine Zone-Redundanz\n- Keine SLA\n\n**Gateway Load Balancer:**\n- Für Network Virtual Appliances (NVAs)\n- Transparentes Einfügen von Firewalls, etc.\n\n*Prüfungstipp*: Für neue Deployments immer **Standard SKU** verwenden. Basic wird schrittweise abgeschafft.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/load-balancer/skus"
+    ]
+  },
+  {
+    "id": "network-004",
+    "category": "networking",
+    "subcategory": "Configure Azure DNS",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Was ist der Hauptvorteil von Azure Private DNS Zones gegenüber Custom DNS Servern in VNets?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Niedrigere Kosten"
+      },
+      {
+        "id": "b",
+        "text": "Höhere Performance"
+      },
+      {
+        "id": "c",
+        "text": "Automatische VM-Name-Registrierung"
+      },
+      {
+        "id": "d",
+        "text": "Unterstützung für externe Domains"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "Der Hauptvorteil von **Azure Private DNS Zones** ist die **automatische VM-Name-Registrierung**.\n\n**Auto-Registration:**\n- Wenn VMs erstellt oder gelöscht werden, aktualisiert Azure DNS-Records automatisch\n- Erfordert VNet-Link mit \"Enable auto registration\"\n\n**Vorteile gegenüber Custom DNS Servern:**\n- Keine manuelle DNS-Verwaltung\n- Hochverfügbar (vollständig managed)\n- Keine zusätzliche Infrastruktur nötig\n\n**Abdeckung:**\n- Private DNS = interne Namen (VNet-intern)\n- Azure Public DNS = externe Domains\n\n*Prüfungstipp*: Private DNS Zones können mit mehreren VNets verknüpft werden, aber Auto-Registration nur bei einem VNet pro Zone.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/dns/private-dns-overview"
+    ]
+  },
+  {
+    "id": "network-005",
+    "category": "networking",
+    "subcategory": "Configure Azure Application Gateway",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Welche Features bietet Application Gateway v2 zusätzlich zu v1? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Autoscaling"
+      },
+      {
+        "id": "b",
+        "text": "Zone Redundancy"
+      },
+      {
+        "id": "c",
+        "text": "Static VIP"
+      },
+      {
+        "id": "d",
+        "text": "Web Application Firewall (WAF)"
+      },
+      {
+        "id": "e",
+        "text": "Rewrite HTTP Headers"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "e"
+    ],
+    "explanation": "**Application Gateway v2** bietet gegenüber v1 mehrere zusätzliche Features:\n\n**Nur in v2:**\n- **Autoscaling**: Dynamische Skalierung basierend auf Traffic-Mustern\n- **Zone Redundancy**: Deployment über Availability Zones für höhere SLA\n- **HTTP Header/URL Rewrite**: Modifikation von Request/Response Headers\n\n**In beiden Versionen (v1 und v2):**\n- Web Application Firewall (WAF)\n- Static VIP\n\n**Weitere v2-Vorteile:**\n- Bessere Performance\n- Key Vault Integration\n- Günstiger bei variabler Last\n\n*Wichtig*: Application Gateway v1 ist **deprecated** und sollte nicht mehr für neue Deployments verwendet werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/application-gateway/overview-v2"
+    ]
+  },
+  {
+    "id": "monitor-001",
+    "category": "monitoring",
+    "subcategory": "Configure Azure Monitor",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Wie lange werden Metriken in Azure Monitor standardmäßig aufbewahrt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "30 Tage"
+      },
+      {
+        "id": "b",
+        "text": "60 Tage"
+      },
+      {
+        "id": "c",
+        "text": "90 Tage"
+      },
+      {
+        "id": "d",
+        "text": "93 Tage"
+      }
+    ],
+    "correctAnswers": [
+      "d"
+    ],
+    "explanation": "**Azure Monitor Metrics** werden standardmäßig **93 Tage** aufbewahrt.\n\n**Metriken-Eigenschaften:**\n- Im Portal frei abfragbar\n- Automatische Sammlung von Platform Metrics (CPU, Memory, Network)\n- Custom Metrics müssen aktiv gesendet werden\n\n**Für längere Aufbewahrung (bis zu 2 Jahre):**\n- Export in **Log Analytics Workspace**\n- Diagnostic Settings konfigurieren\n\n**Aufbewahrungszeiten:**\n- **Platform Metrics**: 93 Tage\n- **Activity Logs**: 90 Tage\n- **Resource Logs**: Muss explizit konfiguriert werden\n\n*Prüfungstipp*: Die 93 Tage für Metriken und 90 Tage für Activity Logs sind wichtige Prüfungsfakten.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/data-platform-metrics"
+    ]
+  },
+  {
+    "id": "monitor-002",
+    "category": "monitoring",
+    "subcategory": "Configure Azure Alerts",
+    "type": "order",
+    "difficulty": "medium",
+    "question": "Sortieren Sie die Komponenten einer Azure Alert Rule in der logischen Konfigurationsreihenfolge:",
+    "options": [
+      {
+        "id": "a",
+        "text": "Scope (Zielressource auswählen)"
+      },
+      {
+        "id": "b",
+        "text": "Condition (Signal und Schwellenwert definieren)"
+      },
+      {
+        "id": "c",
+        "text": "Action Group (Benachrichtigungen konfigurieren)"
+      },
+      {
+        "id": "d",
+        "text": "Alert Details (Name und Severity festlegen)"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "explanation": "**Azure Alert Rule** Komponenten in der logischen Konfigurationsreihenfolge:\n\n1. **Scope:**\n   - Zielressource oder Ressourcengruppe auswählen\n   - Definiert *was* überwacht wird\n\n2. **Condition:**\n   - Signal Type: Metric, Log, Activity Log\n   - Threshold/Logic definieren (z.B. CPU > 80%)\n   - Aggregation und Evaluation-Frequenz\n\n3. **Action Group:**\n   - Benachrichtigungsmethoden konfigurieren\n   - Email, SMS, Webhook, Azure Function, Logic App, ITSM\n\n4. **Alert Details:**\n   - Rule Name und Description\n   - **Severity** (0-4): Hilft bei Priorisierung\n   - Resource Group für die Alert Rule selbst\n\n*Prüfungstipp*: Severity 0 = Critical, Severity 4 = Verbose. Action Groups können von mehreren Alert Rules wiederverwendet werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-overview"
+    ]
+  },
+  {
+    "id": "monitor-003",
+    "category": "monitoring",
+    "subcategory": "Configure Log Analytics",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Abfragesprache wird in Log Analytics verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "SQL"
+      },
+      {
+        "id": "b",
+        "text": "KQL (Kusto Query Language)"
+      },
+      {
+        "id": "c",
+        "text": "PowerShell"
+      },
+      {
+        "id": "d",
+        "text": "JSON Query Syntax"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Log Analytics** verwendet **KQL (Kusto Query Language)** für Abfragen.\n\n**KQL-Eigenschaften:**\n- Leistungsfähige Read-Only Query Language\n- Optimiert für Logs und Telemetrie-Daten\n- Verwendet auch in: Application Insights, Azure Data Explorer, Microsoft Sentinel\n\n**Wichtige Operatoren:**\n- `where`: Filtern\n- `summarize`: Aggregieren\n- `join`: Tabellen verbinden\n- `render`: Visualisieren\n\n**Beispiel-Query:**\n`AzureActivity | where TimeGenerated > ago(1h) | summarize count() by OperationName`\n\n*Prüfungstipp*: KQL-Grundkenntnisse sind für die AZ-104 relevant – insbesondere `where`, `summarize`, und `ago()`.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-query-overview"
+    ]
+  },
+  {
+    "id": "monitor-004",
+    "category": "monitoring",
+    "subcategory": "Configure Network Watcher",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Network Watcher-Tools helfen bei Konnektivitätsproblemen? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "IP Flow Verify"
+      },
+      {
+        "id": "b",
+        "text": "Connection Monitor"
+      },
+      {
+        "id": "c",
+        "text": "NSG Flow Logs"
+      },
+      {
+        "id": "d",
+        "text": "Topology View"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b"
+    ],
+    "explanation": "**Network Watcher Tools** für Konnektivitätsprobleme:\n\n**IP Flow Verify:**\n- Testet ob ein spezifisches Packet durch NSG-Rules erlaubt oder blockiert wird\n- Zeigt *welche Rule* matched\n- Für Troubleshooting von \"Warum kann VM A nicht zu VM B verbinden?\"\n\n**Connection Monitor:**\n- Testet *kontinuierlich* End-to-End-Konnektivität\n- Zwischen Azure-Ressourcen oder zu externen Endpoints\n- Liefert Latency und Packet Loss Metriken\n- Für Langzeit-Monitoring und Alerting\n\n**Andere Tools (nicht direkt für Troubleshooting):**\n- **NSG Flow Logs**: Zeichnen Traffic auf (für Analyse, nicht Live-Troubleshooting)\n- **Topology**: Zeigt Netzwerk-Architektur grafisch\n\n*Prüfungstipp*: IP Flow Verify = \"Wird Traffic blockiert?\", Connection Monitor = \"Ist die Verbindung stabil?\"",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview"
+    ]
+  },
+  {
+    "id": "monitor-005",
+    "category": "monitoring",
+    "subcategory": "Configure Diagnostic Settings",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wohin können Azure Resource Logs (Diagnostic Logs) NICHT geroutet werden?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Log Analytics Workspace"
+      },
+      {
+        "id": "b",
+        "text": "Storage Account"
+      },
+      {
+        "id": "c",
+        "text": "Event Hub"
+      },
+      {
+        "id": "d",
+        "text": "Azure SQL Database"
+      }
+    ],
+    "correctAnswers": [
+      "d"
+    ],
+    "explanation": "**Azure Resource Logs** (früher Diagnostic Logs) können an drei Ziele geroutet werden:\n\n**Unterstützte Ziele:**\n- **Log Analytics Workspace**: KQL-Queries, erweiterte Analyse\n- **Storage Account**: Kostengünstige Langzeit-Archivierung\n- **Event Hub**: Streaming an externe SIEM/Monitoring-Tools\n\n**NICHT unterstützt:**\n- Azure SQL Database\n- Cosmos DB (als Ziel)\n- Blob Storage direkt (nur via Storage Account)\n\n**Konfiguration:**\n- Diagnostic Settings *pro Ressource* konfigurieren\n- Definieren welche Log-Kategorien erfasst werden\n- Mehrere Destinations pro Ressource möglich\n\n*Prüfungstipp*: Event Hub für SIEM-Integration (Splunk, etc.), Log Analytics für Azure-native Analyse.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings"
+    ]
+  },
+  {
+    "id": "ig-006",
+    "category": "identity-governance",
+    "subcategory": "Configure Managed Identities",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Hauptunterschied zwischen System-Assigned und User-Assigned Managed Identities?",
+    "options": [
+      {
+        "id": "a",
+        "text": "System-Assigned Identities können von mehreren Ressourcen verwendet werden"
+      },
+      {
+        "id": "b",
+        "text": "User-Assigned Identities haben einen eigenständigen Lifecycle"
+      },
+      {
+        "id": "c",
+        "text": "System-Assigned Identities bieten höhere Sicherheit"
+      },
+      {
+        "id": "d",
+        "text": "User-Assigned Identities sind kostenlos"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Der Hauptunterschied zwischen **Managed Identity**-Typen liegt im Lifecycle:\n\n**User-Assigned Managed Identity:**\n- Wird als *separate* Azure-Ressource erstellt\n- Hat einen *eigenständigen* Lifecycle\n- Kann von *mehreren* Ressourcen (VMs, App Services, Functions) gemeinsam genutzt werden\n- Bleibt bestehen, wenn verknüpfte Ressourcen gelöscht werden\n\n**System-Assigned Managed Identity:**\n- Ist direkt an *eine* Ressource gebunden\n- Wird automatisch mit der Ressource erstellt und gelöscht\n- Kann *nicht* zwischen Ressourcen geteilt werden\n\n*Prüfungstipp*: Beide Typen bieten gleiche Sicherheit (kein Passwort-Management nötig) und sind kostenlos. User-Assigned eignet sich für mehrere Ressourcen mit identischen Zugriffsanforderungen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview"
+    ]
+  },
+  {
+    "id": "storage-006",
+    "category": "storage",
+    "subcategory": "Configure Azure Disk Encryption",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Welche Azure-Komponente wird für VM Disk Encryption Keys verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Azure Storage Service Encryption"
+      },
+      {
+        "id": "b",
+        "text": "Azure Key Vault"
+      },
+      {
+        "id": "c",
+        "text": "Azure Backup Vault"
+      },
+      {
+        "id": "d",
+        "text": "Azure Disk Encryption Set"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Disk Encryption (ADE)** verwendet **Azure Key Vault** zur Speicherung und Verwaltung der Encryption Keys.\n\n**Verschlüsselungstechnologien:**\n- **Windows VMs**: BitLocker\n- **Linux VMs**: dm-crypt\n\n**Wichtige Unterscheidungen:**\n- **Azure Key Vault**: Speichert ADE-Schlüssel\n- **Disk Encryption Sets**: Server-Side Encryption (SSE) mit Customer-Managed Keys\n- **Storage Service Encryption**: Automatische Verschlüsselung at-rest mit Platform-Managed Keys\n\n*Prüfungstipp*: ADE verschlüsselt OS- und Data-Disks auf VM-Ebene, während SSE die Verschlüsselung auf Storage-Ebene übernimmt. Beide können kombiniert werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/disk-encryption-overview"
+    ]
+  },
+  {
+    "id": "compute-006",
+    "category": "compute",
+    "subcategory": "Configure VM Scale Sets",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche automatischen Scaling-Modi unterstützen VM Scale Sets? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Manual Scaling"
+      },
+      {
+        "id": "b",
+        "text": "Scheduled Scaling"
+      },
+      {
+        "id": "c",
+        "text": "Autoscale basierend auf Metriken"
+      },
+      {
+        "id": "d",
+        "text": "Predictive Scaling mit Machine Learning"
+      }
+    ],
+    "correctAnswers": [
+      "b",
+      "c"
+    ],
+    "explanation": "**VM Scale Sets** unterstützen zwei *automatische* Scaling-Modi:\n\n1. **Scheduled Scaling:**\n   - Zeitbasierte Rules\n   - Beispiel: \"Scale auf 10 Instanzen jeden Montag 8:00 Uhr\"\n\n2. **Metric-based Autoscaling:**\n   - Basierend auf Azure Monitor Metrics\n   - Beispiel: \"Wenn CPU > 75% für 10 Minuten, scale out um 2 Instanzen\"\n   - Custom Metrics möglich (Application Insights, etc.)\n\n**Manual Scaling:**\n- Ist *immer möglich*, aber kein automatischer \"Modus\"\n- Einfach die Instance Count manuell anpassen\n\n**Nicht verfügbar:**\n- *Predictive Scaling mit ML* ist ein AWS-Feature, nicht in Azure VMSS\n\n*Prüfungstipp*: VMSS kombiniert oft mehrere Scale Rules (z.B. Scheduled + Metric-based) für flexible Skalierung.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-autoscale-overview"
+    ]
+  },
+  {
+    "id": "network-006",
+    "category": "networking",
+    "subcategory": "Configure Azure Firewall",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Hauptunterschied zwischen Azure Firewall und Network Security Groups?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Azure Firewall ist Layer 4, NSG ist Layer 7"
+      },
+      {
+        "id": "b",
+        "text": "Azure Firewall ist stateful, NSG ist stateless"
+      },
+      {
+        "id": "c",
+        "text": "Azure Firewall arbeitet zentralisiert, NSG auf Subnet/NIC-Ebene"
+      },
+      {
+        "id": "d",
+        "text": "Azure Firewall ist kostenlos, NSG kostenpflichtig"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "Der Hauptunterschied zwischen **Azure Firewall** und **Network Security Groups**:\n\n**Azure Firewall:**\n- *Zentraler*, managed Firewall-Service\n- Für das gesamte VNet oder Hub-VNet in Hub-and-Spoke-Topologien\n- **Layer 7 Filtering** (Application Rules)\n- FQDN-basierte Rules (z.B. `*.microsoft.com`)\n- Threat Intelligence\n- Zentrales Logging\n- *Kostenpflichtig*\n\n**Network Security Groups (NSG):**\n- *Dezentral* auf Subnet- oder NIC-Ebene\n- **Layer 4** Rules (IP, Port, Protocol)\n- Einfache, granulare Network Segmentation\n- *Kostenlos*\n\n**Gemeinsamkeiten:**\n- Beide sind **stateful**\n\n*Prüfungstipp*: Azure Firewall für komplexe Szenarien mit Application-Level Filtering, NSGs für einfache Segmentation.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/firewall/overview"
+    ]
+  },
+  {
+    "id": "storage-007",
+    "category": "storage",
+    "subcategory": "Configure Azure Backup",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wie lange werden Azure VM Backups in einem Recovery Services Vault mindestens aufbewahrt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "7 Tage"
+      },
+      {
+        "id": "b",
+        "text": "30 Tage"
+      },
+      {
+        "id": "c",
+        "text": "90 Tage"
+      },
+      {
+        "id": "d",
+        "text": "1 Jahr"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "Die minimale Retention für **Azure VM Backups** im Recovery Services Vault beträgt **7 Tage**, die maximale 9999 Tage (praktisch unbegrenzt).\n\n**Default Backup Policy:**\n- Tägliche Backups um 22:30 Uhr UTC\n- 30 Tage Retention\n\n**Backup-Typen:**\n- **Windows**: Application-consistent Backups (via VSS)\n- **Linux**: File-consistent Backups\n\n**Kostenoptimierung:**\nFür Long-term Retention können Backups auf den **Vault-Archive Tier** verschoben werden – bis zu 10x günstiger als Standard Storage.\n\n*Prüfungstipp*: Die 7-Tage-Mindest-Retention verhindert versehentliches Löschen wichtiger Backups.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/backup/backup-azure-vms-introduction"
+    ]
+  },
+  {
+    "id": "ig-007",
+    "category": "identity-governance",
+    "subcategory": "Configure PIM",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Welche Entra ID-Edition wird für Privileged Identity Management (PIM) benötigt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Free"
+      },
+      {
+        "id": "b",
+        "text": "Premium P1"
+      },
+      {
+        "id": "c",
+        "text": "Premium P2"
+      },
+      {
+        "id": "d",
+        "text": "Governance"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "**Privileged Identity Management (PIM)** erfordert **Entra ID Premium P2**.\n\nPIM bietet Just-In-Time (JIT) privileged access:\n- Benutzer erhalten erhöhte Berechtigungen nur für einen *begrenzten Zeitraum*\n- Aktivierung erfordert oft eine Genehmigung (Approval)\n- Alle Aktivierungen werden protokolliert (Audit)\n\nEditionen im Vergleich:\n- **Premium P1**: Conditional Access, Self-Service Password Reset, aber *kein* PIM\n- **Premium P2**: PIM, Identity Protection, Access Reviews\n\n*Prüfungstipp*: PIM reduziert das Risiko von permanent privilegierten Accounts erheblich und ist ein wichtiges Zero-Trust-Konzept.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure"
+    ]
+  },
+  {
+    "id": "compute-007",
+    "category": "compute",
+    "subcategory": "Configure Azure Kubernetes Service",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Welche Aussagen über AKS Node Pools sind korrekt? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Der System Node Pool kann gelöscht werden"
+      },
+      {
+        "id": "b",
+        "text": "User Node Pools können verschiedene VM-Größen haben"
+      },
+      {
+        "id": "c",
+        "text": "Spot VMs können in Node Pools verwendet werden"
+      },
+      {
+        "id": "d",
+        "text": "Ein Cluster kann nur einen Node Pool haben"
+      }
+    ],
+    "correctAnswers": [
+      "b",
+      "c"
+    ],
+    "explanation": "**AKS Node Pools** – wichtige Eigenschaften:\n\n**User Node Pools:**\n- Können *unterschiedliche VM-SKUs* verwenden\n- Beispiel: D4s_v5 für Web-Tier, E16s_v5 für Memory-intensive Workloads\n- Workload-Zuweisung über **Taints** und **Labels**\n\n**Spot VM Node Pools:**\n- Bis zu **90% Kostenersparnis** für interruptible Workloads\n- Ideal für Batch Processing, Dev/Test\n\n**System Node Pool:**\n- Für System Pods (CoreDNS, Metrics Server, etc.)\n- *Muss immer existieren* – sollte nicht gelöscht werden\n- Mindestens 2 Nodes für Production empfohlen\n\n**Ein Cluster kann mehrere Node Pools haben:**\n- Multi-Pool für Workload-Segregation\n- Unterschiedliche VM-Sizes, OS-Typen (Linux/Windows)\n\n*Prüfungstipp*: System und User Node Pools sauber trennen für bessere Stabilität.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/aks/use-multiple-node-pools"
+    ]
+  },
+  {
+    "id": "network-007",
+    "category": "networking",
+    "subcategory": "Configure Service Endpoints",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Hauptvorteil von VNet Service Endpoints für Azure Storage?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Reduzierte Kosten für Storage Transactions"
+      },
+      {
+        "id": "b",
+        "text": "Traffic bleibt im Microsoft Backbone Network"
+      },
+      {
+        "id": "c",
+        "text": "Automatische Storage Replication"
+      },
+      {
+        "id": "d",
+        "text": "Höhere Storage Performance"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Der Hauptvorteil von **VNet Service Endpoints** für Azure Storage:\n\n**Traffic bleibt im Microsoft Backbone Network** statt über das öffentliche Internet zu routen.\n\n**Vorteile:**\n- *Bessere Sicherheit*: Traffic verlässt nie das Azure-Netzwerk\n- *Optimierte Routing-Performance*\n- Storage Firewall Rules können VNet-Integration nutzen\n\n**Eigenschaften:**\n- **Kostenlos**\n- PaaS-Services behalten Public IPs (aber Traffic ist geschützt)\n\n**Für vollständig private Connectivity:**\n→ **Private Link** verwenden (Private Endpoints mit privaten IPs)\n\n**Service Endpoints ändern NICHT:**\n- Storage-Kosten\n- Storage-Replication\n\n*Prüfungstipp*: Service Endpoints = einfach, kostenlos, aber Services behalten Public IPs. Private Link = vollständig privat, aber kostenpflichtig.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview"
+    ]
+  },
+  {
+    "id": "storage-008",
+    "category": "storage",
+    "subcategory": "Configure Azure File Sync",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist die Hauptfunktion von Cloud Tiering in Azure File Sync?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Automatisches Backup von Files in die Cloud"
+      },
+      {
+        "id": "b",
+        "text": "Caching von häufig genutzten Files lokal, selten genutzte in Azure Files"
+      },
+      {
+        "id": "c",
+        "text": "Kompression von Files für Storage-Einsparung"
+      },
+      {
+        "id": "d",
+        "text": "Verschlüsselung von Files mit Azure Key Vault"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Cloud Tiering** in Azure File Sync nutzt den On-Premises Windows Server als *Cache* für Azure Files.\n\n**Funktionsweise:**\n- **Häufig zugegriffene Files**: Werden lokal gecacht (Hot)\n- **Selten genutzte Files**: Nur als *Reparse Points* lokal gespeichert (Inhalt in Azure Files)\n- Bei Zugriff auf getierted Files werden diese automatisch heruntergeladen (*Recall*)\n\n**Steuerung:**\n- **Volume Free Space Policy**: z.B. 20% des lokalen Speichers freihalten\n- **Date Policy**: Files älter als X Tage automatisch tiern\n\n**Vorteile:**\n- Unbegrenzte Cloud-Kapazität mit lokaler Performance\n- Reduzierter lokaler Speicherbedarf\n\n*Prüfungstipp*: Cloud Tiering ist *optional* und ideal für Server mit begrenztem lokalem Speicher.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/file-sync/file-sync-cloud-tiering-overview"
+    ]
+  },
+  {
+    "id": "compute-008",
+    "category": "compute",
+    "subcategory": "Configure Azure Batch",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Für welche Art von Workloads ist Azure Batch am besten geeignet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Web Hosting mit Load Balancing"
+      },
+      {
+        "id": "b",
+        "text": "Large-scale parallel und HPC Batch Jobs"
+      },
+      {
+        "id": "c",
+        "text": "Microservices mit Container Orchestration"
+      },
+      {
+        "id": "d",
+        "text": "Real-time Stream Processing"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Batch** ist optimiert für **large-scale parallel Computing** und **HPC** (High-Performance Computing) Workloads.\n\n**Typische Anwendungsfälle:**\n- Video-/3D-Rendering\n- Finanzsimulationen, Monte-Carlo-Analysen\n- Genetische Sequenzierung\n- ETL-Jobs (Extract, Transform, Load)\n\n**Funktionen:**\n- Automatisches Erstellen von VM Pools\n- Task-Verteilung auf Worker Nodes\n- Skalierung basierend auf Queue Length\n- Job Scheduling\n\n**Abgrenzung zu anderen Services:**\n- **Web Hosting**: App Service, VMs\n- **Microservices**: AKS\n- **Stream Processing**: Stream Analytics, Event Hub\n- **Parallel Batch Jobs**: Azure Batch\n\n*Prüfungstipp*: Batch = \"Embarrassingly parallel\" Workloads (unabhängige Tasks, die parallel laufen können).",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/batch/batch-technical-overview"
+    ]
+  },
+  {
+    "id": "network-008",
+    "category": "networking",
+    "subcategory": "Configure Azure Bastion",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Über welchen Port erfolgt der Zugriff auf VMs via Azure Bastion?",
+    "options": [
+      {
+        "id": "a",
+        "text": "SSH Port 22"
+      },
+      {
+        "id": "b",
+        "text": "RDP Port 3389"
+      },
+      {
+        "id": "c",
+        "text": "HTTPS Port 443"
+      },
+      {
+        "id": "d",
+        "text": "VPN Port 1194"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "Der Zugriff auf VMs über **Azure Bastion** erfolgt über **HTTPS Port 443**.\n\n**Funktionsweise:**\n- Bastion ist ein PaaS-Service für sicheren RDP/SSH-Zugriff\n- Zugriff direkt im Browser (Azure Portal)\n- VMs benötigen *keine* Public IPs\n\n**Sicherheitsvorteile:**\n- RDP (3389) und SSH (22) müssen *nicht* öffentlich exponiert werden\n- Keine NSG-Konfiguration für Inbound RDP/SSH nötig\n- Integrierte Audit Logs\n- Schutz vor Port-Scanning und Zero-Day Exploits\n\n**Deployment:**\n- Dediziertes Subnet: \"AzureBastionSubnet\"\n- Mindestgröße: /26\n\n**Premium SKU Features:**\n- Shareable Links\n- IP-based Connection\n\n*Prüfungstipp*: Bastion = sichere Alternative zu Jump Hosts oder öffentlichen IPs.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/bastion/bastion-overview"
+    ]
+  },
+  {
+    "id": "monitor-006",
+    "category": "monitoring",
+    "subcategory": "Configure Application Insights",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Telemetrie-Daten sammelt Application Insights automatisch? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Requests (HTTP Calls)"
+      },
+      {
+        "id": "b",
+        "text": "Dependencies (SQL, Redis, HTTP calls)"
+      },
+      {
+        "id": "c",
+        "text": "Exceptions und Stack Traces"
+      },
+      {
+        "id": "d",
+        "text": "Source Code"
+      },
+      {
+        "id": "e",
+        "text": "User Email Addresses"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Application Insights** sammelt automatisch folgende Telemetrie-Daten:\n\n**Automatisch gesammelt (mit SDK/Auto-Instrumentation):**\n\n1. **Requests:**\n   - HTTP Request Dauer\n   - Response Codes\n   - URLs\n\n2. **Dependencies:**\n   - Ausgehende Calls zu SQL, Redis, External APIs\n   - Timing und Erfolg/Fehler\n\n3. **Exceptions:**\n   - Unhandled und Handled Exceptions\n   - Stack Traces\n\n**Zusätzlich verfügbar:**\n- Page Views (für Web Apps)\n- Performance Counters\n- Custom Events und Metrics\n\n**NICHT gesammelt:**\n- Source Code (nur Assembly-Namen und Versionen)\n- PII wie Email-Adressen (sollten gefiltert werden)\n\n*Prüfungstipp*: Application Insights ist das Haupttool für Application Performance Monitoring (APM) in Azure.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview"
+    ]
+  },
+  {
+    "id": "ig-008",
+    "category": "identity-governance",
+    "subcategory": "Configure MFA",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche MFA-Methode bietet die höchste Sicherheit?",
+    "options": [
+      {
+        "id": "a",
+        "text": "SMS Text Message"
+      },
+      {
+        "id": "b",
+        "text": "Voice Call"
+      },
+      {
+        "id": "c",
+        "text": "Microsoft Authenticator (Push Notification)"
+      },
+      {
+        "id": "d",
+        "text": "FIDO2 Security Key"
+      }
+    ],
+    "correctAnswers": [
+      "d"
+    ],
+    "explanation": "Die **MFA-Methoden** unterscheiden sich erheblich in ihrer Sicherheit:\n\n**Sicherheits-Ranking (von sicher zu unsicher):**\n1. **FIDO2 Security Key** (z.B. YubiKey) – Phishing-resistent durch Public-Key-Kryptographie\n2. **Microsoft Authenticator** (Passwordless/Number Matching) – Sehr sicher, aber gerätegebunden\n3. **OATH Hardware Token** – Gut, aber ohne Phishing-Schutz\n4. **SMS/Voice Call** – *Anfällig* für SIM-Swapping-Angriffe\n\n*Wichtig*: Microsoft empfiehlt, SMS und Voice Calls als MFA-Methoden zu vermeiden. FIDO2 Security Keys bieten die höchste Sicherheit, da sie Domain-Binding nutzen und nicht gefälscht werden können.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods"
+    ]
+  },
+  {
+    "id": "storage-009",
+    "category": "storage",
+    "subcategory": "Configure Storage Replication",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist der Recovery Time Objective (RTO) bei einem Failover von GRS zu RA-GRS?",
+    "options": [
+      {
+        "id": "a",
+        "text": "0 Sekunden (sofort)"
+      },
+      {
+        "id": "b",
+        "text": "< 1 Minute"
+      },
+      {
+        "id": "c",
+        "text": "< 15 Minuten"
+      },
+      {
+        "id": "d",
+        "text": "Bis zu 1 Stunde"
+      }
+    ],
+    "correctAnswers": [
+      "d"
+    ],
+    "explanation": "Der **Recovery Time Objective (RTO)** bei einem GRS-Failover kann **bis zu 1 Stunde oder länger** betragen.\n\n**Wichtige Metriken:**\n- **RPO** (Recovery Point Objective): Typisch < 15 Minuten\n- **RTO** (Recovery Time Objective): Bis zu 1 Stunde (Microsoft-initiated)\n\n**Failover-Typen:**\n- **Microsoft-initiated Failover**: Bei größeren regionalen Ausfällen, RTO kann Stunden betragen\n- **Customer-managed Failover**: Schneller, aber mit potenziellem Datenverlust\n\n**RA-GRS Vorteil:**\nErlaubt *Lesezugriff* auf die sekundäre Region auch ohne Failover – für kritische Lesezugriffe während eines Ausfalls.\n\n*Prüfungstipp*: Für niedrigere RTOs sind **Active-Active Architekturen** mit ZRS oder manuellem Failover zu bevorzugen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/common/storage-disaster-recovery-guidance"
+    ]
+  },
+  {
+    "id": "compute-009",
+    "category": "compute",
+    "subcategory": "Configure Azure Functions",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welcher Azure Functions Hosting Plan bietet VNet Integration UND unbegrenzte Execution Duration?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Consumption Plan"
+      },
+      {
+        "id": "b",
+        "text": "Premium Plan"
+      },
+      {
+        "id": "c",
+        "text": "Dedicated (App Service) Plan"
+      },
+      {
+        "id": "d",
+        "text": "Container Apps"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "**Azure Functions Hosting Plans** im Vergleich:\n\n**Consumption Plan:**\n- Kein VNet Integration\n- Execution Timeout: 5-10 Minuten\n- Automatisches Scaling\n- Cold Start möglich\n\n**Premium Plan:**\n- VNet Integration ✓\n- Execution Timeout: 60 Minuten (erweiterbar)\n- Automatisches Scaling\n- Keine Cold Starts (Pre-warmed Instances)\n\n**Dedicated (App Service) Plan:**\n- VNet Integration ✓\n- **Unbegrenzte** Execution Duration\n- Manuelles/Autoscale Scaling\n- Keine Cold Starts\n\n*Prüfungstipp*: Für *sowohl* VNet Integration *als auch* unbegrenzte Duration ist **Dedicated Plan** die Antwort.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale"
+    ]
+  },
+  {
+    "id": "network-009",
+    "category": "networking",
+    "subcategory": "Configure Traffic Manager",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Traffic Manager Routing-Methode leitet Traffic basierend auf Endpoint-Latenz?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Priority"
+      },
+      {
+        "id": "b",
+        "text": "Weighted"
+      },
+      {
+        "id": "c",
+        "text": "Performance"
+      },
+      {
+        "id": "d",
+        "text": "Geographic"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "Die **Performance** Routing-Methode in Traffic Manager leitet Traffic basierend auf **Endpoint-Latenz**.\n\n**Traffic Manager Routing-Methoden:**\n- **Performance**: Niedrigste Netzwerk-Latenz zum User\n- **Priority**: Primary/Secondary Endpoints (Failover)\n- **Weighted**: Traffic-Distribution nach Prozentsätzen (A/B Testing)\n- **Geographic**: Basierend auf User-Location (Data Residency)\n\n**Performance Routing:**\n- Traffic Manager pflegt eine Internet Latency Table\n- Regelmäßige Performance-Evaluation\n- User wird zum *schnellsten* Endpoint geleitet\n\n*Prüfungstipp*: Traffic Manager ist ein **DNS-based** Load Balancer (Layer 7). Er routet nur DNS-Anfragen, nicht den eigentlichen Traffic.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/traffic-manager/traffic-manager-routing-methods"
+    ]
+  },
+  {
+    "id": "monitor-007",
+    "category": "monitoring",
+    "subcategory": "Configure Azure Service Health",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Was ist der Unterschied zwischen Azure Status und Azure Service Health?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Azure Status ist für alle Azure Services global, Service Health ist personalisiert"
+      },
+      {
+        "id": "b",
+        "text": "Azure Status kostet extra, Service Health ist kostenlos"
+      },
+      {
+        "id": "c",
+        "text": "Azure Status zeigt nur Outages, Service Health auch Planned Maintenance"
+      },
+      {
+        "id": "d",
+        "text": "Es gibt keinen Unterschied"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "Unterschied zwischen **Azure Status** und **Azure Service Health**:\n\n**Azure Status (status.azure.com):**\n- *Globaler* Health-Status für ALLE Azure Services\n- Alle Regionen, alle Services\n- *Öffentlich* sichtbar für jeden\n- Keine Personalisierung\n\n**Azure Service Health:**\n- *Personalisierter* Service im Azure Portal\n- Nur Events für *vom Kunden genutzte* Services/Subscriptions/Regionen\n- Umfasst:\n  - Service Issues (Outages)\n  - Planned Maintenance\n  - Health Advisories\n  - Security Advisories\n- **Alerts konfigurierbar** für proaktive Benachrichtigung\n\n**Beide sind kostenlos.**\n\n*Prüfungstipp*: Azure Status für globale Übersicht, Service Health für personalisierte Benachrichtigungen zu eigenen Resources.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/service-health/overview"
+    ]
+  },
+  {
+    "id": "ig-009",
+    "category": "identity-governance",
+    "subcategory": "Configure Conditional Access",
+    "type": "multiple",
+    "difficulty": "hard",
+    "question": "Welche Conditions können in Conditional Access Policies verwendet werden? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "User Risk Level"
+      },
+      {
+        "id": "b",
+        "text": "Device Platform (iOS, Android, Windows)"
+      },
+      {
+        "id": "c",
+        "text": "Geographic Location"
+      },
+      {
+        "id": "d",
+        "text": "User's Department"
+      },
+      {
+        "id": "e",
+        "text": "Time of Day"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Conditional Access Policies** unterstützen zahlreiche Conditions:\n\n**Verfügbare Conditions:**\n- **User Risk Level** (aus Identity Protection)\n- **Sign-in Risk Level** (verdächtige Anmeldungen)\n- **Device Platform** (iOS, Android, Windows, macOS)\n- **Location** (Named Locations, IP-Bereiche, Länder)\n- **Device State** (Compliant, Hybrid Azure AD Joined)\n- **Client Apps** (Browser, Mobile Apps, Legacy Auth)\n\n**Nicht direkt als Condition verfügbar:**\n- *User's Department* – muss über Gruppenmitgliedschaft abgebildet werden\n- *Time of Day* – kein nativer Condition, erfordert Workarounds\n\n*Prüfungstipp*: Conditional Access ist **P1**-Feature, aber Risk-based Conditions (User Risk, Sign-in Risk) erfordern **P2** (Identity Protection).",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-conditions"
+    ]
+  },
+  {
+    "id": "ig-010",
+    "category": "identity-governance",
+    "subcategory": "Configure Administrative Units",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wofür werden Administrative Units in Entra ID verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Zum Erstellen von Subscription-Hierarchien"
+      },
+      {
+        "id": "b",
+        "text": "Zum Delegieren von Admin-Rechten für bestimmte User/Groups"
+      },
+      {
+        "id": "c",
+        "text": "Zum Organisieren von Azure Resources"
+      },
+      {
+        "id": "d",
+        "text": "Zum Erstellen von Budget Alerts"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Administrative Units (AUs)** ermöglichen die Delegation von administrativen Berechtigungen für einen *Subset* von Benutzern, Gruppen oder Geräten in Entra ID.\n\n**Anwendungsbeispiel:**\nEin Helpdesk-Administrator für die Marketing-Abteilung kann nur Benutzer in der \"Marketing AU\" verwalten, aber keine anderen Abteilungen.\n\n**Vorteile:**\n- Implementiert das **Least Privilege**-Prinzip\n- Reduziert die Anzahl globaler Administratoren\n- Ermöglicht dezentrale IT-Administration in großen Organisationen\n\n*Wichtig*: AUs sind unabhängig von Management Groups (für Subscriptions) und Resource Groups (für Azure Resources). Sie erfordern **Premium P1**.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/administrative-units"
+    ]
+  },
+  {
+    "id": "ig-011",
+    "category": "identity-governance",
+    "subcategory": "Configure Self-Service Password Reset",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Wie viele Authentication Methods müssen User mindestens für SSPR registrieren?",
+    "options": [
+      {
+        "id": "a",
+        "text": "1 Methode"
+      },
+      {
+        "id": "b",
+        "text": "2 Methoden"
+      },
+      {
+        "id": "c",
+        "text": "3 Methoden"
+      },
+      {
+        "id": "d",
+        "text": "Es gibt kein Minimum"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Self-Service Password Reset (SSPR)** erfordert standardmäßig die Registrierung von **2 Authentication Methods** für höhere Sicherheit.\n\n**Verfügbare Methoden:**\n- Mobile App Notification (Microsoft Authenticator)\n- Mobile App Code (TOTP)\n- Email (externe Adresse)\n- Mobile Phone (SMS)\n- Office Phone\n- Security Questions (schwächste Methode – vermeiden!)\n\n*Best Practice*: Security Questions sollten deaktiviert werden, da sie leicht durch Social Engineering kompromittiert werden können.\n\n*Prüfungstipp*: Mit **Password Writeback** (erfordert P1) können Passwortänderungen auch zurück zum On-Premises Active Directory synchronisiert werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-sspr-howitworks"
+    ]
+  },
+  {
+    "id": "ig-012",
+    "category": "identity-governance",
+    "subcategory": "Configure Access Reviews",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Entra ID-Edition wird für Access Reviews benötigt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Free"
+      },
+      {
+        "id": "b",
+        "text": "Premium P1"
+      },
+      {
+        "id": "c",
+        "text": "Premium P2"
+      },
+      {
+        "id": "d",
+        "text": "Governance"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "**Access Reviews** sind Teil von **Entra ID Governance** und erfordern **Premium P2** (oder die Microsoft Entra ID Governance-Lizenz).\n\n**Funktionen:**\n- Regelmäßige Überprüfung von Group Memberships\n- Review von Application Assignments\n- Prüfung von Azure Role Assignments\n\n**Beispiel:**\nQuartalsweise Review aller Mitglieder der \"Global Admins\"-Gruppe durch den IT-Security-Leiter.\n\n**Features:**\n- *Auto-Apply Results*: Automatisches Entfernen von Zugriffen bei Ablehnung\n- Verschiedene Reviewer möglich: Group Owner, Manager, oder spezifische Benutzer\n\n*Prüfungstipp*: Access Reviews erfüllen Compliance-Anforderungen und reduzieren **Privilege Creep** (schleichende Rechteerweiterung).",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview"
+    ]
+  },
+  {
+    "id": "ig-013",
+    "category": "identity-governance",
+    "subcategory": "Configure Dynamic Groups",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Attribute können für Dynamic Group Membership Rules verwendet werden? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Department"
+      },
+      {
+        "id": "b",
+        "text": "Country"
+      },
+      {
+        "id": "c",
+        "text": "Device OS Type"
+      },
+      {
+        "id": "d",
+        "text": "Password Strength"
+      },
+      {
+        "id": "e",
+        "text": "Last Sign-in Date"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Dynamic Groups** verwenden Attribut-basierte Rules für automatische Mitgliedschaft.\n\n**Verfügbare User-Attribute:**\n- **Department**, **Country**, **JobTitle**, **UserType**, **CompanyName**, etc.\n\n**Verfügbare Device-Attribute:**\n- **deviceOSType**, **deviceOSVersion**, **deviceManagementAppId** (z.B. Intune)\n\n**Beispiel-Rule:**\n`(user.department -eq \"Marketing\") -and (user.country -eq \"Germany\")`\n\n**Nicht verfügbar als Attribute:**\n- Password Strength\n- Last Sign-in Date\n\n*Wichtig*: Dynamic Groups erfordern **Premium P1**. Die Mitgliedschaft wird alle 12-24 Stunden automatisch evaluiert, kann aber auch manuell getriggert werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-membership"
+    ]
+  },
+  {
+    "id": "ig-014",
+    "category": "identity-governance",
+    "subcategory": "Configure Azure AD B2B",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Hauptunterschied zwischen B2B Guest Users und Member Users?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Guest Users können keine Azure Resources zugreifen"
+      },
+      {
+        "id": "b",
+        "text": "Guest Users haben standardmäßig eingeschränkte Directory-Berechtigungen"
+      },
+      {
+        "id": "c",
+        "text": "Guest Users kosten extra"
+      },
+      {
+        "id": "d",
+        "text": "Guest Users können keine MFA nutzen"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**B2B Guest Users** unterscheiden sich von **Member Users** primär durch ihre Directory-Berechtigungen:\n\n**Guest Users (UserType: Guest):**\n- *Eingeschränkte* Directory-Permissions als Standard\n- Können keine vollständige User-Liste durchsuchen\n- Limitierte App-Discovery\n- Können dennoch RBAC-Rollen für Azure Resources erhalten\n\n**Member Users (UserType: Member):**\n- Volle Directory Read Permissions\n- Vollständige Sichtbarkeit der Organisation\n\n*Wichtig*: Guest User Permissions können in den \"External Collaboration Settings\" angepasst werden. B2B ist ideal für Partnerorganisationen, Contractors oder Cross-Company Collaboration. Die ersten 50.000 MAU sind kostenlos.",
+    "references": [
+      "https://learn.microsoft.com/en-us/entra/external-id/what-is-b2b"
+    ]
+  },
+  {
+    "id": "ig-015",
+    "category": "identity-governance",
+    "subcategory": "Configure Azure Policy Initiatives",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist eine Azure Policy Initiative (Policy Set)?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Eine Group von Policy Definitions für ein gemeinsames Ziel"
+      },
+      {
+        "id": "b",
+        "text": "Eine Policy mit höherer Priorität"
+      },
+      {
+        "id": "c",
+        "text": "Eine Policy für Management Groups"
+      },
+      {
+        "id": "d",
+        "text": "Eine automatische Remediation Task"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "Eine **Initiative** (auch **Policy Set** genannt) ist eine Collection von Policy Definitions, die für ein gemeinsames Compliance-Ziel gruppiert sind.\n\n**Beispiel:**\nDie Initiative \"Enable Monitoring in Azure Security Center\" enthält 100+ einzelne Policies für Monitoring Agent Deployment, Diagnostics Settings, etc.\n\n**Vorteile:**\n- *Vereinfachtes Assignment Management* – eine Initiative statt vieler einzelner Policies zuweisen\n- *Gebündeltes Compliance-Reporting* – Übersicht über alle enthaltenen Policies\n- *Einfachere Exemption-Verwaltung*\n\n**Built-in Initiatives:**\n- Azure Security Benchmark\n- NIST SP 800-53\n- ISO 27001\n\n*Prüfungstipp*: Custom Initiatives können für organisationsspezifische Standards erstellt werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/governance/policy/concepts/initiative-definition-structure"
+    ]
+  },
+  {
+    "id": "ig-016",
+    "category": "identity-governance",
+    "subcategory": "Configure Resource Tags",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Was ist die maximale Anzahl von Tags pro Azure Resource?",
+    "options": [
+      {
+        "id": "a",
+        "text": "10"
+      },
+      {
+        "id": "b",
+        "text": "15"
+      },
+      {
+        "id": "c",
+        "text": "25"
+      },
+      {
+        "id": "d",
+        "text": "50"
+      }
+    ],
+    "correctAnswers": [
+      "d"
+    ],
+    "explanation": "Azure **Resource Tags** haben folgende Limits:\n\n- **Maximum 50 Tags** pro Ressource\n- Tag Names: max. 512 Zeichen (128 für Storage Accounts)\n- Tag Values: max. 256 Zeichen\n\n**Wichtige Eigenschaften:**\n- Tags werden *nicht* automatisch von Parent-Ressourcen vererbt\n- Vererbung kann über **Azure Policy** erzwungen werden\n- Einige Ressourcen (z.B. Classic Resources) unterstützen keine Tags\n\n**Common Tag-Strategien:**\n- Environment (Prod/Dev/Test)\n- CostCenter\n- Owner\n- Project\n\n*Prüfungstipp*: Tags sind essentiell für **Cost Management**, Automation und Resource Organization.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-resources"
+    ]
+  },
+  {
+    "id": "ig-017",
+    "category": "identity-governance",
+    "subcategory": "Configure Management Groups",
+    "type": "order",
+    "difficulty": "medium",
+    "question": "Sortieren Sie die Management Group Hierarchy von Root bis Resource:",
+    "options": [
+      {
+        "id": "a",
+        "text": "Tenant Root Group"
+      },
+      {
+        "id": "b",
+        "text": "Management Group (z.B. 'Production')"
+      },
+      {
+        "id": "c",
+        "text": "Subscription"
+      },
+      {
+        "id": "d",
+        "text": "Resource Group"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "explanation": "Die **Azure Management Hierarchy** von oben nach unten:\n\n1. **Tenant Root Group** – automatisch erstellt, entspricht dem Entra ID Tenant\n2. **Management Groups** – für Policy und RBAC Inheritance (bis zu 6 Ebenen Verschachtelung)\n3. **Subscriptions** – Billing Boundary und Service Limits\n4. **Resource Groups** – logischer Container für Resources\n5. Resources (nicht in dieser Frage)\n\n**Vererbung:**\n- Policies und RBAC Assignments werden *nach unten vererbt*\n- Was auf Management Group gesetzt wird, gilt für alle darunterliegenden Subscriptions\n\n*Best Practice*: Root Management Group für Security Policies nutzen, Child Management Groups für Departments oder Environments.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/governance/management-groups/overview"
+    ]
+  },
+  {
+    "id": "ig-018",
+    "category": "identity-governance",
+    "subcategory": "Configure Azure Blueprints",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist der Hauptunterschied zwischen Azure Blueprints und ARM Templates?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Blueprints können Resource Groups erstellen"
+      },
+      {
+        "id": "b",
+        "text": "Blueprints behalten eine aktive Beziehung zu deployed Resources"
+      },
+      {
+        "id": "c",
+        "text": "Blueprints sind kostenlos, ARM Templates nicht"
+      },
+      {
+        "id": "d",
+        "text": "Blueprints unterstützen nur Subscriptions"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Der Hauptunterschied zwischen **Azure Blueprints** und **ARM Templates**:\n\n**Azure Blueprints:**\n- Behalten eine *aktive Beziehung* zu deployed Resources\n- Assignments können getrackt, upgraded und auf Compliance überwacht werden\n- Kombinieren mehrere Artifacts: ARM Templates, Policy Assignments, RBAC Assignments, Resource Groups\n\n**ARM Templates:**\n- *Fire and forget* – keine nachträgliche Tracking-Möglichkeit\n- Rein deklarative Infrastructure-as-Code\n\n*Wichtig*: Blueprints sind ideal für wiederholbare, compliant Environment-Setups. Beide sind kostenlos.\n\n*Hinweis*: Blueprints werden zugunsten von **Template Specs** und **Deployment Stacks** schrittweise deprecated.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/governance/blueprints/overview"
+    ]
+  },
+  {
+    "id": "ig-019",
+    "category": "identity-governance",
+    "subcategory": "Configure Azure Subscriptions",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welches Azure Subscription-Modell eignet sich am besten für isolierte Billing pro Abteilung?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Single Subscription mit Resource Groups"
+      },
+      {
+        "id": "b",
+        "text": "Subscription per Department"
+      },
+      {
+        "id": "c",
+        "text": "Management Groups"
+      },
+      {
+        "id": "d",
+        "text": "Resource Tags"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Für isolierte Billing pro Abteilung sind **separate Subscriptions** optimal:\n\n**Subscription per Department:**\n- Jede Subscription hat eine *eigene Invoice*\n- Spending Limits können pro Subscription gesetzt werden\n- Klare Kostentrennung ohne zusätzlichen Aufwand\n\n**Alternativen:**\n- *Resource Tags* mit Cost Management: Ermöglicht Chargeback innerhalb einer Subscription, aber weniger Isolation\n- *Management Groups*: Für Policy/RBAC Governance, nicht für Billing Separation\n\n**Weitere Subscription-Design-Faktoren:**\n- Service Limits (manche Limits gelten pro Subscription)\n- Security Boundaries\n- Deployment Isolation\n\n*Best Practice*: Production/Non-Production oder Department-based Subscriptions.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/scale-subscriptions"
+    ]
+  },
+  {
+    "id": "ig-020",
+    "category": "identity-governance",
+    "subcategory": "Configure Cost Management",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Features bietet Azure Cost Management? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Cost Analysis und Reporting"
+      },
+      {
+        "id": "b",
+        "text": "Budgets mit Alert Notifications"
+      },
+      {
+        "id": "c",
+        "text": "Recommendations für Cost Optimization"
+      },
+      {
+        "id": "d",
+        "text": "Automatisches Shutdown von teuren Resources"
+      },
+      {
+        "id": "e",
+        "text": "Automatische Resource Scaling"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Azure Cost Management** bietet umfassende Funktionen:\n\n**Verfügbare Features:**\n- **Cost Analysis**: Granulare Dashboards mit Filtering nach Tags, Resource Groups, Services\n- **Budgets**: Monatliche oder quartalsweise Budgets mit Alert Notifications (Email oder Action Groups)\n- **Advisor Recommendations**: Identifikation von ungenutzten Resources, unoptimalen VM-Sizes, Reserved Instance-Möglichkeiten\n\n**Nicht Teil von Cost Management:**\n- *Automatisches Shutdown* von teuren Resources (→ Azure Automation)\n- *Automatisches Scaling* (→ Autoscale-Features der jeweiligen Services)\n\n*Prüfungstipp*: Budgets können Action Groups triggern, die wiederum Automation Runbooks starten können – aber das Shutdown selbst ist kein Cost Management-Feature.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/overview-cost-management"
+    ]
+  },
+  {
+    "id": "storage-010",
+    "category": "storage",
+    "subcategory": "Configure Soft Delete",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Wie lange werden gelöschte Blobs standardmäßig mit Soft Delete aufbewahrt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "1 Tag"
+      },
+      {
+        "id": "b",
+        "text": "7 Tage"
+      },
+      {
+        "id": "c",
+        "text": "30 Tage"
+      },
+      {
+        "id": "d",
+        "text": "365 Tage"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Blob Soft Delete** hat eine Default-Retention von **7 Tagen** (konfigurierbar von 1 bis 365 Tagen).\n\n**Funktionsweise:**\n- Gelöschte Blobs verbleiben im Storage Account\n- Können innerhalb der Retention Period wiederhergestellt werden\n- Gilt auch für Blob *Snapshots* und *Versions*\n\n**Kosten:**\nEs fallen weiterhin Storage-Kosten für soft-deleted Daten an.\n\n**Verwandte Features:**\n- **Container Soft Delete**: Für versehentlich gelöschte Container\n- **Share Soft Delete**: Für Azure Files\n\n*Prüfungstipp*: Soft Delete schützt vor versehentlichem Löschen. Für Schutz vor Ransomware oder böswilligem Löschen sollte **Immutable Storage** verwendet werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-overview"
+    ]
+  },
+  {
+    "id": "storage-011",
+    "category": "storage",
+    "subcategory": "Configure Immutable Storage",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Welche Immutable Storage Policy kann NICHT mehr entfernt werden, nachdem sie committed wurde?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Time-based Retention Policy (unlocked)"
+      },
+      {
+        "id": "b",
+        "text": "Time-based Retention Policy (locked)"
+      },
+      {
+        "id": "c",
+        "text": "Legal Hold Policy"
+      },
+      {
+        "id": "d",
+        "text": "Version-level Immutability"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Eine **locked Time-based Retention Policy** kann nach dem Commit *nicht* mehr gelöscht werden.\n\n**Immutable Storage Policy-Typen:**\n\n**Time-based (unlocked):**\n- Nach Lock löschbar: Ja\n- Verwendung: Testing, Entwicklung\n\n**Time-based (locked):**\n- Nach Lock löschbar: *Nein*\n- Verwendung: Compliance (SEC 17a-4, FINRA, CFTC)\n\n**Legal Hold:**\n- Nach Lock löschbar: Ja (wenn Legal Case abgeschlossen)\n- Verwendung: Gerichtliche Aufbewahrung\n\n**Locked Policy:**\n- Retention Period kann nur *verlängert*, nicht verkürzt werden\n- Erfüllt WORM-Anforderungen (Write Once, Read Many)\n- Verhindert Deletion und Modification von Blobs\n\n*Wichtig*: Vor dem Locken gründlich testen – die Aktion ist irreversibel!",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/immutable-storage-overview"
+    ]
+  },
+  {
+    "id": "storage-012",
+    "category": "storage",
+    "subcategory": "Configure Azure Data Lake Storage Gen2",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Features bietet Azure Data Lake Storage Gen2 zusätzlich zu Standard Blob Storage? (Wählen Sie 2 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Hierarchical Namespace"
+      },
+      {
+        "id": "b",
+        "text": "POSIX-compliant ACLs"
+      },
+      {
+        "id": "c",
+        "text": "Hot/Cool/Archive Tiers"
+      },
+      {
+        "id": "d",
+        "text": "GRS Replication"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b"
+    ],
+    "explanation": "**Azure Data Lake Storage Gen2** erweitert Blob Storage um zwei wichtige Features:\n\n1. **Hierarchical Namespace (HNS):**\n   - Echte Directory-Strukturen (nicht nur Prefixes)\n   - Atomare Directory-Operationen (Rename, Delete)\n   - Optimiert für Big Data Analytics\n\n2. **POSIX-compliant ACLs:**\n   - Granulare File- und Folder-Level Permissions\n   - Kompatibel mit Hadoop, Spark, Azure Databricks\n\n**Was beide (Gen2 und Standard Blob) haben:**\n- Hot/Cool/Archive Tiers\n- GRS Replication (mit Einschränkungen bei HNS)\n\n**Einschränkungen bei Gen2 mit HNS:**\n- Kein RA-GRS (nur GRS ohne Read-Access)\n- Kein Static Website Hosting\n\n*Prüfungstipp*: Gen2 ist für Analytics-Workloads optimiert, Standard Blob für allgemeine Speicherung.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction"
+    ]
+  },
+  {
+    "id": "storage-013",
+    "category": "storage",
+    "subcategory": "Configure Storage Account Networking",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was passiert, wenn Sie Storage Account Firewall Rules aktivieren ohne Allow-Rules?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Nur Zugriff über Private Endpoints"
+      },
+      {
+        "id": "b",
+        "text": "Alle Zugriffe werden blockiert (auch vom Azure Portal)"
+      },
+      {
+        "id": "c",
+        "text": "Nur Azure Services können zugreifen"
+      },
+      {
+        "id": "d",
+        "text": "Keine Änderung, alle können zugreifen"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Wenn die **Storage Firewall** aktiviert wird (\"Selected networks\") ohne explizite Allow-Rules, werden *alle Zugriffe blockiert* – auch das Azure Portal.\n\n**Konsequenzen:**\n- Kein Zugriff auf Blobs/Files über das Portal möglich\n- Keine API-Zugriffe von nicht-freigegebenen Netzwerken\n\n**Ausnahmen konfigurieren:**\n- **Trusted Azure Services**: Checkbox aktivieren\n- **VNet Service Endpoints**: Spezifische Subnets freigeben\n- **Public IP-Ranges**: Client-IPs hinzufügen\n\n*Best Practice*: \n- **Private Endpoints** für private Konnektivität nutzen\n- Public Network Access komplett deaktivieren\n- Firewall Rules gelten nur für den *Public Endpoint*, nicht für Private Endpoints\n\n*Prüfungstipp*: Für Portal-Zugriff muss die eigene Client-IP explizit hinzugefügt werden!",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security"
+    ]
+  },
+  {
+    "id": "storage-014",
+    "category": "storage",
+    "subcategory": "Configure Azure Import/Export Service",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wofür wird Azure Import/Export Service verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für schnelle Migration großer Datenmengen via physische Disks"
+      },
+      {
+        "id": "b",
+        "text": "Für automatisches Backup von VMs"
+      },
+      {
+        "id": "c",
+        "text": "Für Synchronisation zwischen On-Premises und Cloud"
+      },
+      {
+        "id": "d",
+        "text": "Für Replikation zwischen Storage Accounts"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "Der **Azure Import/Export Service** ermöglicht die Migration sehr großer Datenmengen (mehrere TB) durch Versand physischer Festplatten.\n\n**Prozess:**\n1. Daten auf SATA HDDs/SSDs kopieren und mit **BitLocker** verschlüsseln\n2. Import Job im Azure Portal erstellen\n3. Disks zum Azure Datacenter senden\n4. Microsoft lädt die Daten hoch\n5. Disks werden zurückgesendet\n\n**Anwendungsfälle:**\n- Langsame Internet-Verbindung\n- Initiale Bulk-Migration großer Datenbestände\n- Offline-Datenübertragung\n\n**Alternative:**\n**Azure Data Box** für noch größere Datenmengen (bis zu 80 TB pro Device).\n\n*Prüfungstipp*: Import/Export eignet sich für einmalige Migrationen, nicht für regelmäßige Synchronisation.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/import-export/storage-import-export-service"
+    ]
+  },
+  {
+    "id": "storage-015",
+    "category": "storage",
+    "subcategory": "Configure Azure NetApp Files",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Welches Protokoll wird primär von Azure NetApp Files verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "SMB 3.0"
+      },
+      {
+        "id": "b",
+        "text": "NFS v3 und v4.1"
+      },
+      {
+        "id": "c",
+        "text": "iSCSI"
+      },
+      {
+        "id": "d",
+        "text": "FTP"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure NetApp Files** unterstützt primär **NFS v3 und NFSv4.1** (sowie SMB für Windows-Workloads).\n\n**Eigenschaften:**\n- Enterprise-grade File Storage Service\n- Extreme Performance: bis zu 4.5 GB/s Throughput pro Volume\n- Sub-millisecond Latency\n\n**Ideale Workloads:**\n- High-Performance Computing (HPC)\n- SAP-Anwendungen\n- Datenbanken (Oracle, SQL Server)\n- Virtual Desktop Infrastructure (VDI)\n- Genomics und wissenschaftliche Analysen\n\n**Service Levels:**\n- Standard, Premium, Ultra (unterschiedliche IOPS/Throughput)\n\n*Prüfungstipp*: Azure NetApp Files ist teurer als Azure Files, aber für performance-kritische Workloads oft unverzichtbar.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-netapp-files/azure-netapp-files-introduction"
+    ]
+  },
+  {
+    "id": "storage-016",
+    "category": "storage",
+    "subcategory": "Configure Storage Analytics",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wie lange werden Storage Analytics Metrics standardmäßig aufbewahrt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "7 Tage"
+      },
+      {
+        "id": "b",
+        "text": "30 Tage"
+      },
+      {
+        "id": "c",
+        "text": "90 Tage"
+      },
+      {
+        "id": "d",
+        "text": "1 Jahr"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "**Storage Analytics Metrics** (Classic Metrics) werden **7 Tage** aufbewahrt und dann automatisch gelöscht.\n\n**Für längere Retention:**\n- **Azure Monitor Metrics** verwenden\n- Über Diagnostic Settings an Log Analytics Workspace senden\n- Retention bis zu 2 Jahre möglich\n\n**Metriken-Typen:**\n- **Transaction Metrics**: Requests, Success Rate, Latency\n- **Capacity Metrics**: Für Blob Storage\n\n*Best Practice*: Migration von Classic Storage Analytics zu **Azure Monitor Metrics/Logs** für:\n- Bessere Integration mit Azure Monitor\n- Längere Retention\n- Einheitliches Monitoring-Erlebnis\n\n*Prüfungstipp*: Storage Analytics Logs können bis zu 1 Jahr aufbewahrt werden (manuell konfigurierbar).",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/common/storage-analytics-metrics"
+    ]
+  },
+  {
+    "id": "storage-017",
+    "category": "storage",
+    "subcategory": "Configure Azure Blob Inventory",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wofür wird Azure Blob Inventory verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für automatisches Lifecycle Management"
+      },
+      {
+        "id": "b",
+        "text": "Für tägliche Reports über Blob-Metadaten und Properties"
+      },
+      {
+        "id": "c",
+        "text": "Für Blob Replication zwischen Regions"
+      },
+      {
+        "id": "d",
+        "text": "Für Blob Access Logging"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Blob Inventory** generiert tägliche Reports über Blob-Metadaten und Properties.\n\n**Reportinhalte:**\n- Name, Size, Access Tier\n- Encryption Status\n- Tags, Timestamps\n- Blob Type, Content Type\n\n**Anwendungsfälle:**\n- **Compliance-Audits**: z.B. \"Sind alle Blobs verschlüsselt?\"\n- **Cost Analysis**: Tier-Distribution analysieren\n- **Data Lifecycle Governance**: Überblick über Datenalterung\n\n**Konfiguration:**\n- Inventory Rules definieren Container-Scope\n- Export-Format: CSV oder Parquet\n- Reports werden als Blob gespeichert\n\n*Prüfungstipp*: Blob Inventory ist günstiger und effizienter als List-APIs für Large-Scale-Analysen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/blob-inventory"
+    ]
+  },
+  {
+    "id": "storage-018",
+    "category": "storage",
+    "subcategory": "Configure Object Replication",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist der Hauptunterschied zwischen GRS und Object Replication?",
+    "options": [
+      {
+        "id": "a",
+        "text": "GRS ist synchron, Object Replication asynchron"
+      },
+      {
+        "id": "b",
+        "text": "GRS repliziert alle Blobs automatisch, Object Replication nur ausgewählte Container"
+      },
+      {
+        "id": "c",
+        "text": "GRS ist günstiger"
+      },
+      {
+        "id": "d",
+        "text": "Object Replication unterstützt Cross-Subscription"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Der Hauptunterschied zwischen **GRS** und **Object Replication**:\n\n**GRS (Geo-Redundant Storage):**\n- Repliziert *automatisch alle* Daten eines Storage Accounts\n- Zur Paired Region (fest vorgegeben)\n- Secondary ist Read-Only (außer bei Failover)\n\n**Object Replication:**\n- Granulare, *policy-basierte* Replikation\n- Nur *ausgewählte Container* werden repliziert\n- Zu *beliebigem* Storage Account (auch Cross-Subscription, Cross-Region)\n- Beide Seiten sind Read/Write\n\n**Anwendungsfälle für Object Replication:**\n- Data Sovereignty (nur bestimmte Daten in Region X)\n- Latenz minimieren (Daten näher zu Users)\n- Custom Backup Strategy\n\n*Wichtig*: Object Replication erfordert **Versioning** auf Source und Destination.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/blobs/object-replication-overview"
+    ]
+  },
+  {
+    "id": "storage-019",
+    "category": "storage",
+    "subcategory": "Configure Storage Account Keys",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist die Best Practice für Storage Account Key Rotation?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Beide Keys gleichzeitig regenerieren"
+      },
+      {
+        "id": "b",
+        "text": "Key1 regenerieren, dann Key2 nach Application Update"
+      },
+      {
+        "id": "c",
+        "text": "Keys niemals regenerieren"
+      },
+      {
+        "id": "d",
+        "text": "Keys monatlich automatisch rotieren lassen"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Best Practice für Storage Account Key Rotation:**\n\n**Empfohlener Prozess:**\n1. Alle Applications nutzen **Key1**\n2. **Key2 regenerieren** (Key1 bleibt gültig)\n3. Applications auf **Key2 umstellen**\n4. **Key1 regenerieren**\n\nDieser Prozess minimiert Downtime, da immer ein gültiger Key verfügbar ist.\n\n**Zu vermeiden:**\n- *Niemals* beide Keys gleichzeitig regenerieren (unterbricht alle Zugriffe sofort!)\n\n**Bessere Alternativen:**\n- **Shared Access Signatures (SAS)** mit Expiration nutzen\n- Komplett auf **Entra ID Authentication** wechseln (Managed Identities, RBAC)\n- Account Keys dann deaktivieren\n\n*Prüfungstipp*: Azure Key Vault kann für sichere Key Storage und automatische Rotation verwendet werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage"
+    ]
+  },
+  {
+    "id": "storage-020",
+    "category": "storage",
+    "subcategory": "Configure Azure Disk Types",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Managed Disk Types bieten SSD-Performance? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Standard HDD"
+      },
+      {
+        "id": "b",
+        "text": "Standard SSD"
+      },
+      {
+        "id": "c",
+        "text": "Premium SSD"
+      },
+      {
+        "id": "d",
+        "text": "Ultra Disk"
+      },
+      {
+        "id": "e",
+        "text": "Premium HDD"
+      }
+    ],
+    "correctAnswers": [
+      "b",
+      "c",
+      "d"
+    ],
+    "explanation": "**Azure Managed Disk Types** mit SSD-Performance:\n\n**Standard SSD:**\n- SSD-Technologie\n- Bis zu 6.000 IOPS\n- Mittlere Latenz\n- Für Production mit moderaten Anforderungen\n\n**Premium SSD:**\n- SSD-Technologie\n- Bis zu 20.000 IOPS\n- Niedrige Latenz\n- Für Production VMs, Datenbanken\n\n**Ultra Disk:**\n- SSD-Technologie\n- Bis zu 160.000 IOPS\n- Sub-Millisekunden Latenz\n- Für SAP HANA, Transaction-intensive DBs\n\n**Nicht SSD:**\n- **Standard HDD**: Für Dev/Test, Backup (günstigste Option)\n- *Premium HDD existiert nicht*\n\n**Voraussetzungen:**\n- Premium SSD und Ultra Disk erfordern VM-Sizes mit \"s\" (z.B. D4s_v5)\n- Ultra Disk nur in bestimmten Regions/Zones verfügbar\n\n*Prüfungstipp*: Für Datenbanken mit hohen IOPS-Anforderungen ist **Ultra Disk** die beste Wahl.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types"
+    ]
+  },
+  {
+    "id": "compute-010",
+    "category": "compute",
+    "subcategory": "Configure Proximity Placement Groups",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Wofür werden Proximity Placement Groups verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Um VMs über mehrere Availability Zones zu verteilen"
+      },
+      {
+        "id": "b",
+        "text": "Um VMs physisch nahe beieinander zu platzieren für niedrige Latency"
+      },
+      {
+        "id": "c",
+        "text": "Um VMs automatisch zu skalieren"
+      },
+      {
+        "id": "d",
+        "text": "Um VMs in verschiedene Resource Groups zu organisieren"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Proximity Placement Groups (PPG)** platzieren VMs *physisch nahe beieinander* im selben Azure Datacenter.\n\n**Zweck:**\n- Minimiert Network Latency zwischen VMs (< 1ms)\n- Optimiert für latenz-sensitive Workloads\n\n**Ideale Anwendungsfälle:**\n- HPC Clusters mit hohem Inter-Node-Traffic\n- Datenbanken mit Replikation\n- Latenz-sensitive Gaming Server\n\n**Tradeoffs:**\n- *Reduziert Availability* (alle VMs im selben Datacenter)\n- Sollte *mit Availability Sets kombiniert* werden (für Fault/Update Domain Separation)\n- *Nicht kompatibel* mit Availability Zones\n\n*Prüfungstipp*: PPG = niedrige Latenz, aber Availability-Einschränkungen. Für hohe Verfügbarkeit → Availability Zones bevorzugen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/co-location"
+    ]
+  },
+  {
+    "id": "compute-011",
+    "category": "compute",
+    "subcategory": "Configure Dedicated Hosts",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Hauptvorteil von Azure Dedicated Hosts?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Niedrigere Kosten durch Sharing"
+      },
+      {
+        "id": "b",
+        "text": "Dedizierte physische Server für Compliance/Lizenzierung"
+      },
+      {
+        "id": "c",
+        "text": "Automatisches Scaling"
+      },
+      {
+        "id": "d",
+        "text": "Höhere VM-Performance"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Dedicated Hosts** bieten *dedizierte physische Server*, auf denen ausschließlich die eigenen VMs laufen.\n\n**Hauptvorteile:**\n\n1. **Compliance:**\n   - Hardware-Isolation für regulierte Workloads\n   - Healthcare, Government, Financial Services\n\n2. **Lizenzierung:**\n   - **Bring-Your-Own-License (BYOL)** für Windows Server/SQL Server\n   - Host-based Licensing kann Kosten sparen\n\n3. **Kontrolle:**\n   - Einfluss auf Maintenance Events\n   - VM Placement auf spezifischen Hosts\n\n**Nachteile:**\n- *Deutlich teurer* als Shared Infrastructure\n- Performance ist *vergleichbar* zu Standard VMs (kein Performance-Vorteil)\n\n*Prüfungstipp*: Dedicated Hosts für Compliance oder Licensing-Optimierung bei großen Deployments.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/dedicated-hosts"
+    ]
+  },
+  {
+    "id": "compute-012",
+    "category": "compute",
+    "subcategory": "Configure Azure Spot VMs",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Aussage über Azure Spot VMs ist korrekt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Spot VMs haben eine 99.9% SLA"
+      },
+      {
+        "id": "b",
+        "text": "Spot VMs können jederzeit evicted werden mit 30 Sekunden Vorwarnung"
+      },
+      {
+        "id": "c",
+        "text": "Spot VMs sind nur für Linux verfügbar"
+      },
+      {
+        "id": "d",
+        "text": "Spot VMs bieten 50% Rabatt"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Spot VMs** – wichtige Eigenschaften:\n\n**Fakten:**\n- Nutzen ungenutzte Azure-Kapazität\n- Bis zu **90% Rabatt** gegenüber Pay-as-you-go\n- Können *jederzeit evicted* werden (mit **30 Sekunden Vorwarnung**)\n- Unterstützen Windows *und* Linux\n\n**Keine SLA:**\n- Spot VMs haben *keine* Verfügbarkeits-SLA\n- Nicht für Production Workloads geeignet\n\n**Ideale Anwendungsfälle:**\n- Batch Processing\n- Dev/Test Umgebungen\n- Rendering Jobs\n- Big Data Analysis\n\n**Eviction Policy:**\n- *Deallocate* (default): VM wird gestoppt\n- *Delete*: VM wird gelöscht\n\n*Prüfungstipp*: Spot VMs ideal für *interruptible* Workloads. Für Production → Reserved Instances oder Pay-as-you-go.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/spot-vms"
+    ]
+  },
+  {
+    "id": "compute-013",
+    "category": "compute",
+    "subcategory": "Configure VM Disk Caching",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welcher Caching-Modus wird für OS Disks standardmäßig empfohlen?",
+    "options": [
+      {
+        "id": "a",
+        "text": "None"
+      },
+      {
+        "id": "b",
+        "text": "Read-Only"
+      },
+      {
+        "id": "c",
+        "text": "Read/Write"
+      },
+      {
+        "id": "d",
+        "text": "Write-Through"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "**VM Disk Caching** – empfohlene Modi:\n\n**OS Disk:**\n- Empfohlen: **Read/Write** (Standard)\n- Verbessert Boot-Zeiten und OS-Performance\n\n**Data Disk (Read-heavy):**\n- Empfohlen: Read-Only\n\n**Data Disk (Database):**\n- Empfohlen: None\n- Verhindert Datenverlust bei Cache-Failure\n\n**Read/Write Caching:**\n- Nutzt VM-lokale SSDs für Caching\n- Writes werden nach Flush zur Disk bestätigt (Write-Back)\n\n**Kostenlos:**\n- Host Caching verursacht *keine* zusätzlichen IOPS/Throughput-Kosten\n\n*Prüfungstipp*: Ultra Disks unterstützen nur \"None\" als Caching-Modus.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/premium-storage-performance#disk-caching"
+    ]
+  },
+  {
+    "id": "compute-014",
+    "category": "compute",
+    "subcategory": "Configure Custom Script Extension",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Wofür wird Custom Script Extension verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für automatische Backups"
+      },
+      {
+        "id": "b",
+        "text": "Für Post-Deployment Configuration und Software Installation"
+      },
+      {
+        "id": "c",
+        "text": "Für Network Monitoring"
+      },
+      {
+        "id": "d",
+        "text": "Für VM-Scaling"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Die **Custom Script Extension (CSE)** führt Skripte auf VMs nach dem Deployment aus.\n\n**Typische Anwendungsfälle:**\n- Post-Deployment Configuration\n- Software Installation\n- Application Deployment\n- Initiale Systemkonfiguration\n\n**Skript-Quellen:**\n- Azure Storage Blobs\n- GitHub\n- Inline im ARM Template\n\n**Unterstützte Skripttypen:**\n- **Windows**: PowerShell, Batch\n- **Linux**: Bash, Python\n\n**Eigenschaften:**\n- Läuft *einmalig* nach VM-Erstellung\n- Deployment via ARM Templates, Azure CLI, oder Portal\n\n*Prüfungstipp*: Für komplexeres Configuration Management → **Azure Automation DSC** oder **Ansible** verwenden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-windows"
+    ]
+  },
+  {
+    "id": "compute-015",
+    "category": "compute",
+    "subcategory": "Configure VM Resize",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was passiert bei einem VM Resize auf eine andere VM-Familie (z.B. D-Series zu E-Series)?",
+    "options": [
+      {
+        "id": "a",
+        "text": "VM wird automatisch migriert ohne Downtime"
+      },
+      {
+        "id": "b",
+        "text": "VM muss deallocated und neu gestartet werden"
+      },
+      {
+        "id": "c",
+        "text": "Nur die CPU/Memory werden angepasst"
+      },
+      {
+        "id": "d",
+        "text": "Resize ist nicht möglich"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Bei einem **VM Resize zu einer anderen VM-Familie** (z.B. D-Series → E-Series):\n\n**Erforderliche Schritte:**\n1. VM muss **deallocated** werden (Stop + Release)\n2. VM wird auf *neue Hardware* migriert\n3. VM muss neu gestartet werden\n\n**Konsequenzen:**\n- **Downtime** erforderlich\n- *Dynamische IPs* gehen verloren (Static IPs bleiben)\n- Availability Set VMs: Alle VMs im Set müssen die Ziel-Size unterstützen\n\n**Resize innerhalb derselben Familie:**\n- z.B. D2s_v5 → D4s_v5\n- *Manchmal* ohne Deallocation möglich\n- Nicht garantiert – hängt von Cluster-Kapazität ab\n\n*Best Practice*: Resize in Maintenance Windows planen. Bei kritischen Workloads: Load Balancer für Blue-Green Deployment nutzen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/resize-vm"
+    ]
+  },
+  {
+    "id": "compute-016",
+    "category": "compute",
+    "subcategory": "Configure App Service Deployment Slots",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Hauptvorteil von App Service Deployment Slots?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Niedrigere Kosten durch Resource Sharing"
+      },
+      {
+        "id": "b",
+        "text": "Zero-Downtime Deployments mit Slot Swap"
+      },
+      {
+        "id": "c",
+        "text": "Automatisches Scaling"
+      },
+      {
+        "id": "d",
+        "text": "Kostenlose SSL Certificates"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**App Service Deployment Slots** ermöglichen **Zero-Downtime Blue-Green Deployments**.\n\n**Workflow:**\n1. Neue Version in **Staging Slot** deployen\n2. Staging Slot testen (hat eigene URL: `app-staging.azurewebsites.net`)\n3. **Swap** durchführen – Staging wird Production\n4. Bei Problemen: *Swap zurück* (Rollback)\n\n**Swap-Prozess:**\n- Nur Route-Änderung, kein Code-Move\n- App wird vor dem Swap *warm-up* (warm-up requests)\n- App Settings können *Slot-specific* sein (werden nicht geswapped)\n\n**Voraussetzungen:**\n- Ab **Standard-Plan** verfügbar\n- Anzahl Slots: Standard (5), Premium (20)\n\n*Prüfungstipp*: Deployment Slots sind essenziell für Production Deployments ohne Downtime.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots"
+    ]
+  },
+  {
+    "id": "compute-017",
+    "category": "compute",
+    "subcategory": "Configure Hybrid Use Benefit",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Lizenz-Voraussetzung ist für Azure Hybrid Benefit (Windows Server) erforderlich?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Windows Server Standard ohne Software Assurance"
+      },
+      {
+        "id": "b",
+        "text": "Windows Server mit Software Assurance oder Subscription"
+      },
+      {
+        "id": "c",
+        "text": "Windows 10 Pro Lizenz"
+      },
+      {
+        "id": "d",
+        "text": "Office 365 Subscription"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Hybrid Benefit (AHB)** für Windows Server erfordert Lizenzen mit **Software Assurance** (oder äquivalente Subscriptions).\n\n**Lizenzvoraussetzungen:**\n- Windows Server Datacenter oder Standard\n- *Aktive* Software Assurance\n- Oder: CSP Subscriptions mit entsprechenden Rechten\n\n**Kostenersparnis:**\n- Bis zu **40%** bei Windows VMs\n- Nur Compute-Kosten, keine Windows License Fees\n\n**Lizenz-Mapping:**\n- 2-Core Datacenter Lizenz → bis zu 16 vCores in Azure\n- Oder: 2 VMs mit je 8 vCores\n\n**Gilt auch für:**\n- **SQL Server** (bis zu 180 Tage Dual Use Rights während Migration)\n\n*Prüfungstipp*: AHB kann bei VM-Erstellung oder nachträglich aktiviert werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/hybrid-use-benefit-licensing"
+    ]
+  },
+  {
+    "id": "compute-018",
+    "category": "compute",
+    "subcategory": "Configure Azure Container Registry",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welcher Azure Container Registry SKU bietet Geo-Replication?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Basic"
+      },
+      {
+        "id": "b",
+        "text": "Standard"
+      },
+      {
+        "id": "c",
+        "text": "Premium"
+      },
+      {
+        "id": "d",
+        "text": "Alle SKUs"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "**Azure Container Registry (ACR)** SKUs:\n\n**Basic SKU:**\n- Storage: 10 GB inkludiert\n- Kein Geo-Replication\n- Kein Private Link\n- Für Dev/Test\n\n**Standard SKU:**\n- Storage: 100 GB inkludiert\n- Kein Geo-Replication\n- Kein Private Link\n- Webhooks und erweiterte Features\n\n**Premium SKU:**\n- Storage: 500 GB inkludiert\n- **Geo-Replication** ✓\n- **Private Link** ✓\n- **Content Trust** (Image Signing) ✓\n\n**Alle SKUs bieten:**\n- Encryption at Rest\n- Entra ID Authentication\n- Vulnerability Scanning (via Microsoft Defender)\n\n*Prüfungstipp*: Für globale AKS-Deployments ist Premium mit Geo-Replication die richtige Wahl.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-skus"
+    ]
+  },
+  {
+    "id": "compute-019",
+    "category": "compute",
+    "subcategory": "Configure Reserved Instances",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Commitment-Dauer ist für Azure Reserved Instances möglich?",
+    "options": [
+      {
+        "id": "a",
+        "text": "6 Monate"
+      },
+      {
+        "id": "b",
+        "text": "1 Jahr oder 3 Jahre"
+      },
+      {
+        "id": "c",
+        "text": "2 Jahre"
+      },
+      {
+        "id": "d",
+        "text": "5 Jahre"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Reserved Instances (RI)** bieten zwei Commitment-Dauern:\n\n**Verfügbare Commitment-Optionen:**\n- **1 Jahr**: Moderater Rabatt\n- **3 Jahre**: Höchster Rabatt (bis zu 72% vs. Pay-as-you-go)\n\n**Gültig für:**\n- Virtual Machines\n- SQL Database\n- Cosmos DB\n- Azure Synapse Analytics\n- Blob Storage Reserved Capacity\n\n**RI-Scope:**\n- *Shared*: Über alle Subscriptions im Tenant\n- *Single Subscription*: Nur in einer Subscription\n- *Resource Group*: Noch granularer\n\n**Instance Size Flexibility:**\n- RIs matchen automatisch auf verschiedene VM-Größen in derselben Series\n\n*Prüfungstipp*: 3-Jahres-RIs bieten den höchsten Rabatt, erfordern aber langfristige Kapazitätsplanung.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/cost-management-billing/reservations/save-compute-costs-reservations"
+    ]
+  },
+  {
+    "id": "compute-020",
+    "category": "compute",
+    "subcategory": "Configure VM Generalized vs Specialized",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist der Unterschied zwischen Generalized und Specialized VM Images?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Generalized Images sind encrypted, Specialized nicht"
+      },
+      {
+        "id": "b",
+        "text": "Generalized Images haben keine Machine-specific Info, Specialized behalten sie"
+      },
+      {
+        "id": "c",
+        "text": "Specialized Images sind schneller"
+      },
+      {
+        "id": "d",
+        "text": "Es gibt keinen Unterschied"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "Der Unterschied zwischen **Generalized** und **Specialized** VM Images:\n\n**Generalized Images:**\n- Machine-specific Info wurde *entfernt* (Computer Name, Admin Accounts, SIDs)\n- Erstellt via **Sysprep** (Windows) oder **waagent -deprovision** (Linux)\n- Kann für *mehrere* VM-Deployments verwendet werden\n\n**Specialized Images:**\n- *Behält* alle Machine-specific Settings\n- Kann direkt gebootet werden\n- Nur für Single-VM oder exaktes Cloning geeignet\n- Nach Deployment: Hostname-Änderung etc. erforderlich\n\n**Verwendung:**\n- **VM Scale Sets**: Generalized\n- **ARM Templates**: Generalized\n- **Disaster Recovery**: Specialized\n- **Exakte VM-Kopie**: Specialized\n\n*Prüfungstipp*: Für wiederholbare Deployments immer **Generalized** verwenden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-machines/generalized-shared-image-gallery"
+    ]
+  },
+  {
+    "id": "network-010",
+    "category": "networking",
+    "subcategory": "Configure VNet Peering",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Ist VNet Peering transitiv (kann VNet A über VNet B zu VNet C kommunizieren)?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Ja, automatisch transitiv"
+      },
+      {
+        "id": "b",
+        "text": "Nein, Peering ist nicht transitiv"
+      },
+      {
+        "id": "c",
+        "text": "Nur innerhalb derselben Region"
+      },
+      {
+        "id": "d",
+        "text": "Nur mit Premium Peering"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**VNet Peering ist NICHT transitiv.**\n\n**Beispiel:**\n- VNet A ↔ VNet B (gepeert)\n- VNet B ↔ VNet C (gepeert)\n- VNet A ↔ VNet C: *Keine direkte Kommunikation möglich*\n\n**Für Transitivität:**\nExplizites Peering zwischen allen VNets erforderlich (A-B, B-C, *und* A-C).\n\n**Workarounds für Hub-and-Spoke:**\n- **Network Virtual Appliance (NVA)** im Hub-VNet\n- **VPN Gateway** mit \"Allow Gateway Transit\"\n- Spokes nutzen Hub-Gateway für Routing\n\n**VNet Peering Eigenschaften:**\n- Günstig und schnell (kein Gateway nötig)\n- Unterstützt **Global VNet Peering** (Cross-Region)\n\n*Prüfungstipp*: Transitivität ist ein häufiges Missverständnis bei VNet Peering – immer explizit konfigurieren!",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-peering-overview"
+    ]
+  },
+  {
+    "id": "network-011",
+    "category": "networking",
+    "subcategory": "Configure User-Defined Routes",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Welche Next Hop Type in User-Defined Routes (UDR) leitet Traffic zu einem NVA?",
+    "options": [
+      {
+        "id": "a",
+        "text": "VirtualNetworkGateway"
+      },
+      {
+        "id": "b",
+        "text": "Internet"
+      },
+      {
+        "id": "c",
+        "text": "VirtualAppliance"
+      },
+      {
+        "id": "d",
+        "text": "VnetLocal"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "Der **Next Hop Type \"VirtualAppliance\"** in User-Defined Routes (UDR) leitet Traffic zu einem NVA.\n\n**Next Hop Types:**\n- **VirtualAppliance**: Network Virtual Appliance (Firewall, Router)\n- **VirtualNetworkGateway**: VPN/ExpressRoute Gateway\n- **Internet**: Direkter Internet-Zugang\n- **VnetLocal**: Innerhalb des VNets\n- **None**: Traffic verwerfen (Drop)\n\n**Konfiguration für NVA:**\n- Next Hop Type: VirtualAppliance\n- Next Hop Address: *Private IP* der NVA\n\n**Wichtig:**\n- **IP Forwarding** muss auf der NVA-NIC aktiviert sein\n- Ohne IP Forwarding wird der Traffic verworfen\n\n*Prüfungstipp*: UDRs überschreiben System Routes und ermöglichen Force Tunneling oder Traffic Inspection via NVA.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview"
+    ]
+  },
+  {
+    "id": "network-012",
+    "category": "networking",
+    "subcategory": "Configure Azure Private Link",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Hauptvorteil von Private Link gegenüber Service Endpoints?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Private Link ist kostenlos"
+      },
+      {
+        "id": "b",
+        "text": "Private Link bietet private IP-Adressen für PaaS Services"
+      },
+      {
+        "id": "c",
+        "text": "Private Link hat bessere Performance"
+      },
+      {
+        "id": "d",
+        "text": "Private Link unterstützt mehr Services"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Private Link** bietet **private IP-Adressen** für PaaS Services – der Hauptvorteil gegenüber Service Endpoints.\n\n**Private Link:**\n- Erstellt **Private Endpoints** mit privaten IPs im VNet\n- Traffic verlässt *nie* das Microsoft Network\n- Services haben *keine Public IPs* mehr\n- Unterstützt On-Premises Connectivity (via VPN/ExpressRoute)\n- Cross-Region und Cross-Tenant Access möglich\n- *Kostenpflichtig* (Endpoint + Data Processing)\n\n**Service Endpoints:**\n- Traffic über Microsoft Backbone\n- Services *behalten* Public IPs\n- Nur innerhalb des VNets nutzbar\n- *Kostenlos*\n\n*Prüfungstipp*: Private Link für maximale Sicherheit (keine Public Exposure), Service Endpoints für einfache Szenarien ohne On-Premises-Anforderungen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/private-link/private-link-overview"
+    ]
+  },
+  {
+    "id": "network-013",
+    "category": "networking",
+    "subcategory": "Configure ExpressRoute",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Welcher ExpressRoute SKU bietet 99.95% SLA?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Local"
+      },
+      {
+        "id": "b",
+        "text": "Standard"
+      },
+      {
+        "id": "c",
+        "text": "Premium"
+      },
+      {
+        "id": "d",
+        "text": "Alle SKUs mit Redundant Connections"
+      }
+    ],
+    "correctAnswers": [
+      "d"
+    ],
+    "explanation": "**ExpressRoute SLA von 99,95%** erfordert **zwei Circuits in verschiedenen Peering Locations** – unabhängig vom SKU.\n\n**ExpressRoute SKUs:**\n- **Local**: Für Azure Regions nahe Peering Location, günstiger\n- **Standard**: Alle Regions in derselben Geopolitical Region\n- **Premium**: Global Connectivity, höhere Route Limits, Office 365\n\n**SLA-Anforderungen:**\n- Single Circuit: *Keine* SLA\n- Zwei Circuits (verschiedene Peering Locations): **99,95%**\n\n**Peering-Typen:**\n- **Private Peering**: Zu VNets\n- **Microsoft Peering**: Zu Public Services (Storage, SQL)\n\n*Prüfungstipp*: Für Production immer redundante ExpressRoute Circuits in unterschiedlichen Peering Locations.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/expressroute/expressroute-introduction"
+    ]
+  },
+  {
+    "id": "network-014",
+    "category": "networking",
+    "subcategory": "Configure Azure Front Door",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Features bietet Azure Front Door? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Global Load Balancing mit URL-based Routing"
+      },
+      {
+        "id": "b",
+        "text": "Web Application Firewall (WAF)"
+      },
+      {
+        "id": "c",
+        "text": "SSL Offloading und Caching"
+      },
+      {
+        "id": "d",
+        "text": "VPN Gateway Functionality"
+      },
+      {
+        "id": "e",
+        "text": "Virtual Machine Orchestration"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Azure Front Door** ist ein global distributed Layer 7 Load Balancer mit CDN-Funktionen.\n\n**Hauptfeatures:**\n\n1. **Global Load Balancing mit URL-based Routing:**\n   - Path-based Routing für Microservices\n   - Latency-based Routing über Microsoft Global Network\n\n2. **Web Application Firewall (WAF):**\n   - OWASP Top 10 Protection\n   - Custom Rules\n   - Bot Protection\n\n3. **SSL Offloading und Caching:**\n   - TLS-Termination am Edge\n   - Content Caching\n   - Compression\n\n**Nicht Teil von Front Door:**\n- VPN Gateway Functionality (→ VPN Gateway)\n- VM Orchestration (→ VMSS, AKS)\n\n*Prüfungstipp*: Front Door für globale Web-Anwendungen und APIs, Application Gateway für regionale Layer-7-Anforderungen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/frontdoor/front-door-overview"
+    ]
+  },
+  {
+    "id": "network-015",
+    "category": "networking",
+    "subcategory": "Configure Azure DDoS Protection",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was ist der Unterschied zwischen DDoS Infrastructure Protection und DDoS Network Protection?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Infrastructure ist kostenlos und Basic, Network bietet erweiterte Features"
+      },
+      {
+        "id": "b",
+        "text": "Infrastructure ist nur für VMs, Network für alle Resources"
+      },
+      {
+        "id": "c",
+        "text": "Infrastructure ist teurer"
+      },
+      {
+        "id": "d",
+        "text": "Es gibt keinen Unterschied"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "Unterschied zwischen **DDoS Infrastructure Protection** und **DDoS Network Protection**:\n\n**DDoS Infrastructure Protection (früher Basic):**\n- *Kostenlos* und automatisch für alle Public IPs\n- Basic Layer 3/4 Schutz\n- Keine erweiterten Features\n\n**DDoS Network Protection (früher Standard):**\n- *Kostenpflichtig*\n- Adaptive Tuning (ML-basiert)\n- Real-time Attack Metrics\n- Diagnostic Logging\n- DDoS Rapid Response Team Support\n- **Cost Protection**: Credits für Scale-out während Attack\n\n**Aktivierung:**\n- Network Protection wird per VNet aktiviert\n- Schützt alle Public IPs im VNet\n\n*Prüfungstipp*: Für Business-Critical Applications mit Public Endpoints ist DDoS Network Protection empfohlen.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/ddos-protection/ddos-protection-overview"
+    ]
+  },
+  {
+    "id": "network-016",
+    "category": "networking",
+    "subcategory": "Configure Azure NAT Gateway",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wofür wird Azure NAT Gateway primär verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für Inbound Internet Traffic"
+      },
+      {
+        "id": "b",
+        "text": "Für Outbound Internet Connectivity von Private Subnets"
+      },
+      {
+        "id": "c",
+        "text": "Für VNet-to-VNet Routing"
+      },
+      {
+        "id": "d",
+        "text": "Für Load Balancing"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure NAT Gateway** bietet **Outbound Internet Connectivity** für Resources in Private Subnets.\n\n**Funktionsweise:**\n- Resources ohne Public IPs können ins Internet kommunizieren\n- NAT Gateway nutzt statische Public IPs für Source NAT (SNAT)\n- Eliminiert SNAT Port Exhaustion (bis zu 64k Ports pro IP)\n\n**Eigenschaften:**\n- Zone-Redundant (wenn Public IPs zone-redundant sind)\n- **SLA: 99,9%**\n- Mehrere NAT Gateway IPs für höheren Durchsatz möglich\n\n**NAT Gateway ist NICHT für:**\n- *Inbound* Internet Traffic (→ Load Balancer, Application Gateway)\n- VNet-to-VNet Routing (→ VNet Peering, VPN Gateway)\n\n*Prüfungstipp*: NAT Gateway ist die beste Lösung für Outbound-Connectivity von Private Subnets ohne Public Load Balancer.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-network/nat-gateway/nat-overview"
+    ]
+  },
+  {
+    "id": "network-017",
+    "category": "networking",
+    "subcategory": "Configure Azure Route Server",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Wofür wird Azure Route Server verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für statisches Routing zwischen VNets"
+      },
+      {
+        "id": "b",
+        "text": "Für dynamisches BGP Routing zwischen NVAs und Azure VNets"
+      },
+      {
+        "id": "c",
+        "text": "Für DNS Resolution"
+      },
+      {
+        "id": "d",
+        "text": "Für Load Balancing"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Route Server** ermöglicht **dynamisches BGP Routing** zwischen NVAs und Azure VNets.\n\n**Funktionsweise:**\n- NVAs (z.B. Cisco CSR, Palo Alto) können Routes dynamisch zu Azure VNet propagieren\n- Keine manuellen UDR-Updates nötig\n- Vereinfacht NVA-Integration\n\n**Anwendungsfälle:**\n- Dynamisches Routing mit Third-Party NVAs\n- High Availability für NVAs via BGP\n- SD-WAN Integration\n\n**Deployment:**\n- Dediziertes /27 Subnet\n- Zwei Instanzen für Redundanz\n- Unterstützt bis zu 1000 Routes\n\n**BGP (Border Gateway Protocol):**\n- Industrie-Standard für dynamisches Routing\n- Ermöglicht automatische Route-Updates bei Netzwerkänderungen\n\n*Prüfungstipp*: Route Server für komplexe Routing-Szenarien mit NVAs, statische UDRs für einfache Szenarien.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/route-server/overview"
+    ]
+  },
+  {
+    "id": "network-018",
+    "category": "networking",
+    "subcategory": "Configure Azure Virtual WAN",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist der Hauptvorteil von Azure Virtual WAN?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Niedrigere Netzwerk-Kosten"
+      },
+      {
+        "id": "b",
+        "text": "Vereinfachtes Hub-and-Spoke Networking mit Global Transit"
+      },
+      {
+        "id": "c",
+        "text": "Bessere VM-Performance"
+      },
+      {
+        "id": "d",
+        "text": "Automatische VM-Skalierung"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Virtual WAN** ist ein Microsoft-managed Service für **Hub-and-Spoke Networking mit Global Transit**.\n\n**Hauptvorteile:**\n\n1. **Unified Hub:**\n   - VPN, ExpressRoute, VNet Peering in einem Hub\n   - Microsoft verwaltet die Hub-Infrastruktur\n\n2. **Global Transit Routing:**\n   - Any-to-Any Connectivity\n   - Branch-to-VNet, VNet-to-VNet über Hubs\n   - Automatic route propagation\n\n3. **Integrierte Security:**\n   - Azure Firewall in Secured Virtual Hubs\n   - Zentrales Policy Management\n\n4. **Simplified Management:**\n   - Keine manuellen UDRs oder Peerings\n\n**SKUs:**\n- *Basic*: Nur VPN\n- *Standard*: Alle Features\n\n*Prüfungstipp*: Virtual WAN für Enterprises mit vielen Sites/VNets, manuelle Hub-and-Spoke für einfachere Szenarien.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about"
+    ]
+  },
+  {
+    "id": "network-019",
+    "category": "networking",
+    "subcategory": "Configure NSG Flow Logs",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wohin werden NSG Flow Logs gespeichert?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Log Analytics Workspace"
+      },
+      {
+        "id": "b",
+        "text": "Storage Account"
+      },
+      {
+        "id": "c",
+        "text": "Event Hub"
+      },
+      {
+        "id": "d",
+        "text": "Azure SQL Database"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**NSG Flow Logs** werden primär in einem **Storage Account** gespeichert.\n\n**Speicherformat:**\n- JSON-Files im Storage Account\n- Enthalten: Source/Dest IP, Ports, Protocol, Action (Allow/Deny)\n\n**Traffic Analytics (optional):**\n- Analysiert Flow Logs\n- Visualisiert in **Log Analytics Workspace**\n- Zeigt: Top Talkers, Traffic Patterns, Geographic Distribution\n\n**Flow Logs v2:**\n- Erweiterte Informationen\n- Bytes und Packets pro Flow\n- Flow State (Begin, Continuing, End)\n\n**Voraussetzungen:**\n- Network Watcher muss aktiviert sein\n- Storage Account in derselben Region\n\n*Prüfungstipp*: Flow Logs für Security Analysis und Compliance, Traffic Analytics für Visualisierung und Insights.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/network-watcher/nsg-flow-logs-overview"
+    ]
+  },
+  {
+    "id": "network-020",
+    "category": "networking",
+    "subcategory": "Configure Azure Firewall Manager",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Wofür wird Azure Firewall Manager verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für Management einzelner Azure Firewall Instanzen"
+      },
+      {
+        "id": "b",
+        "text": "Für zentrales Management von mehreren Firewalls und Secured Hubs"
+      },
+      {
+        "id": "c",
+        "text": "Für NSG Rule Management"
+      },
+      {
+        "id": "d",
+        "text": "Für VPN Gateway Configuration"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Firewall Manager** bietet **zentrales Management** für mehrere Firewalls und Secured Virtual Hubs.\n\n**Funktionen:**\n\n1. **Zentrales Policy Management:**\n   - Firewall Policies für mehrere Azure Firewalls\n   - Hierarchische Policies (Parent/Child)\n\n2. **Secured Virtual Hub Management:**\n   - Azure Firewall in Virtual WAN Hubs\n   - Integrierte Routing-Konfiguration\n\n3. **Security Partner Providers:**\n   - Integration von Third-Party Security (z.B. Zscaler, Check Point)\n\n**Abgrenzung:**\n- *Einzelne* Azure Firewall: Direkt im Portal verwalten\n- *Mehrere* Firewalls/Hubs: **Firewall Manager**\n\n**Nicht Teil von Firewall Manager:**\n- NSG Rule Management (→ NSGs direkt)\n- VPN Gateway Configuration (→ VPN Gateway)\n\n*Prüfungstipp*: Firewall Manager für Enterprise-Scale mit mehreren Firewalls und Virtual WAN.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/firewall-manager/overview"
+    ]
+  },
+  {
+    "id": "monitor-008",
+    "category": "monitoring",
+    "subcategory": "Configure Workbooks",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wofür werden Azure Monitor Workbooks verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für automatische Remediation von Alerts"
+      },
+      {
+        "id": "b",
+        "text": "Für interaktive Custom Reports und Dashboards"
+      },
+      {
+        "id": "c",
+        "text": "Für VM Backups"
+      },
+      {
+        "id": "d",
+        "text": "Für Network Traffic Analysis"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Monitor Workbooks** sind interaktive, anpassbare Reports und Dashboards.\n\n**Bestandteile:**\n- Text-Elemente\n- KQL-Queries\n- Metrics-Visualisierungen\n- Parameter Controls (Dropdowns, Time Range Pickers)\n\n**Anwendungsfälle:**\n- Health Reports für Applications\n- Troubleshooting-Guides\n- Capacity Planning\n- Compliance Reports\n\n**Datenquellen:**\nWorkbooks kombinieren Daten aus Logs, Metrics, Azure Resource Graph und Application Insights.\n\n**Vorlagen:**\nTemplates für VM Insights, Container Insights und Application Insights sind verfügbar.\n\n*Prüfungstipp*: Workbooks können als JSON gespeichert, geteilt und versioniert werden – ideal für Custom Monitoring Dashboards.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/visualize/workbooks-overview"
+    ]
+  },
+  {
+    "id": "monitor-009",
+    "category": "monitoring",
+    "subcategory": "Configure Change Tracking",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Änderungen trackt Azure Change Tracking auf VMs?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Nur Software Installation"
+      },
+      {
+        "id": "b",
+        "text": "Software, Services, Registry, Files, Linux Daemons"
+      },
+      {
+        "id": "c",
+        "text": "Nur Network Configuration"
+      },
+      {
+        "id": "d",
+        "text": "Nur User Logins"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Change Tracking** erfasst Änderungen auf VMs:\n\n**Getrackte Elemente:**\n- Windows Software\n- Windows Services\n- Windows Registry\n- Windows Files\n- Linux Daemons\n- Linux Packages\n\n**Anwendungsfälle:**\n- **Compliance Audits**: \"Wurde Software XYZ installiert?\"\n- **Security Investigation**: Nicht autorisierte Änderungen erkennen\n- **Troubleshooting**: Änderungen vor einem Incident identifizieren\n\n**Voraussetzungen:**\n- Log Analytics Agent oder Azure Monitor Agent\n- Log Analytics Workspace\n- Änderungen werden bis zu 6 Monate gespeichert\n\n*Prüfungstipp*: Change Tracking wird oft mit **Update Management** kombiniert für holistische VM-Governance.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview"
+    ]
+  },
+  {
+    "id": "monitor-010",
+    "category": "monitoring",
+    "subcategory": "Configure VM Insights",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Welcher Agent wird für VM Insights benötigt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Nur Azure Monitor Agent"
+      },
+      {
+        "id": "b",
+        "text": "Azure Monitor Agent UND Dependency Agent"
+      },
+      {
+        "id": "c",
+        "text": "Nur Log Analytics Agent"
+      },
+      {
+        "id": "d",
+        "text": "Kein Agent nötig"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**VM Insights** benötigt zwei Agents:\n\n1. **Azure Monitor Agent (AMA)**:\n   - Sammelt Performance Counters und Logs\n   - Ersetzt den Legacy Log Analytics Agent\n\n2. **Dependency Agent**:\n   - Erfasst Process- und Network-Dependencies\n   - Ermöglicht das **Map Feature** (Service Map)\n\n**VM Insights Features:**\n- Performance Charts (CPU, Memory, Disk, Network)\n- Health Model\n- **Dependency Maps**: Visualisiert Connections zwischen VMs und externen Services\n- Vorkonfigurierte Alerts\n\n**Verfügbarkeit:**\nWindows und Linux VMs sowie VM Scale Sets\n\n*Prüfungstipp*: Die Agents können via **Azure Policy** automatisch deployed werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/vm/vminsights-overview"
+    ]
+  },
+  {
+    "id": "monitor-011",
+    "category": "monitoring",
+    "subcategory": "Configure Container Insights",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Metriken sammelt Container Insights für AKS?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Nur CPU und Memory"
+      },
+      {
+        "id": "b",
+        "text": "CPU, Memory, Disk, Network, Container Logs"
+      },
+      {
+        "id": "c",
+        "text": "Nur Container Logs"
+      },
+      {
+        "id": "d",
+        "text": "Nur Node Health"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Container Insights** für AKS sammelt umfassende Metriken:\n\n**Gesammelte Daten:**\n- **Node-Level Metrics**: CPU, Memory, Disk\n- **Pod/Container Metrics**: Resource Usage\n- **Container Logs**: stdout/stderr\n- **Kubernetes Events**\n- **Performance Data**\n\n**Features:**\n- **Live Logs**: Äquivalent zu `kubectl logs`\n- Resource Usage Views\n- Workbook Templates\n- Pre-configured Alerts\n\n**Technische Umsetzung:**\n- Containerized Azure Monitor Agent (DaemonSet)\n- Speicherung in Log Analytics\n- **Prometheus Integration** für Custom Metrics möglich\n\n*Prüfungstipp*: Container Insights ist essenziell für AKS Performance Monitoring, Troubleshooting und Capacity Planning.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-overview"
+    ]
+  },
+  {
+    "id": "monitor-012",
+    "category": "monitoring",
+    "subcategory": "Configure Action Groups",
+    "type": "multiple",
+    "difficulty": "medium",
+    "question": "Welche Notification-Typen unterstützen Action Groups? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Email/SMS/Voice"
+      },
+      {
+        "id": "b",
+        "text": "Azure Function"
+      },
+      {
+        "id": "c",
+        "text": "Logic App"
+      },
+      {
+        "id": "d",
+        "text": "Physical Mail"
+      },
+      {
+        "id": "e",
+        "text": "Telegram Bot"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Action Groups** unterstützen diverse Notification- und Automation-Methoden:\n\n**Notification-Typen:**\n- Email, SMS, Voice Call\n- Push Notifications (Azure Mobile App)\n\n**Automation-Typen:**\n- **Azure Functions**: Custom Code Execution\n- **Logic Apps**: Komplexe Workflows (z.B. Ticket-Erstellung in ServiceNow)\n- **Webhooks**: Integration mit externen Services\n- **ITSM Connectors**: ServiceNow, BMC\n- **Automation Runbooks**: PowerShell/Python Scripts\n- **Event Hub**: Für Streaming zu externen Systemen\n\n**Rate Limiting:**\n- Max. 1 SMS pro 5 Minuten pro Telefonnummer\n\n*Prüfungstipp*: Action Groups können von mehreren Alert Rules wiederverwendet werden. Telegram ist nicht nativ unterstützt, aber via Webhook integrierbar.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/action-groups"
+    ]
+  },
+  {
+    "id": "monitor-013",
+    "category": "monitoring",
+    "subcategory": "Configure Data Collection Rules",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Was ist der Hauptvorteil von Data Collection Rules (DCR) gegenüber Legacy Agents?",
+    "options": [
+      {
+        "id": "a",
+        "text": "DCRs sind kostenlos"
+      },
+      {
+        "id": "b",
+        "text": "DCRs ermöglichen granulare, ressourcenspezifische Data Collection"
+      },
+      {
+        "id": "c",
+        "text": "DCRs haben bessere Performance"
+      },
+      {
+        "id": "d",
+        "text": "DCRs unterstützen mehr OS"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Data Collection Rules (DCR)** bieten granulare Control über die Datensammlung.\n\n**Hauptvorteile gegenüber Legacy Agents:**\n- **Ressourcenspezifische Konfiguration**: DCRs sind Resource-level (per VM oder Tag), nicht Workspace-level\n- **Multi-homing**: Daten zu mehreren Workspaces senden\n- **Data Filtering/Transformation**: Nur relevante Daten erfassen\n- **Schema Declaration**: Klare Definition der Datenstruktur\n\n**DCR ist zentrales Element der Azure Monitor Agent (AMA) Architektur.**\n\n**Vorteile der Migration:**\n- Flexibility bei der Datensammlung\n- Cost Optimization (weniger unnötige Daten)\n- Bessere Governance\n\n*Prüfungstipp*: DCRs ermöglichen präzise Steuerung, welche Daten von welchen Resources zu welchen Zielen gesendet werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/data-collection-rule-overview"
+    ]
+  },
+  {
+    "id": "monitor-014",
+    "category": "monitoring",
+    "subcategory": "Configure Azure Advisor",
+    "type": "multiple",
+    "difficulty": "easy",
+    "question": "Welche Kategorien bietet Azure Advisor? (Wählen Sie 3 Antworten)",
+    "options": [
+      {
+        "id": "a",
+        "text": "Cost Optimization"
+      },
+      {
+        "id": "b",
+        "text": "Security"
+      },
+      {
+        "id": "c",
+        "text": "Performance"
+      },
+      {
+        "id": "d",
+        "text": "Graphic Design"
+      },
+      {
+        "id": "e",
+        "text": "Marketing Strategy"
+      }
+    ],
+    "correctAnswers": [
+      "a",
+      "b",
+      "c"
+    ],
+    "explanation": "**Azure Advisor** ist ein kostenloser Recommendation Engine mit fünf Kategorien:\n\n1. **Cost**: z.B. \"Resize underutilized VMs\", \"Buy Reserved Instances\"\n2. **Security**: z.B. \"Enable MFA\", \"Apply NSG Rules\" (integriert mit Defender for Cloud)\n3. **Reliability**: z.B. \"Configure Backups\", \"Use Availability Zones\"\n4. **Performance**: z.B. \"Upgrade to Premium Disks\", \"Scale Out\"\n5. **Operational Excellence**: z.B. \"Update outdated SDKs\", \"Configure Monitoring\"\n\n**Funktionsweise:**\n- Advisor scannt regelmäßig alle Resources\n- Generiert personalisierte Recommendations\n- Recommendations können dismissed oder postponed werden\n\n*Prüfungstipp*: Advisor ist kostenlos und sollte regelmäßig überprüft werden – insbesondere für Cost Optimization.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/advisor/advisor-overview"
+    ]
+  },
+  {
+    "id": "monitor-015",
+    "category": "monitoring",
+    "subcategory": "Configure Autoscale",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Welche Azure Resources unterstützen KEINE Autoscale?",
+    "options": [
+      {
+        "id": "a",
+        "text": "VM Scale Sets"
+      },
+      {
+        "id": "b",
+        "text": "App Service Plans"
+      },
+      {
+        "id": "c",
+        "text": "Single VMs"
+      },
+      {
+        "id": "d",
+        "text": "Azure SQL Database"
+      }
+    ],
+    "correctAnswers": [
+      "c"
+    ],
+    "explanation": "**Single VMs** unterstützen *kein* natives Autoscale.\n\n**Autoscale-unterstützte Services:**\n- VM Scale Sets\n- App Service Plans\n- Cloud Services\n- Azure Functions (Consumption Plan)\n- Azure SQL Database (Elastic Pools)\n- Azure Cosmos DB\n\n**Für VM-Autoscaling:**\n→ **VM Scale Sets** verwenden\n\n**Autoscale-Trigger:**\n- **Metric-based Rules**: CPU > X%, Queue Length > Y\n- **Schedule-based Rules**: Scale out Montag 8:00\n- **Predictive Autoscaling**: ML-basiert (Preview)\n\n**Cooldown Periods:**\nVerhindern Flapping (zu häufiges Scale-In/Out)\n\n*Prüfungstipp*: Für Autoscaling von VMs sind immer VM Scale Sets erforderlich – einzelne VMs können nur manuell skaliert werden.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-overview"
+    ]
+  },
+  {
+    "id": "monitor-016",
+    "category": "monitoring",
+    "subcategory": "Configure Resource Health",
+    "type": "single",
+    "difficulty": "easy",
+    "question": "Was ist der Unterschied zwischen Azure Service Health und Resource Health?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Service Health ist für Azure Platform, Resource Health für spezifische Resources"
+      },
+      {
+        "id": "b",
+        "text": "Service Health ist kostenlos, Resource Health kostenpflichtig"
+      },
+      {
+        "id": "c",
+        "text": "Es gibt keinen Unterschied"
+      },
+      {
+        "id": "d",
+        "text": "Resource Health ist deprecated"
+      }
+    ],
+    "correctAnswers": [
+      "a"
+    ],
+    "explanation": "Unterschied zwischen **Service Health** und **Resource Health**:\n\n**Azure Service Health:**\n- Zeigt **Service-Level Health Events**\n- Outages, Planned Maintenance für Azure Platform Services\n- Betrifft potenziell viele Kunden gleichzeitig\n\n**Azure Resource Health:**\n- Zeigt den Health-Status von **individuellen Resources**\n- VMs, Databases, Storage Accounts\n- Unterscheidet zwischen \"Platform Initiated\" und \"User Initiated\"\n- Bietet Troubleshooting-Guidance\n\n**Beispiel:**\nWenn eine VM unavailable ist, zeigt Resource Health die Ursache und gibt Lösungsvorschläge.\n\n**Integration:**\nResource Health integriert mit Activity Log und kann Alerts triggern.\n\n*Prüfungstipp*: Beide Services sind kostenlos. Resource Health ist essenziell für Root Cause Analysis bei ressourcenspezifischen Issues.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/service-health/resource-health-overview"
+    ]
+  },
+  {
+    "id": "monitor-017",
+    "category": "monitoring",
+    "subcategory": "Configure Smart Detection",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Was erkennt Application Insights Smart Detection automatisch?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Nur Performance Degradation"
+      },
+      {
+        "id": "b",
+        "text": "Performance Anomalies, Failure Rate Spikes, Memory Leaks"
+      },
+      {
+        "id": "c",
+        "text": "Nur Security Threats"
+      },
+      {
+        "id": "d",
+        "text": "Nur Traffic Patterns"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Application Insights Smart Detection** verwendet Machine Learning für automatische Anomalie-Erkennung:\n\n**Erkannte Anomalien:**\n\n1. **Failure Anomalies**: Ungewöhnliche Erhöhung von Failure Rates\n2. **Performance Anomalies**: Slow Response Times, Dependency Latency\n3. **Memory Leaks**: Kontinuierliches Memory-Wachstum\n4. **Potential Security Issues**: Abnormale Exception Patterns\n\n**Eigenschaften:**\n- Standardmäßig *aktiviert*\n- Sendet proaktive Email-Alerts\n- *Keine manuelle Threshold-Konfiguration* nötig\n- ML lernt normale Baseline und erkennt Abweichungen\n\n*Prüfungstipp*: Smart Detection ergänzt manuelle Alerts für proaktives Monitoring – besonders nützlich für unbekannte Anomalien.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/proactive-diagnostics"
+    ]
+  },
+  {
+    "id": "monitor-018",
+    "category": "monitoring",
+    "subcategory": "Configure Log Query Packs",
+    "type": "single",
+    "difficulty": "medium",
+    "question": "Wofür werden Query Packs in Log Analytics verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für schnellere Query-Ausführung"
+      },
+      {
+        "id": "b",
+        "text": "Für Sharing und Versionierung von saved KQL Queries"
+      },
+      {
+        "id": "c",
+        "text": "Für automatische Query-Optimization"
+      },
+      {
+        "id": "d",
+        "text": "Für Query-Caching"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Query Packs** in Log Analytics dienen zum **Sharing und Versionieren** von gespeicherten KQL-Queries.\n\n**Anwendungsfälle:**\n- Team-weite Query-Bibliotheken (z.B. \"Security Queries\", \"Performance Queries\")\n- Cross-Workspace Query Sharing\n- Query-Governance mit Access Control\n\n**Features:**\n- Tags und Categories\n- Query Metadata\n- RBAC-geschützter Zugriff\n- Versionierung\n\n**Technische Details:**\n- Query Packs sind **Azure Resources**\n- Können via ARM Templates deployed werden\n- Default Query Pack wird automatisch erstellt\n\n*Prüfungstipp*: Query Packs ersetzen die älteren \"Saved Searches\" (legacy, Workspace-scoped) und bieten bessere Governance.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/logs/query-packs"
+    ]
+  },
+  {
+    "id": "monitor-019",
+    "category": "monitoring",
+    "subcategory": "Configure Azure Monitor Private Link Scope",
+    "type": "single",
+    "difficulty": "hard",
+    "question": "Wofür wird Azure Monitor Private Link Scope (AMPLS) verwendet?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Für schnellere Monitoring-Performance"
+      },
+      {
+        "id": "b",
+        "text": "Für private Connectivity zu Azure Monitor über Private Endpoints"
+      },
+      {
+        "id": "c",
+        "text": "Für automatische Alert Escalation"
+      },
+      {
+        "id": "d",
+        "text": "Für Cost Reduction"
+      }
+    ],
+    "correctAnswers": [
+      "b"
+    ],
+    "explanation": "**Azure Monitor Private Link Scope (AMPLS)** ermöglicht **private Connectivity** zu Azure Monitor Services.\n\n**Funktionsweise:**\n- Private Endpoints verbinden VNets oder On-Premises mit:\n  - Log Analytics Workspaces\n  - Application Insights\n\n**Vorteile:**\n\n1. **Data Exfiltration Protection**: Monitoring-Daten verlassen nie das private Netzwerk\n2. **Bypass Public Internet**: Traffic bleibt im Microsoft Backbone\n3. **Compliance**: Für regulierte Industries (Healthcare, Finance)\n\n**AMPLS definiert:**\nWelche Azure Monitor Resources über den Private Endpoint zugänglich sind.\n\n**Einschränkungen:**\nEinige Features wie Live Metrics benötigen Public Access.\n\n*Prüfungstipp*: AMPLS ist komplex und sollte nur bei Compliance-Requirements verwendet werden – für die meisten Szenarien ist Public Access ausreichend.",
+    "references": [
+      "https://learn.microsoft.com/en-us/azure/azure-monitor/logs/private-link-security"
+    ]
+  }
+]
