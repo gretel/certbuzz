@@ -171,8 +171,21 @@ export function TrainingGameSession({
     });
 
     socket.on('training-state', (state: any) => {
-      if (state.phase) setPhase(state.phase);
+      // Server sends 'phase' (mapped from gameState). Map server states to client
+      // phases; 'result' on server means we're past the question but don't have
+      // the result payload — show question (disabled) until next event.
+      if (state.phase) {
+        const serverToClient: Record<string, TrainingPhase> = {
+          lobby: 'lobby',
+          question: 'question',
+          result: 'result',
+          finished: 'finished',
+        };
+        const mapped = serverToClient[state.phase];
+        if (mapped) setPhase(mapped);
+      }
       if (state.currentQuestionIndex !== undefined) setCurrentQuestionIndex(state.currentQuestionIndex);
+      // Restore current question so reconnect doesn't show infinite spinner
       if (state.question) setCurrentQuestion(state.question);
       if (state.leaderboard) setLeaderboard(state.leaderboard);
       if (state.votes && Array.isArray(state.votes)) {
@@ -211,6 +224,10 @@ export function TrainingGameSession({
       setOwnVote(null);
       setOtherVotes([]);
       setResult(null);
+      // Clear stale transitionData so the auto-advance effect doesn't fire
+      // immediately when this round's result phase starts (old startedAt would
+      // give a near-zero remaining time).
+      setTransitionData(null);
       setPhase('question');
     });
 
@@ -321,8 +338,10 @@ export function TrainingGameSession({
       ? {
           correct: false,
           noBuzzes: false,
-          questionText: result.question?.question,
-          options: result.question?.options,
+          // result.question lacks question text (stripped server-side for safety);
+          // use currentQuestion which has the full object.
+          questionText: result.question?.question ?? currentQuestion?.question,
+          options: result.question?.options ?? currentQuestion?.options,
           correctAnswers: result.correctAnswerId ? [result.correctAnswerId] : undefined,
           explanation: result.question?.explanation,
           references: result.question?.references,

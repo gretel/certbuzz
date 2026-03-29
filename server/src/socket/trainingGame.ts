@@ -147,7 +147,9 @@ export function closeTrainingRound(io: Server, sessionCode: string) {
   if (!state) return;
 
   const session = queries.getSession(sessionCode);
-  if (!session) return;
+  // Guard: only close if actively showing a question. Prevents double-fire from
+  // simultaneous dozent click + 3-min safety timeout.
+  if (!session || session.gameState !== 'question') return;
 
   if (state.timers.roundTimeout) clearTimeout(state.timers.roundTimeout);
 
@@ -209,6 +211,7 @@ export function closeTrainingRound(io: Server, sessionCode: string) {
     correctAnswerId,
     question: {
       id: question.id,
+      question: question.question,   // include text for TransitionScreen
       options: question.options,
       explanation: question.explanation,
       references: question.references,
@@ -280,6 +283,11 @@ export function forceNextTrainingQuestion(io: Server, sessionCode: string) {
   const session = queries.getSession(sessionCode);
   if (!session) return;
 
+  // Guard: don't advance if we're already showing the next question (auto-advance
+  // timer already fired) or already finished. Without this, a dozent click racing
+  // the 20-sec transitionTimeout would overshoot by one question.
+  if (session.gameState === 'question' || session.gameState === 'finished') return;
+
   let state = trainingGames.get(sessionCode);
   if (!state) {
     state = initTrainingGame(sessionCode);
@@ -320,10 +328,27 @@ export function getTrainingGameState(sessionCode: string) {
   const session = queries.getSession(sessionCode);
   if (!session) return null;
 
+  // Include the current question so reconnecting players can restore UI without
+  // waiting for the next training-question broadcast.
+  let currentQuestion: ReturnType<typeof getQuestion> | null = null;
+  if (session.gameState === 'question' || session.gameState === 'result') {
+    const questionId = session.questionIds[session.currentQuestionIndex];
+    if (questionId) {
+      const q = getQuestionForSession(sessionCode, questionId);
+      if (q) {
+        // Strip correct answers regardless of game state
+        const { correctAnswers: _ca, ...questionWithoutAnswer } = q;
+        currentQuestion = questionWithoutAnswer as ReturnType<typeof getQuestion>;
+      }
+    }
+  }
+
   return {
-    gameState: session.gameState,
+    // Use 'phase' to match what the client expects
+    phase: session.gameState,
     currentQuestionIndex: session.currentQuestionIndex,
     totalQuestions: session.totalQuestions,
+    question: currentQuestion,
     votes: state
       ? Array.from(state.votes.values()).map(v => ({
           playerId: v.playerId,
