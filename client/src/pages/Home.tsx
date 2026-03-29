@@ -8,7 +8,7 @@ interface Session {
   status: 'active' | 'finished';
   totalQuestions: number;
   playerCount: number;
-  gameMode: 'racing' | 'buzzer';
+  gameMode: 'racing' | 'buzzer' | 'training';
   gameState: string;
   questionBank: string;
   questionBankLabel: string;
@@ -129,7 +129,7 @@ export function Home() {
                             {getStateLabel(session.gameState)}
                           </span>
                           <span className="text-xs text-white/50">
-                            {session.gameMode === 'buzzer' ? 'Buzzer-Modus' : 'Racing-Modus'}
+                            {session.gameMode === 'buzzer' ? 'Buzzer-Modus' : session.gameMode === 'training' ? 'Team Training' : 'Racing-Modus'}
                           </span>
                         </div>
                       </div>
