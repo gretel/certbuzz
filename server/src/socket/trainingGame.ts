@@ -137,6 +137,7 @@ export function handleTrainingVote(
   // Broadcast to room (all players + dozent)
   io.to(sessionCode).emit('training-vote-update', {
     playerId: vote.playerId,
+    nickname: vote.nickname,
     emoji: vote.emoji,
     answerId: vote.answerId,
     confidenceZone: vote.confidenceZone,

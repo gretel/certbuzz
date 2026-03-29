@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from 'react';
 
 export interface Vote {
   playerId: string;
+  nickname?: string;
   emoji: string;
   answerId: string;
   confidenceZone: 1 | 2 | 3;
@@ -197,6 +198,11 @@ export function ConfidenceGrid({
           <div className="w-7 h-7 text-sm rounded-full flex items-center justify-center shadow-lg border-2 border-white/50 bg-black/30">
             {badge.emoji}
           </div>
+          {badge.nickname && (
+            <span className="text-[10px] text-white/80 bg-black/50 rounded px-1 mt-0.5 whitespace-nowrap max-w-[60px] truncate">
+              {badge.nickname}
+            </span>
+          )}
         </div>
       ))}
 

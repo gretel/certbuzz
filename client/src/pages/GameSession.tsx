@@ -247,28 +247,10 @@ export function GameSession() {
     setStartTime(Date.now());
   };
 
-  // Show session deleted message
-  if (sessionDeleted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
-        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🚫</div>
-          <h1 className="text-2xl font-bold text-white mb-2">
-            Session beendet
-          </h1>
-          <p className="text-white/70 mb-6">
-            Diese Session wurde vom Dozenten geschlossen.
-          </p>
-          <button
-            onClick={() => navigate('/')}
-            className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-3 px-6 rounded-xl transition-all"
-          >
-            Zur Startseite
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Session deleted → auto-redirect
+  useEffect(() => {
+    if (sessionDeleted) navigate('/');
+  }, [sessionDeleted, navigate]);
 
   if (loading) {
     return (

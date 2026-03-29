@@ -66,6 +66,11 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
   const [joinedPlayers, setJoinedPlayers] = useState<Player[]>([]);
   const [gameStatus, setGameStatus] = useState<BuzzerGameStatus | null>(null);
   const [trainingVoteCount, setTrainingVoteCount] = useState<{ voted: number; total: number } | null>(null);
+  const [trainingResult, setTrainingResult] = useState<{
+    correctAnswerId: string;
+    question: { question?: string; options: Array<{ id: string; text: string }>; explanation?: string };
+    votes: Array<{ nickname: string; emoji: string; correct: boolean; pointsAwarded: number }>;
+  } | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [showNextRoundConfig, setShowNextRoundConfig] = useState(false);
   const hasJoinedRef = useRef(false);
@@ -185,6 +190,26 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       alert('Fehler beim Zurücksetzen der Rangliste');
     }
   };
+
+  // Hotkey: "R" advances to next question (training + buzzer)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'r' || e.key === 'R') {
+        // Don't trigger when typing in inputs
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+        if (!socket || !sessionCode || !gameStatus) return;
+        if (gameStatus.gameState === 'result' || gameStatus.gameState === 'transition') {
+          if (createdGameMode === 'training') {
+            handleForceNextTrainingQuestion();
+          } else if (createdGameMode === 'buzzer') {
+            handleForceNextQuestion();
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [socket, sessionCode, gameStatus, createdGameMode]);
 
   useEffect(() => {
     fetchSessions();
@@ -313,10 +338,16 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       }));
       setGameStarted(true);
       setTrainingVoteCount(null);
+      setTrainingResult(null);
     };
 
     const handleTrainingResult = (data: any) => {
       setGameStatus(prev => ({ ...prev!, gameState: 'result' }));
+      setTrainingResult({
+        correctAnswerId: data.correctAnswerId,
+        question: data.question,
+        votes: data.votes,
+      });
       if (data.leaderboard) {
         setJoinedPlayers(data.leaderboard.map((p: any) => ({
           playerId: p.playerId || p.nickname,
@@ -1045,12 +1076,40 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                             </div>
                           )}
                           {gameStatus && (gameStatus.gameState === 'result' || gameStatus.gameState === 'transition') && (
-                            <button
-                              onClick={handleForceNextTrainingQuestion}
-                              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all"
-                            >
-                              Nächste Frage →
-                            </button>
+                            <>
+                              {/* Show correct answer after round closes */}
+                              {trainingResult && (
+                                <div className="p-3 bg-white/5 rounded-xl border border-teal-400/20 space-y-2">
+                                  <div className="space-y-1">
+                                    {trainingResult.question.options.map(opt => {
+                                      const isCorrect = opt.id === trainingResult.correctAnswerId;
+                                      return (
+                                        <div
+                                          key={opt.id}
+                                          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
+                                            isCorrect
+                                              ? 'bg-green-500/30 border border-green-400/40 text-green-200 font-semibold'
+                                              : 'bg-white/5 text-white/50'
+                                          }`}
+                                        >
+                                          <span>{isCorrect ? '✓' : '·'}</span>
+                                          <span>{opt.text}</span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  <div className="text-xs text-white/40 text-center">
+                                    {trainingResult.votes.filter(v => v.correct).length} / {trainingResult.votes.length} richtig
+                                  </div>
+                                </div>
+                              )}
+                              <button
+                                onClick={handleForceNextTrainingQuestion}
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all"
+                              >
+                                Nächste Frage → <span className="text-white/50 text-sm ml-1">(R)</span>
+                              </button>
+                            </>
                           )}
                           <button
                             onClick={handleEndTrainingGame}
