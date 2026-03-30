@@ -26,7 +26,7 @@ router.post('/join', (req, res) => {
     }
 
     const playerId = uuidv4();
-    const emoji = getRandomEmoji();
+    const emoji = getRandomEmoji(nickname.trim());
 
     queries.createPlayer({
       playerId,
