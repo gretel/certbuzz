@@ -269,9 +269,6 @@ export function GameSession() {
   }
 
   if (!playerId) {
-    const isBuzzerMode = sessionData.gameMode === 'buzzer';
-    const isTrainingMode = sessionData.gameMode === 'training';
-    
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
@@ -288,11 +285,8 @@ export function GameSession() {
           {/* Card */}
           <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
             <div className="text-center mb-6">
-              <div className="text-6xl mb-4">
-                {isBuzzerMode ? '🔔' : isTrainingMode ? '🧠' : '🏎️'}
-              </div>
               <h2 className="text-2xl font-bold text-white">
-                {isBuzzerMode ? 'Buzzer-Modus' : isTrainingMode ? 'Team Training' : 'Racing-Modus'}
+                Session beitreten
               </h2>
             </div>
 

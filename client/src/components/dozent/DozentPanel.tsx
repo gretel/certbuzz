@@ -929,7 +929,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                   )}
 
                   {/* Next Round Config */}
-                  {showNextRoundConfig && (
+                  {(showNextRoundConfig || gameStatus?.gameState === 'finished') && (
                     <div className="p-4 bg-blue-500/20 border-2 border-blue-400/30 rounded-xl">
                       <h3 className="font-bold text-blue-300 mb-4">Nächste Runde konfigurieren</h3>
                       
@@ -1020,15 +1020,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                           </button>
                         </>
                       ) : gameStatus?.gameState === 'finished' ? (
-                        <>
-                          <h3 className="font-bold text-purple-300 mb-3">Spiel beendet!</h3>
-                          <button
-                            onClick={() => setShowNextRoundConfig(true)}
-                            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all text-lg shadow-lg"
-                          >
-                            🔄 Nächste Runde vorbereiten
-                          </button>
-                        </>
+                        <p className="text-purple-300 font-bold text-center py-2">Spiel beendet — konfiguriere unten die nächste Runde.</p>
                       ) : (
                         <>
                           <h3 className="font-bold text-purple-300 mb-3">Spiel-Steuerung</h3>
@@ -1091,15 +1083,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                           </button>
                         </>
                       ) : gameStatus?.gameState === 'finished' ? (
-                        <>
-                          <h3 className="font-bold text-teal-300 mb-3">Training abgeschlossen!</h3>
-                          <button
-                            onClick={() => setShowNextRoundConfig(true)}
-                            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all text-lg shadow-lg"
-                          >
-                            Nächste Runde vorbereiten
-                          </button>
-                        </>
+                        <p className="text-teal-300 font-bold text-center py-2">Training abgeschlossen — konfiguriere unten die nächste Runde.</p>
                       ) : (
                         <>
                           {gameStatus && gameStatus.gameState === 'question' && (
