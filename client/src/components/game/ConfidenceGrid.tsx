@@ -35,10 +35,9 @@ const ZONE_LABELS: Record<1 | 2 | 3, string> = {
 };
 
 // Thresholds for zone detection (normalized distance from center)
-// Zones sized so "Unsicher" (edge) is smaller, "Garantiert" (center) is larger
 function getZone(normDist: number): 1 | 2 | 3 {
-  if (normDist < 0.50) return 3; // center = Garantiert (2×)
-  if (normDist < 0.80) return 2; // middle = Sicher (1.5×)
+  if (normDist < 0.40) return 3; // center = Garantiert (2×)
+  if (normDist < 0.72) return 2; // middle = Sicher (1.5×)
   return 1; // edge = Unsicher (1×)
 }
 
@@ -171,31 +170,28 @@ export function ConfidenceGrid({
         <div className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-gray-900/80 border-2 border-white/30 -translate-x-1/2 -translate-y-1/2" />
       </div>
 
-      {/* Zone boundary rings with multiplier annotations.
-          normDist = hypot((nx-0.5)*2, (ny-0.5)*2) / 1.4
-          CSS ring at center with width/height P% has normDist = (P/100) / 1.4 along axis.
-          → For normDist threshold T: CSS% = T * 1.4 * 100
-          normDist 0.50 → CSS 70%,  normDist 0.80 → CSS 112% (clips at edges — correct) */}
+      {/* Zone boundary rings — CSS% = normDist × 1.4 × 100
+          normDist 0.40 → CSS 56%,  normDist 0.72 → CSS ~101% */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl" style={{ zIndex: 5 }}>
-        {/* Inner ring — Garantiert ×2 (normDist < 0.50 → CSS 70%) */}
+        {/* Inner ring — Garantiert ×2 */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-yellow-300/50"
-          style={{ width: '70%', height: '70%' }}
+          style={{ width: '56%', height: '56%' }}
         >
           <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-200 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
             Garantiert ×2
           </span>
         </div>
-        {/* Outer ring — Sicher ×1.5 (normDist < 0.80 → CSS 112%, clips at edges) */}
+        {/* Outer ring — Sicher ×1.5 */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-white/30"
-          style={{ width: '112%', height: '112%' }}
+          style={{ width: '101%', height: '101%' }}
         >
           <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white/10 text-white/60 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
             Sicher ×1.5
           </span>
         </div>
-        {/* Outer label — Unsicher ×1 (corners only) */}
+        {/* Outer label — Unsicher ×1 */}
         <span className="absolute top-1 right-2 px-2 py-0.5 rounded bg-white/5 text-white/40 text-[10px] font-bold whitespace-nowrap">
           Unsicher ×1
         </span>

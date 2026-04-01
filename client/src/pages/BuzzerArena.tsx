@@ -606,7 +606,7 @@ export function BuzzerArena() {
                     </span>
                   </div>
                 )}
-                <h2 className={`font-bold leading-relaxed ${gameMode === 'training' ? 'text-xl text-center' : 'text-2xl'}`}>
+                <h2 className={`font-bold leading-relaxed ${gameMode === 'training' ? 'text-2xl md:text-3xl text-center' : 'text-2xl'}`}>
                   {currentQuestion.question}
                 </h2>
               </div>
