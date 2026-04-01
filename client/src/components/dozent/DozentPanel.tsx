@@ -1182,15 +1182,21 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                   )}
 
                   {/* Quick Links */}
-                  {createdGameMode === 'buzzer' && (
+                  {sessionCode && (
                     <a
                       href={arenaUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-3 p-4 bg-purple-500/20 hover:bg-purple-500/30 rounded-xl transition-colors text-center border border-purple-400/30"
+                      className={`flex items-center justify-center gap-3 p-4 rounded-xl transition-colors text-center border ${
+                        createdGameMode === 'training'
+                          ? 'bg-teal-500/20 hover:bg-teal-500/30 border-teal-400/30'
+                          : 'bg-purple-500/20 hover:bg-purple-500/30 border-purple-400/30'
+                      }`}
                     >
                       <span className="text-2xl">🏟️</span>
-                      <span className="font-medium text-purple-300">Arena öffnen (Beamer)</span>
+                      <span className={`font-medium ${createdGameMode === 'training' ? 'text-teal-300' : 'text-purple-300'}`}>
+                        Arena öffnen (Beamer)
+                      </span>
                     </a>
                   )}
 

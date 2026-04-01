@@ -758,9 +758,57 @@ export function BuzzerArena() {
                   </div>
                 </div>
 
-                {/* Vote count */}
-                <div className="mt-4 text-white/60">
-                  {trainingVotes.length} Spieler haben abgestimmt
+                {/* Vote count + live confidence bar */}
+                <div className="mt-4 w-full max-w-3xl">
+                  <div className="text-white/60 text-center mb-3">
+                    {trainingVotes.length} {trainingVotes.length === 1 ? 'Spieler hat' : 'Spieler haben'} abgestimmt
+                  </div>
+                  {trainingVotes.length > 0 && (() => {
+                    const z3 = trainingVotes.filter(v => v.confidenceZone === 3).length;
+                    const z2 = trainingVotes.filter(v => v.confidenceZone === 2).length;
+                    const z1 = trainingVotes.filter(v => v.confidenceZone === 1).length;
+                    const total = trainingVotes.length;
+                    return (
+                      <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div className="text-xs text-white/40 mb-2 text-center font-semibold">ÜBERZEUGUNG</div>
+                        <div className="flex items-end gap-1 h-16 justify-center">
+                          {/* Garantiert */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden" style={{ height: '48px' }}>
+                              <div
+                                className="absolute bottom-0 w-full bg-yellow-400/60 rounded-t transition-all duration-500"
+                                style={{ height: `${total > 0 ? (z3 / total) * 100 : 0}%` }}
+                              />
+                            </div>
+                            <span className="text-yellow-300 text-xs font-bold">{z3}</span>
+                            <span className="text-[10px] text-white/40">×2</span>
+                          </div>
+                          {/* Sicher */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden" style={{ height: '48px' }}>
+                              <div
+                                className="absolute bottom-0 w-full bg-white/40 rounded-t transition-all duration-500"
+                                style={{ height: `${total > 0 ? (z2 / total) * 100 : 0}%` }}
+                              />
+                            </div>
+                            <span className="text-white/70 text-xs font-bold">{z2}</span>
+                            <span className="text-[10px] text-white/40">×1.5</span>
+                          </div>
+                          {/* Unsicher */}
+                          <div className="flex flex-col items-center gap-1 flex-1">
+                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden" style={{ height: '48px' }}>
+                              <div
+                                className="absolute bottom-0 w-full bg-red-400/40 rounded-t transition-all duration-500"
+                                style={{ height: `${total > 0 ? (z1 / total) * 100 : 0}%` }}
+                              />
+                            </div>
+                            <span className="text-red-300/70 text-xs font-bold">{z1}</span>
+                            <span className="text-[10px] text-white/40">×1</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             )}

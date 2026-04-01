@@ -35,9 +35,10 @@ const ZONE_LABELS: Record<1 | 2 | 3, string> = {
 };
 
 // Thresholds for zone detection (normalized distance from center)
+// Zones sized so "Unsicher" (edge) is smaller, "Garantiert" (center) is larger
 function getZone(normDist: number): 1 | 2 | 3 {
-  if (normDist < 0.35) return 3; // center = Garantiert (2×)
-  if (normDist < 0.65) return 2; // middle = Sicher (1.5×)
+  if (normDist < 0.50) return 3; // center = Garantiert (2×)
+  if (normDist < 0.80) return 2; // middle = Sicher (1.5×)
   return 1; // edge = Unsicher (1×)
 }
 
@@ -172,25 +173,25 @@ export function ConfidenceGrid({
 
       {/* Zone boundary rings with multiplier annotations */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        {/* Inner ring — Garantiert ×2 */}
+        {/* Inner ring — Garantiert ×2 (50% of normalized distance) */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-yellow-300/50"
-          style={{ width: '35%', height: '35%' }}
+          style={{ width: '50%', height: '50%' }}
         >
           <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-200 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
             Garantiert ×2
           </span>
         </div>
-        {/* Middle ring — Sicher ×1.5 */}
+        {/* Middle ring — Sicher ×1.5 (80% of normalized distance) */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-white/30"
-          style={{ width: '65%', height: '65%' }}
+          style={{ width: '80%', height: '80%' }}
         >
           <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white/10 text-white/60 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
             Sicher ×1.5
           </span>
         </div>
-        {/* Outer label — Unsicher ×1 (no ring, just a label near the edge) */}
+        {/* Outer label — Unsicher ×1 */}
         <span className="absolute top-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white/5 text-white/40 text-[10px] font-bold whitespace-nowrap">
           Unsicher ×1
         </span>
