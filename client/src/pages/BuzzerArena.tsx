@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSocket } from '../hooks/useSocket';
 import { ParticleEffects } from '../components/effects/ParticleEffects';
+import { ConfidenceGrid } from '../components/game/ConfidenceGrid';
 import { computeDenseRanks, getRankStyle } from '../utils/ranking';
 
 interface Question {
@@ -711,65 +712,29 @@ export function BuzzerArena() {
               </div>
             )}
 
-            {/* Training Question Phase — full-width grid + confidence bar */}
+            {/* Training Question Phase — reuse ConfidenceGrid + confidence bar */}
             {gameMode === 'training' && gamePhase === 'question' && currentQuestion && (
               <div className="flex-1 flex gap-4 min-h-0">
-                {/* Grid fills available space */}
                 <div className="flex-1 min-h-0">
-                  <div className="relative w-full h-full grid grid-cols-2 grid-rows-2 rounded-2xl overflow-hidden">
-                    {currentQuestion.options.slice(0, 4).map((opt, i) => {
-                      const gradients = [
-                        'radial-gradient(ellipse at 0% 0%, #1d4ed8 0%, #3b82f6 50%, #93c5fd 100%)',
-                        'radial-gradient(ellipse at 100% 0%, #15803d 0%, #22c55e 50%, #86efac 100%)',
-                        'radial-gradient(ellipse at 0% 100%, #c2410c 0%, #f97316 50%, #fdba74 100%)',
-                        'radial-gradient(ellipse at 100% 100%, #7e22ce 0%, #a855f7 50%, #d8b4fe 100%)',
-                      ];
-                      return (
-                        <div key={opt.id} className="relative flex items-center justify-center p-4"
-                          style={{ background: gradients[i] }}>
-                          <span className="text-white font-bold text-lg md:text-2xl text-center drop-shadow-lg">
-                            {opt.text}
-                          </span>
-                        </div>
-                      );
-                    })}
-                    {/* Center dividers */}
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-0 bottom-0 left-1/2 w-1 bg-gray-900/60 -translate-x-1/2" />
-                      <div className="absolute left-0 right-0 top-1/2 h-1 bg-gray-900/60 -translate-y-1/2" />
-                    </div>
-                    {/* Player vote dots */}
-                    {trainingVotes.map(vote => (
-                      <div key={vote.playerId}
-                        className="absolute z-10 flex flex-col items-center pointer-events-none"
-                        style={{
-                          left: `${vote.clickX * 100}%`,
-                          top: `${vote.clickY * 100}%`,
-                          transform: 'translate(-50%, -50%)',
-                        }}>
-                        <div className="w-10 h-10 text-xl rounded-full flex items-center justify-center shadow-lg border-2 border-white/60 bg-black/40">
-                          {vote.emoji}
-                        </div>
-                        {vote.nickname && (
-                          <span className="text-xs text-white/80 bg-black/50 rounded px-1 mt-0.5">
-                            {vote.nickname}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  <ConfidenceGrid
+                    options={currentQuestion.options}
+                    disabled={true}
+                    ownPlayerId=""
+                    ownEmoji=""
+                    ownVote={null}
+                    otherVotes={trainingVotes}
+                    onVote={() => {}}
+                  />
                 </div>
 
                 {/* Single confidence bar — traffic light color */}
                 {trainingVotes.length > 0 && (
                   <div className="w-16 flex flex-col items-center justify-end pb-2">
                     {(() => {
-                      // Weighted average: zone3=100%, zone2=50%, zone1=0%
                       const total = trainingVotes.length;
                       const z3 = trainingVotes.filter(v => v.confidenceZone === 3).length;
                       const z2 = trainingVotes.filter(v => v.confidenceZone === 2).length;
                       const pct = Math.round(((z3 * 1.0 + z2 * 0.5) / total) * 100);
-                      // Traffic light: red < 33%, yellow 33-66%, green > 66%
                       const color = pct >= 66 ? 'bg-green-500' : pct >= 33 ? 'bg-yellow-400' : 'bg-red-500';
                       const textColor = pct >= 66 ? 'text-green-300' : pct >= 33 ? 'text-yellow-300' : 'text-red-300';
                       return (
