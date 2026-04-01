@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { queries } from '../db/queries.js';
 import { getQuestion, type Question } from '../questions/questionBank.js';
+import { shuffleArray } from '../utils/helpers.js';
 
 export interface TrainingVote {
   playerId: string;
@@ -107,6 +108,7 @@ function showTrainingQuestion(io: Server, sessionCode: string, questionIndex: nu
   queries.updateSessionGameState(sessionCode, 'question', questionIndex);
 
   const { correctAnswers, explanation, references, ...questionWithoutAnswer } = question;
+  questionWithoutAnswer.options = shuffleArray([...questionWithoutAnswer.options]);
 
   io.to(sessionCode).emit('training-question', {
     questionIndex,

@@ -141,9 +141,13 @@ router.post('/session/:sessionCode/continue', authenticate, (req, res) => {
     cleanupBuzzerGame(sessionCode);
     cleanupTrainingGame(sessionCode);
 
-    // Select new questions
+    // Select new questions, prioritizing those not yet asked in this session
     const actualQuestionCount = Math.min(totalQuestions, filteredQuestions.length);
-    const selectedQuestions = shuffleArray(filteredQuestions).slice(0, actualQuestionCount);
+    const askedIds = new Set(queries.getAskedQuestionIds(sessionCode));
+    const unseenQuestions = filteredQuestions.filter(q => !askedIds.has(q.id));
+    const seenQuestions = filteredQuestions.filter(q => askedIds.has(q.id));
+    const prioritized = [...shuffleArray(unseenQuestions), ...shuffleArray(seenQuestions)];
+    const selectedQuestions = prioritized.slice(0, actualQuestionCount);
 
     // Update session with new questions and reset state
     queries.continueSession(sessionCode, {

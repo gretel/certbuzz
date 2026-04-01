@@ -22,10 +22,10 @@ interface ConfidenceGridProps {
 
 // Colors per quadrant: TL=blue, TR=green, BL=orange, BR=purple
 const QUADRANT_GRADIENTS = [
-  'radial-gradient(ellipse at 100% 100%, #1d4ed8 0%, #3b82f6 50%, #93c5fd 100%)',
-  'radial-gradient(ellipse at 0% 100%, #15803d 0%, #22c55e 50%, #86efac 100%)',
-  'radial-gradient(ellipse at 100% 0%, #c2410c 0%, #f97316 50%, #fdba74 100%)',
-  'radial-gradient(ellipse at 0% 0%, #7e22ce 0%, #a855f7 50%, #d8b4fe 100%)',
+  'radial-gradient(ellipse at 0% 0%, #1d4ed8 0%, #3b82f6 50%, #93c5fd 100%)',
+  'radial-gradient(ellipse at 100% 0%, #15803d 0%, #22c55e 50%, #86efac 100%)',
+  'radial-gradient(ellipse at 0% 100%, #c2410c 0%, #f97316 50%, #fdba74 100%)',
+  'radial-gradient(ellipse at 100% 100%, #7e22ce 0%, #a855f7 50%, #d8b4fe 100%)',
 ];
 
 const ZONE_LABELS: Record<1 | 2 | 3, string> = {
@@ -36,9 +36,9 @@ const ZONE_LABELS: Record<1 | 2 | 3, string> = {
 
 // Thresholds for zone detection (normalized distance from center)
 function getZone(normDist: number): 1 | 2 | 3 {
-  if (normDist < 0.35) return 1;
-  if (normDist < 0.65) return 2;
-  return 3;
+  if (normDist < 0.35) return 3; // center = Garantiert (2×)
+  if (normDist < 0.65) return 2; // middle = Sicher (1.5×)
+  return 1; // edge = Unsicher (1×)
 }
 
 // Which quadrant (0-3) does a normalized point (nx, ny) fall in?

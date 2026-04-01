@@ -185,6 +185,18 @@ export const queries = {
     saveDatabase();
   },
 
+  getAskedQuestionIds: (sessionCode: string): string[] => {
+    const db = getDatabase();
+    const result = db.exec(`
+      SELECT DISTINCT pa.question_id
+      FROM player_answers pa
+      JOIN players p ON pa.player_id = p.player_id
+      WHERE p.session_code = ?
+    `, [sessionCode]);
+    if (result.length === 0) return [];
+    return result[0].values.map((row: any) => row[0] as string);
+  },
+
   getPlayerAnswerCount: (playerId: string): number => {
     const db = getDatabase();
     const result = db.exec(`SELECT COUNT(*) FROM player_answers WHERE player_id = ?`, [playerId]);
