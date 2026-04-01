@@ -509,7 +509,12 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
       setJoinedPlayers([]);
       setShowNextRoundConfig(false);
       // Sync with actual question count (may be less than requested if not enough qualifying questions)
-      if (data.actualQuestions) setQuestionCount(data.actualQuestions);
+      if (data.actualQuestions) {
+        if (data.actualQuestions < questionCount) {
+          alert(`Hinweis: Nur ${data.actualQuestions} passende Fragen verfügbar (${questionCount} angefragt).`);
+        }
+        setQuestionCount(data.actualQuestions);
+      }
       await fetchSessions();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
@@ -541,6 +546,12 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
 
       if (!response.ok) {
         throw new Error('Fehler beim Fortsetzen der Session');
+      }
+
+      const data = await response.json();
+      if (data.actualQuestions && data.actualQuestions < questionCount) {
+        alert(`Hinweis: Nur ${data.actualQuestions} passende Fragen verfügbar (${questionCount} angefragt).`);
+        setQuestionCount(data.actualQuestions);
       }
 
       setShowNextRoundConfig(false);
