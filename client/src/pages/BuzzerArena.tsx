@@ -589,22 +589,24 @@ export function BuzzerArena() {
           <div className={`flex flex-col min-h-0 ${gameMode === 'training' ? '' : 'col-span-2'}`}>
             {/* Question Card */}
             {currentQuestion && (
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-6 flex-shrink-0">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${
-                    currentQuestion.difficulty === 'easy' ? 'bg-green-500/30 text-green-300' :
-                    currentQuestion.difficulty === 'medium' ? 'bg-yellow-500/30 text-yellow-300' :
-                    'bg-red-500/30 text-red-300'
-                  }`}>
-                    {currentQuestion.difficulty === 'easy' ? '500 Punkte' :
-                     currentQuestion.difficulty === 'medium' ? '1000 Punkte' :
-                     '1500 Punkte'}
-                  </span>
-                  <span className="px-3 py-1 bg-cb-primary/30 rounded-full text-sm text-cb-accent">
-                    {currentQuestion.category}
-                  </span>
-                </div>
-                <h2 className="text-2xl font-bold leading-relaxed">
+              <div className={`flex-shrink-0 ${gameMode === 'training' ? 'py-2' : 'bg-white/10 backdrop-blur rounded-2xl p-6'}`}>
+                {gameMode !== 'training' && (
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                      currentQuestion.difficulty === 'easy' ? 'bg-green-500/30 text-green-300' :
+                      currentQuestion.difficulty === 'medium' ? 'bg-yellow-500/30 text-yellow-300' :
+                      'bg-red-500/30 text-red-300'
+                    }`}>
+                      {currentQuestion.difficulty === 'easy' ? '500 Punkte' :
+                       currentQuestion.difficulty === 'medium' ? '1000 Punkte' :
+                       '1500 Punkte'}
+                    </span>
+                    <span className="px-3 py-1 bg-cb-primary/30 rounded-full text-sm text-cb-accent">
+                      {currentQuestion.category}
+                    </span>
+                  </div>
+                )}
+                <h2 className={`font-bold leading-relaxed ${gameMode === 'training' ? 'text-xl text-center' : 'text-2xl'}`}>
                   {currentQuestion.question}
                 </h2>
               </div>
@@ -709,11 +711,11 @@ export function BuzzerArena() {
               </div>
             )}
 
-            {/* Training Question Phase */}
+            {/* Training Question Phase — full-width grid + confidence bar */}
             {gameMode === 'training' && gamePhase === 'question' && currentQuestion && (
-              <div className="flex-1 flex flex-col items-center justify-center p-4">
-                {/* Simple 2x2 grid with player dots */}
-                <div className="w-full max-w-3xl" style={{ aspectRatio: '4/3' }}>
+              <div className="flex-1 flex gap-4 min-h-0">
+                {/* Grid fills available space */}
+                <div className="flex-1 min-h-0">
                   <div className="relative w-full h-full grid grid-cols-2 grid-rows-2 rounded-2xl overflow-hidden">
                     {currentQuestion.options.slice(0, 4).map((opt, i) => {
                       const gradients = [
@@ -723,9 +725,9 @@ export function BuzzerArena() {
                         'radial-gradient(ellipse at 100% 100%, #7e22ce 0%, #a855f7 50%, #d8b4fe 100%)',
                       ];
                       return (
-                        <div key={opt.id} className="relative flex items-center justify-center p-6"
+                        <div key={opt.id} className="relative flex items-center justify-center p-4"
                           style={{ background: gradients[i] }}>
-                          <span className="text-white font-bold text-lg md:text-xl text-center drop-shadow-lg">
+                          <span className="text-white font-bold text-lg md:text-2xl text-center drop-shadow-lg">
                             {opt.text}
                           </span>
                         </div>
@@ -758,55 +760,52 @@ export function BuzzerArena() {
                   </div>
                 </div>
 
-                {/* Vote count + live confidence bar */}
-                <div className="mt-4 w-full max-w-3xl">
-                  <div className="text-white/60 text-center mb-3">
-                    {trainingVotes.length} {trainingVotes.length === 1 ? 'Spieler hat' : 'Spieler haben'} abgestimmt
-                  </div>
-                  {trainingVotes.length > 0 && (() => {
+                {/* Confidence bar — narrow sidebar */}
+                <div className="w-24 flex flex-col justify-end gap-2 pb-2">
+                  {(() => {
                     const z3 = trainingVotes.filter(v => v.confidenceZone === 3).length;
                     const z2 = trainingVotes.filter(v => v.confidenceZone === 2).length;
                     const z1 = trainingVotes.filter(v => v.confidenceZone === 1).length;
-                    const total = trainingVotes.length;
+                    const total = trainingVotes.length || 1;
                     return (
-                      <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                        <div className="text-xs text-white/40 mb-2 text-center font-semibold">ÜBERZEUGUNG</div>
-                        <div className="flex items-end gap-1 h-16 justify-center">
-                          {/* Garantiert */}
-                          <div className="flex flex-col items-center gap-1 flex-1">
-                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden" style={{ height: '48px' }}>
+                      <>
+                        <div className="text-[10px] text-white/40 text-center font-semibold mb-1">
+                          {trainingVotes.length} Stimmen
+                        </div>
+                        {/* Vertical bars */}
+                        <div className="flex items-end gap-1 flex-1">
+                          <div className="flex flex-col items-center gap-1 flex-1 h-full">
+                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden flex-1">
                               <div
                                 className="absolute bottom-0 w-full bg-yellow-400/60 rounded-t transition-all duration-500"
-                                style={{ height: `${total > 0 ? (z3 / total) * 100 : 0}%` }}
+                                style={{ height: `${(z3 / total) * 100}%` }}
                               />
                             </div>
                             <span className="text-yellow-300 text-xs font-bold">{z3}</span>
-                            <span className="text-[10px] text-white/40">×2</span>
+                            <span className="text-[9px] text-white/40">×2</span>
                           </div>
-                          {/* Sicher */}
-                          <div className="flex flex-col items-center gap-1 flex-1">
-                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden" style={{ height: '48px' }}>
+                          <div className="flex flex-col items-center gap-1 flex-1 h-full">
+                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden flex-1">
                               <div
                                 className="absolute bottom-0 w-full bg-white/40 rounded-t transition-all duration-500"
-                                style={{ height: `${total > 0 ? (z2 / total) * 100 : 0}%` }}
+                                style={{ height: `${(z2 / total) * 100}%` }}
                               />
                             </div>
                             <span className="text-white/70 text-xs font-bold">{z2}</span>
-                            <span className="text-[10px] text-white/40">×1.5</span>
+                            <span className="text-[9px] text-white/40">×1.5</span>
                           </div>
-                          {/* Unsicher */}
-                          <div className="flex flex-col items-center gap-1 flex-1">
-                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden" style={{ height: '48px' }}>
+                          <div className="flex flex-col items-center gap-1 flex-1 h-full">
+                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden flex-1">
                               <div
                                 className="absolute bottom-0 w-full bg-red-400/40 rounded-t transition-all duration-500"
-                                style={{ height: `${total > 0 ? (z1 / total) * 100 : 0}%` }}
+                                style={{ height: `${(z1 / total) * 100}%` }}
                               />
                             </div>
                             <span className="text-red-300/70 text-xs font-bold">{z1}</span>
-                            <span className="text-[10px] text-white/40">×1</span>
+                            <span className="text-[9px] text-white/40">×1</span>
                           </div>
                         </div>
-                      </div>
+                      </>
                     );
                   })()}
                 </div>
