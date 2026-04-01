@@ -60,6 +60,7 @@ export function BuzzerArena() {
   const [sessionDeleted, setSessionDeleted] = useState(false);
 
   // Game state
+  const [gameMode, setGameMode] = useState<'racing' | 'buzzer' | 'training'>('buzzer');
   const [gamePhase, setGamePhase] = useState<GamePhase>('lobby');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
@@ -70,6 +71,18 @@ export function BuzzerArena() {
   const [eliminatedAnswers, setEliminatedAnswers] = useState<string[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [players, setPlayers] = useState<Array<{ playerId: string; nickname: string; emoji: string }>>([]);
+
+  // Training mode state
+  const [trainingVotes, setTrainingVotes] = useState<Array<{
+    playerId: string;
+    nickname?: string;
+    emoji: string;
+    answerId: string;
+    confidenceZone: 1 | 2 | 3;
+    clickX: number;
+    clickY: number;
+  }>>([]);
+  const [trainingResult, setTrainingResult] = useState<any>(null);
 
   // Live selection from answerer (for Dozent assistance)
   const [liveSelection, setLiveSelection] = useState<string[]>([]);
@@ -133,6 +146,7 @@ export function BuzzerArena() {
         if (response.ok) {
           const data = await response.json();
           setTotalQuestions(data.totalQuestions);
+          setGameMode(data.gameMode || 'buzzer');
         }
       } catch (err) {
         console.error('Failed to fetch session:', err);
@@ -150,6 +164,7 @@ export function BuzzerArena() {
 
     // Request initial state
     socket.emit('buzzer-get-state', code);
+    socket.emit('training-get-state', code);
 
     // Initial state
     socket.on('buzzer-state', (state: any) => {
@@ -268,6 +283,58 @@ export function BuzzerArena() {
       setSessionDeleted(true);
     });
 
+    // Training mode event handlers
+    socket.on('training-state', (state: any) => {
+      const phase = state.transition ? 'transition' : state.phase;
+      if (phase === 'lobby') setGamePhase('lobby');
+      else if (phase === 'question') setGamePhase('question');
+      else if (phase === 'finished') setGamePhase('finished');
+      else if (phase === 'transition') setGamePhase('transition');
+
+      setCurrentQuestionIndex(state.currentQuestionIndex || 0);
+      setTotalQuestions(state.totalQuestions || 0);
+      if (state.question) setCurrentQuestion(state.question);
+      setLeaderboard(state.leaderboard || []);
+      if (state.votes) setTrainingVotes(state.votes);
+    });
+
+    socket.on('training-question', (data: any) => {
+      setGamePhase('question');
+      setCurrentQuestionIndex(data.questionIndex);
+      setTotalQuestions(data.totalQuestions);
+      setCurrentQuestion(data.question);
+      setTrainingVotes([]);
+      setTrainingResult(null);
+    });
+
+    socket.on('training-vote-update', (data: any) => {
+      setTrainingVotes(prev => {
+        const without = prev.filter(v => v.playerId !== data.playerId);
+        return [...without, data];
+      });
+    });
+
+    socket.on('training-result', (data: any) => {
+      setGamePhase('result');
+      setTrainingResult(data);
+      setLeaderboard(data.leaderboard || []);
+    });
+
+    socket.on('training-transition', (data: any) => {
+      setGamePhase('transition');
+      setTransitionStartTime(data.transitionStartedAt || Date.now());
+      setLeaderboard(data.leaderboard || []);
+    });
+
+    socket.on('training-game-over', (data: any) => {
+      setGamePhase('finished');
+      setLeaderboard(data.leaderboard || []);
+    });
+
+    socket.on('training-players-update', (data: any) => {
+      setPlayers(data.players || []);
+    });
+
     return () => {
       socket.off('buzzer-state');
       socket.off('buzzer-question');
@@ -281,6 +348,13 @@ export function BuzzerArena() {
       socket.off('buzzer-game-over');
       socket.off('buzzer-players-update');
       socket.off('session-deleted');
+      socket.off('training-state');
+      socket.off('training-question');
+      socket.off('training-vote-update');
+      socket.off('training-result');
+      socket.off('training-transition');
+      socket.off('training-game-over');
+      socket.off('training-players-update');
     };
   }, [socket, code, currentAnswerer]);
 
@@ -484,9 +558,9 @@ export function BuzzerArena() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 grid grid-cols-3 gap-6 py-6 min-h-0">
+        <div className={`flex-1 grid gap-6 py-6 min-h-0 ${gameMode === 'training' ? 'grid-cols-1' : 'grid-cols-3'}`}>
           {/* Left: Question + Options */}
-          <div className="col-span-2 flex flex-col min-h-0">
+          <div className={`flex flex-col min-h-0 ${gameMode === 'training' ? '' : 'col-span-2'}`}>
             {/* Question Card */}
             {currentQuestion && (
               <div className="bg-white/10 backdrop-blur rounded-2xl p-6 flex-shrink-0">
@@ -510,8 +584,8 @@ export function BuzzerArena() {
               </div>
             )}
 
-            {/* Options */}
-            {currentQuestion && (gamePhase === 'answering' || gamePhase === 'result') && (
+            {/* Options (buzzer only) */}
+            {gameMode === 'buzzer' && currentQuestion && (gamePhase === 'answering' || gamePhase === 'result') && (
               <div className="mt-4 grid grid-cols-1 gap-3 flex-1 overflow-auto">
                 {currentQuestion.options.map(option => {
                   const isEliminated = eliminatedAnswers.includes(option.id);
@@ -564,8 +638,8 @@ export function BuzzerArena() {
               </div>
             )}
 
-            {/* Correct Answer(s) - shown instead of full explanation */}
-            {gamePhase === 'result' && lastResult?.correctAnswers && lastResult.correctAnswers.length > 0 && currentQuestion && (
+            {/* Correct Answer(s) - shown instead of full explanation (buzzer only) */}
+            {gameMode === 'buzzer' && gamePhase === 'result' && lastResult?.correctAnswers && lastResult.correctAnswers.length > 0 && currentQuestion && (
               <div className="mt-4 bg-green-500/20 border border-green-400/50 rounded-xl p-4">
                 <h3 className="font-bold text-green-300 mb-2">
                   Richtige Antwort{lastResult.correctAnswers.length > 1 ? 'en' : ''}:
@@ -585,7 +659,7 @@ export function BuzzerArena() {
             )}
 
             {/* Buzzer Phase Message */}
-            {gamePhase === 'question' && (
+            {gameMode === 'buzzer' && gamePhase === 'question' && (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-8xl mb-4 animate-bounce">&#128276;</div>
@@ -608,12 +682,137 @@ export function BuzzerArena() {
                 </div>
               </div>
             )}
+
+            {/* Training Question Phase */}
+            {gameMode === 'training' && gamePhase === 'question' && currentQuestion && (
+              <div className="flex-1 flex flex-col items-center justify-center p-4">
+                {/* Simple 2x2 grid with player dots */}
+                <div className="w-full max-w-3xl" style={{ aspectRatio: '4/3' }}>
+                  <div className="relative w-full h-full grid grid-cols-2 grid-rows-2 rounded-2xl overflow-hidden">
+                    {currentQuestion.options.slice(0, 4).map((opt, i) => {
+                      const gradients = [
+                        'radial-gradient(ellipse at 0% 0%, #1d4ed8 0%, #3b82f6 50%, #93c5fd 100%)',
+                        'radial-gradient(ellipse at 100% 0%, #15803d 0%, #22c55e 50%, #86efac 100%)',
+                        'radial-gradient(ellipse at 0% 100%, #c2410c 0%, #f97316 50%, #fdba74 100%)',
+                        'radial-gradient(ellipse at 100% 100%, #7e22ce 0%, #a855f7 50%, #d8b4fe 100%)',
+                      ];
+                      return (
+                        <div key={opt.id} className="relative flex items-center justify-center p-6"
+                          style={{ background: gradients[i] }}>
+                          <span className="text-white font-bold text-lg md:text-xl text-center drop-shadow-lg">
+                            {opt.text}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    {/* Center dividers */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute top-0 bottom-0 left-1/2 w-1 bg-gray-900/60 -translate-x-1/2" />
+                      <div className="absolute left-0 right-0 top-1/2 h-1 bg-gray-900/60 -translate-y-1/2" />
+                    </div>
+                    {/* Player vote dots */}
+                    {trainingVotes.map(vote => (
+                      <div key={vote.playerId}
+                        className="absolute z-10 flex flex-col items-center pointer-events-none"
+                        style={{
+                          left: `${vote.clickX * 100}%`,
+                          top: `${vote.clickY * 100}%`,
+                          transform: 'translate(-50%, -50%)',
+                        }}>
+                        <div className="w-10 h-10 text-xl rounded-full flex items-center justify-center shadow-lg border-2 border-white/60 bg-black/40">
+                          {vote.emoji}
+                        </div>
+                        {vote.nickname && (
+                          <span className="text-xs text-white/80 bg-black/50 rounded px-1 mt-0.5">
+                            {vote.nickname}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Vote count */}
+                <div className="mt-4 text-white/60">
+                  {trainingVotes.length} Spieler haben abgestimmt
+                </div>
+              </div>
+            )}
+
+            {/* Training Result Phase */}
+            {gameMode === 'training' && gamePhase === 'result' && trainingResult && currentQuestion && (
+              <div className="flex-1 flex flex-col items-center justify-center p-4">
+                <div className="max-w-2xl w-full grid grid-cols-2 gap-3 mb-6">
+                  {(trainingResult.question?.options || currentQuestion.options).map((opt: any) => {
+                    const isCorrect = opt.id === trainingResult.correctAnswerId;
+                    return (
+                      <div key={opt.id}
+                        className={`p-4 rounded-xl text-center font-semibold ${
+                          isCorrect
+                            ? 'bg-green-500/40 border-2 border-green-400 text-green-100'
+                            : 'bg-white/10 border border-white/20 text-white/50'
+                        }`}>
+                        {isCorrect && '\u2713 '}{opt.text}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="text-white/60">
+                  {trainingResult.votes?.filter((v: any) => v.correct).length} / {trainingResult.votes?.length} richtig
+                </div>
+                {/* Transition countdown */}
+                {transitionStartTime > 0 && (
+                  <div className="mt-4 text-center">
+                    <div className="text-sm text-gray-400">Nächste Frage in</div>
+                    <div className="text-3xl font-mono font-bold text-cb-accent">
+                      {Math.ceil(transitionTimeRemaining)}s
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Training Transition Phase */}
+            {gameMode === 'training' && gamePhase === 'transition' && (
+              <div className="flex-1 flex flex-col items-center justify-center p-4">
+                <div className="text-center mb-8">
+                  <div className="text-sm text-gray-400 mb-2">Nächste Frage in</div>
+                  <div className="text-6xl font-mono font-bold text-cb-accent">
+                    {Math.ceil(transitionTimeRemaining)}s
+                  </div>
+                </div>
+                {leaderboard.length > 0 && (
+                  <div className="w-full max-w-2xl bg-white/5 rounded-2xl p-6">
+                    <div className="text-sm text-gray-400 mb-3">RANGLISTE</div>
+                    <div className="space-y-2">
+                      {(() => {
+                        const transRanks = computeDenseRanks(leaderboard);
+                        return leaderboard.slice(0, 10).map((player, index) => {
+                          const rank = transRanks[index];
+                          return (
+                            <div key={player.nickname}
+                              className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+                              <span className={`w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold ${getRankStyle(rank)}`}>
+                                {rank}
+                              </span>
+                              <span className="text-lg">{player.emoji}</span>
+                              <span className="flex-1 font-medium truncate">{player.nickname}</span>
+                              <span className="font-bold text-cb-accent">{player.score}</span>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Right: Status Panel */}
-          <div className="flex flex-col gap-4 min-h-0">
-            {/* Current Answerer */}
-            {gamePhase === 'answering' && currentAnswerer && (
+          {/* Right: Status Panel (buzzer mode sidebar) */}
+          {gameMode === 'buzzer' && <div className="flex flex-col gap-4 min-h-0">
+            {/* Current Answerer (buzzer only) */}
+            {gameMode === 'buzzer' && gamePhase === 'answering' && currentAnswerer && (
               <div className="bg-cb-primary/30 border-2 border-cb-accent rounded-2xl p-6 animate-pulse-slow">
                 <div className="text-center">
                   <div className="text-sm text-cb-accent mb-2">ANTWORTET GERADE</div>
@@ -626,8 +825,8 @@ export function BuzzerArena() {
               </div>
             )}
 
-            {/* Result Banner + Transition Timer */}
-            {gamePhase === 'result' && lastResult && (
+            {/* Result Banner + Transition Timer (buzzer only) */}
+            {gameMode === 'buzzer' && gamePhase === 'result' && lastResult && (
               <div className={`rounded-2xl p-6 ${
                 lastResult.correct ? 'bg-green-500/30 border-2 border-green-400' :
                 lastResult.noBuzzes ? 'bg-gray-500/30 border-2 border-gray-400' :
@@ -668,8 +867,8 @@ export function BuzzerArena() {
               </div>
             )}
 
-            {/* Buzz Order */}
-            {(gamePhase === 'question' || gamePhase === 'enrolling' || gamePhase === 'answering') && (
+            {/* Buzz Order (buzzer only) */}
+            {gameMode === 'buzzer' && (gamePhase === 'question' || gamePhase === 'enrolling' || gamePhase === 'answering') && (
               <div className="bg-white/5 rounded-2xl p-4 flex-shrink-0">
                 <div className="text-sm text-gray-400 mb-3">BUZZ-REIHENFOLGE</div>
                 {buzzes.length === 0 ? (
@@ -727,7 +926,7 @@ export function BuzzerArena() {
                 })()}
               </div>
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </div>
