@@ -486,7 +486,7 @@ export function TrainingGameSession({
 
         {/* Question card */}
         <div className="bg-white/10 backdrop-blur-lg border-x border-white/20 p-6">
-          <h2 className="text-xl font-bold text-white">{currentQuestion.question}</h2>
+          <h2 className="text-xl font-bold text-white drop-shadow-lg">{currentQuestion.question}</h2>
         </div>
 
         {/* Grid container */}

@@ -607,7 +607,7 @@ export function BuzzerArena() {
                     </span>
                   </div>
                 )}
-                <h2 className={`font-bold leading-relaxed ${gameMode === 'training' ? 'text-2xl md:text-3xl text-center' : 'text-2xl'}`}>
+                <h2 className={`font-bold leading-relaxed drop-shadow-lg ${gameMode === 'training' ? 'text-2xl md:text-3xl text-center' : 'text-2xl'}`}>
                   {currentQuestion.question}
                 </h2>
               </div>
@@ -760,7 +760,7 @@ export function BuzzerArena() {
             {/* Training Result Phase — correct answer + participants */}
             {gameMode === 'training' && gamePhase === 'result' && trainingResult && currentQuestion && (
               <div className="flex-1 flex flex-col items-center justify-center p-4">
-                <h2 className="text-2xl font-bold text-white text-center mb-6">
+                <h2 className="text-2xl font-bold text-white text-center mb-6 drop-shadow-lg">
                   {currentQuestion.question}
                 </h2>
                 <div className="max-w-2xl w-full grid grid-cols-2 gap-3 mb-4">
