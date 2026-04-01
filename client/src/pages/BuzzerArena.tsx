@@ -459,6 +459,32 @@ export function BuzzerArena() {
 
   // Finished screen
   if (gamePhase === 'finished') {
+    // Training mode: simple participant celebration, no ranking/podium
+    if (gameMode === 'training') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 text-white p-8">
+          <ParticleEffects type="fireworks" duration={30000} />
+          <div className="max-w-4xl mx-auto relative z-10 text-center">
+            <div className="mb-12">
+              <h1 className="text-6xl font-black mb-4 bg-gradient-to-r from-teal-300 via-white to-teal-300 bg-clip-text text-transparent">
+                Training abgeschlossen!
+              </h1>
+              <p className="text-xl text-teal-300">Danke fürs Mitmachen!</p>
+            </div>
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 max-w-3xl mx-auto">
+              {(leaderboard.length > 0 ? leaderboard : players).map((p, i) => (
+                <div key={p.nickname || i} className="text-center p-3 bg-white/10 rounded-2xl border border-white/10">
+                  <div className="text-5xl mb-2">{p.emoji}</div>
+                  <div className="text-sm font-medium truncate text-white/90">{p.nickname}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Buzzer mode: podium + ranking
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 text-white p-8">
         <ParticleEffects type="fireworks" duration={30000} />
@@ -739,10 +765,13 @@ export function BuzzerArena() {
               </div>
             )}
 
-            {/* Training Result Phase */}
+            {/* Training Result Phase — correct answer + participants */}
             {gameMode === 'training' && gamePhase === 'result' && trainingResult && currentQuestion && (
               <div className="flex-1 flex flex-col items-center justify-center p-4">
-                <div className="max-w-2xl w-full grid grid-cols-2 gap-3 mb-6">
+                <h2 className="text-2xl font-bold text-white text-center mb-6">
+                  {currentQuestion.question}
+                </h2>
+                <div className="max-w-2xl w-full grid grid-cols-2 gap-3 mb-4">
                   {(trainingResult.question?.options || currentQuestion.options).map((opt: any) => {
                     const isCorrect = opt.id === trainingResult.correctAnswerId;
                     return (
@@ -752,27 +781,31 @@ export function BuzzerArena() {
                             ? 'bg-green-500/40 border-2 border-green-400 text-green-100'
                             : 'bg-white/10 border border-white/20 text-white/50'
                         }`}>
-                        {isCorrect && '\u2713 '}{opt.text}
+                        {isCorrect && '✓ '}{opt.text}
                       </div>
                     );
                   })}
                 </div>
-                <div className="text-white/60">
+                <div className="text-white/60 mb-6">
                   {trainingResult.votes?.filter((v: any) => v.correct).length} / {trainingResult.votes?.length} richtig
                 </div>
-                {/* Transition countdown */}
-                {transitionStartTime > 0 && (
-                  <div className="mt-4 text-center">
-                    <div className="text-sm text-gray-400">Nächste Frage in</div>
-                    <div className="text-3xl font-mono font-bold text-cb-accent">
-                      {Math.ceil(transitionTimeRemaining)}s
+                {/* Participant grid */}
+                {players.length > 0 && (
+                  <div className="w-full max-w-3xl">
+                    <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+                      {players.map(p => (
+                        <div key={p.playerId} className="text-center p-1">
+                          <div className="text-2xl">{p.emoji}</div>
+                          <div className="text-[10px] truncate text-white/60">{p.nickname}</div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Training Transition Phase */}
+            {/* Training Transition Phase — show countdown + participants */}
             {gameMode === 'training' && gamePhase === 'transition' && (
               <div className="flex-1 flex flex-col items-center justify-center p-4">
                 <div className="text-center mb-8">
@@ -781,27 +814,16 @@ export function BuzzerArena() {
                     {Math.ceil(transitionTimeRemaining)}s
                   </div>
                 </div>
-                {leaderboard.length > 0 && (
-                  <div className="w-full max-w-2xl bg-white/5 rounded-2xl p-6">
-                    <div className="text-sm text-gray-400 mb-3">RANGLISTE</div>
-                    <div className="space-y-2">
-                      {(() => {
-                        const transRanks = computeDenseRanks(leaderboard);
-                        return leaderboard.slice(0, 10).map((player, index) => {
-                          const rank = transRanks[index];
-                          return (
-                            <div key={player.nickname}
-                              className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
-                              <span className={`w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold ${getRankStyle(rank)}`}>
-                                {rank}
-                              </span>
-                              <span className="text-lg">{player.emoji}</span>
-                              <span className="flex-1 font-medium truncate">{player.nickname}</span>
-                              <span className="font-bold text-cb-accent">{player.score}</span>
-                            </div>
-                          );
-                        });
-                      })()}
+                {players.length > 0 && (
+                  <div className="w-full max-w-3xl">
+                    <div className="text-sm text-gray-400 mb-3 text-center">{players.length} Teilnehmer</div>
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                      {players.map(p => (
+                        <div key={p.playerId} className="text-center p-2 bg-white/5 rounded-xl">
+                          <div className="text-3xl mb-1">{p.emoji}</div>
+                          <div className="text-xs font-medium truncate text-white/80">{p.nickname}</div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

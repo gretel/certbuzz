@@ -7,7 +7,7 @@ import type { Vote } from '../components/game/ConfidenceGrid';
 import { TrainingReveal } from '../components/game/TrainingReveal';
 import { TransitionScreen } from '../components/buzzer/TransitionScreen';
 import { MarkdownText } from '../components/shared/MarkdownText';
-import { computeDenseRanks, getRankStyle } from '../utils/ranking';
+
 
 type TrainingPhase = 'lobby' | 'question' | 'reveal' | 'result' | 'transition' | 'finished';
 
@@ -365,55 +365,39 @@ export function TrainingGameSession({
   if (phase === 'finished') {
     const myEntry = leaderboard.find(p => p.nickname === nickname && p.emoji === emoji);
     const myScore = myEntry?.score ?? 0;
-    const denseRanks = computeDenseRanks(leaderboard);
-    const myIndex = myEntry ? leaderboard.indexOf(myEntry) : -1;
-    const myRank = myIndex >= 0 ? denseRanks[myIndex] : 0;
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
         <div className="bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 p-8 max-w-2xl w-full">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">Training abgeschlossen! 🎉</h1>
-            <p className="text-xl text-cb-accent">{nickname} {emoji}</p>
+            <h1 className="text-4xl font-bold text-white mb-2">Training abgeschlossen!</h1>
+            <p className="text-xl text-teal-300">Danke fürs Mitmachen!</p>
           </div>
 
-          <div className="bg-cb-primary/20 rounded-2xl p-6 mb-6 text-center border border-cb-accent/30">
-            <p className="text-sm text-white/60 mb-2">Dein Ergebnis</p>
-            <div className="text-4xl font-bold text-cb-accent mb-2">Platz {myRank || '—'}</div>
-            <div className="text-2xl font-bold text-white">{myScore} Punkte</div>
+          <div className="bg-teal-500/10 rounded-2xl p-6 mb-6 text-center border border-teal-400/20">
+            <div className="text-5xl mb-3">{emoji}</div>
+            <p className="text-xl font-bold text-white mb-1">{nickname}</p>
+            <p className="text-lg text-teal-300">{myScore} Punkte erreicht</p>
           </div>
 
+          {/* All participants */}
           <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/10">
-            <h3 className="font-semibold text-white/80 mb-3 text-center">Endstand</h3>
-            <ul className="space-y-2">
-              {leaderboard.slice(0, 10).map((player, index) => {
-                const rank = denseRanks[index];
-                return (
-                <li
+            <h3 className="font-semibold text-white/60 mb-3 text-center text-sm">Alle Teilnehmer</h3>
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
+              {leaderboard.map((player) => (
+                <div
                   key={player.nickname}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg ${
-                    player.nickname === nickname
-                      ? 'bg-cb-primary/30 border border-cb-accent/50'
+                  className={`text-center p-2 rounded-xl ${
+                    player.nickname === nickname && player.emoji === emoji
+                      ? 'bg-teal-500/20 border border-teal-400/30'
                       : 'bg-white/5'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${getRankStyle(rank)}`}
-                    >
-                      {rank}
-                    </span>
-                    <span className="text-xl">{player.emoji}</span>
-                    <span className="font-medium text-white">{player.nickname}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-bold text-cb-accent">{player.score}</span>
-                    <span className="text-sm text-white/50 ml-2">({player.correct_answers} richtig)</span>
-                  </div>
-                </li>
-                );
-              })}
-            </ul>
+                  <div className="text-2xl mb-1">{player.emoji}</div>
+                  <div className="text-xs font-medium truncate text-white/80">{player.nickname}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <a

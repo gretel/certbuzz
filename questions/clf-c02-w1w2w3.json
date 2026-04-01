@@ -1,11 +1,11 @@
 {
   "meta": {
-    "id": "clf-c02-w1w2w3mo",
-    "label": "CLF-C02 – Woche 1–3 (bis Montag)",
-    "description": "65 Fragen zu Cloud Concepts, Cloud Technology & Services, Shared Responsibility",
+    "id": "clf-c02-w1w2w3",
+    "label": "CLF-C02 – Woche 1–3 (komplett)",
+    "description": "95 Fragen zu Cloud Concepts, Technology & Services, Security & Compliance (Domaene 1–3)",
     "exam": {
       "passPercent": 70,
-      "totalQuestions": 65,
+      "totalQuestions": 95,
       "info": "Die Prüfung umfasst 65 Fragen (50 gewertet + 15 ungewertet). Mindestpunktzahl: 700/1000 (ca. 70%). Fragetypen: Multiple Choice (1 richtig, 3 falsch) und Mehrfachantwort (2+ richtig aus 5+ Optionen). Raten ohne Abzüge möglich."
     },
     "categories": {
@@ -40,6 +40,18 @@
       "shared-responsibility": {
         "label": "Shared Responsibility Model",
         "icon": "🔐"
+      },
+      "iam": {
+        "label": "IAM – Identity & Access Management",
+        "icon": "👤"
+      },
+      "security-services": {
+        "label": "Sicherheitsdienste",
+        "icon": "🛡️"
+      },
+      "compliance-governance": {
+        "label": "Compliance & Governance",
+        "icon": "📜"
       }
     }
   },
@@ -1934,6 +1946,891 @@
         "c"
       ],
       "explanation": "Reliability umfasst Hochverfügbarkeit über mehrere AZs, automatische Recovery und Disaster-Recovery-Strategien."
+    },
+    {
+      "id": "iam-101",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welche IAM-Entitaet repraesentiert eine Person oder Anwendung, die mit AWS interagiert?",
+      "options": [
+        {
+          "id": "a",
+          "text": "IAM Group"
+        },
+        {
+          "id": "b",
+          "text": "IAM User"
+        },
+        {
+          "id": "c",
+          "text": "IAM Policy"
+        },
+        {
+          "id": "d",
+          "text": "IAM Role"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Ein IAM User repraesentiert eine einzelne Person oder Anwendung. Groups buendeln User, Policies definieren Berechtigungen, Roles werden temporaer angenommen."
+    },
+    {
+      "id": "iam-102",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Warum empfiehlt AWS, den Root-Account nicht fuer alltaegliche Aufgaben zu nutzen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Der Root-Account hat eingeschraenkte Berechtigungen"
+        },
+        {
+          "id": "b",
+          "text": "Der Root-Account hat uneinschraenkbaren Vollzugriff auf alle Ressourcen"
+        },
+        {
+          "id": "c",
+          "text": "Der Root-Account kann keine MFA aktivieren"
+        },
+        {
+          "id": "d",
+          "text": "Der Root-Account kann keine EC2-Instances starten"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Der Root-Account hat uneingeschraenkten Zugriff und kann nicht durch IAM-Policies beschraenkt werden. Deshalb sollte er nur fuer Kontoverwaltungsaufgaben genutzt werden."
+    },
+    {
+      "id": "iam-103",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welches Sicherheitsprinzip besagt, dass Benutzer nur die Berechtigungen erhalten sollen, die sie fuer ihre Aufgabe benoetigen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Defense in Depth"
+        },
+        {
+          "id": "b",
+          "text": "Separation of Duties"
+        },
+        {
+          "id": "c",
+          "text": "Least Privilege"
+        },
+        {
+          "id": "d",
+          "text": "Zero Trust"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Least Privilege (Prinzip der geringsten Berechtigung) bedeutet: nur so viele Rechte wie noetig, so wenige wie moeglich."
+    },
+    {
+      "id": "iam-104",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Wie unterscheiden sich IAM-Rollen von IAM-Benutzern?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Rollen haben permanente Anmeldedaten, Benutzer nicht"
+        },
+        {
+          "id": "b",
+          "text": "Rollen werden temporaer angenommen und haben keine permanenten Anmeldedaten"
+        },
+        {
+          "id": "c",
+          "text": "Rollen koennen nur von AWS-Services genutzt werden"
+        },
+        {
+          "id": "d",
+          "text": "Rollen koennen keine Policies zugewiesen bekommen"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "IAM-Rollen stellen temporaere Sicherheitsanmeldedaten bereit (via STS). Sie haben keine permanenten Passwoerter oder Access Keys wie IAM-User."
+    },
+    {
+      "id": "iam-105",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Aussage ueber IAM-Gruppen ist korrekt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Gruppen koennen verschachtelt werden (Gruppen in Gruppen)"
+        },
+        {
+          "id": "b",
+          "text": "Gruppen koennen sich bei AWS anmelden"
+        },
+        {
+          "id": "c",
+          "text": "Policies werden an Gruppen angehaengt und von allen Mitgliedern geerbt"
+        },
+        {
+          "id": "d",
+          "text": "Ein User kann nur einer einzigen Gruppe angehoeren"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "IAM-Gruppen buendeln User und vererben angehaengte Policies. Gruppen koennen nicht verschachtelt werden, sich nicht anmelden, und ein User kann mehreren Gruppen angehoeren."
+    },
+    {
+      "id": "iam-106",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Unternehmen moechte seinen Mitarbeitern ermoeglichen, sich mit ihren bestehenden Firmen-Zugangsdaten bei AWS anzumelden, ohne separate IAM-User zu erstellen. Welcher Service ist dafuer geeignet?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS IAM Identity Center (SSO)"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Cognito"
+        },
+        {
+          "id": "c",
+          "text": "AWS Direct Connect"
+        },
+        {
+          "id": "d",
+          "text": "AWS Shield"
+        }
+      ],
+      "correctAnswers": [
+        "a"
+      ],
+      "explanation": "IAM Identity Center (frueher AWS SSO) ermoeglicht Federation mit bestehenden Identitaetsanbietern (Active Directory, SAML 2.0) fuer den Zugriff auf AWS-Konten."
+    },
+    {
+      "id": "iam-107",
+      "category": "iam",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche zwei Massnahmen empfiehlt AWS zum Schutz des Root-Accounts? (Waehle ZWEI)",
+      "options": [
+        {
+          "id": "a",
+          "text": "MFA fuer den Root-Account aktivieren"
+        },
+        {
+          "id": "b",
+          "text": "Root-Account-Zugangsdaten loeschen"
+        },
+        {
+          "id": "c",
+          "text": "Root-Account-Passwort in einer DynamoDB-Tabelle speichern"
+        },
+        {
+          "id": "d",
+          "text": "Root-Account nicht fuer alltaegliche Aufgaben verwenden"
+        },
+        {
+          "id": "e",
+          "text": "Root-Account mit allen Mitarbeitern teilen"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "d"
+      ],
+      "explanation": "AWS empfiehlt: MFA aktivieren und den Root-Account nur fuer Aufgaben verwenden, die ihn erfordern (z.B. Account-Einstellungen aendern). Keine alltaegliche Nutzung."
+    },
+    {
+      "id": "iam-108",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Arten von IAM-Policies gibt es NICHT?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Managed Policies"
+        },
+        {
+          "id": "b",
+          "text": "Customer Managed Policies"
+        },
+        {
+          "id": "c",
+          "text": "Inline Policies"
+        },
+        {
+          "id": "d",
+          "text": "Encrypted Policies"
+        }
+      ],
+      "correctAnswers": [
+        "d"
+      ],
+      "explanation": "Es gibt AWS Managed, Customer Managed und Inline Policies. 'Encrypted Policies' existieren nicht als IAM-Policy-Typ."
+    },
+    {
+      "id": "iam-109",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welche Funktion haben Service Control Policies (SCPs) in AWS Organizations?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Sie erteilen Berechtigungen fuer einzelne IAM-User"
+        },
+        {
+          "id": "b",
+          "text": "Sie setzen maximale Berechtigungsgrenzen fuer Accounts in einer Organisation"
+        },
+        {
+          "id": "c",
+          "text": "Sie verschluesseln Daten in S3-Buckets"
+        },
+        {
+          "id": "d",
+          "text": "Sie steuern den Netzwerkverkehr zwischen VPCs"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "SCPs definieren die maximalen Berechtigungen fuer Accounts in AWS Organizations. Sie erteilen selbst keine Rechte, sondern setzen Grenzen (Guardrails)."
+    },
+    {
+      "id": "iam-110",
+      "category": "iam",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welches JSON-Element in einer IAM-Policy gibt an, ob der Zugriff erlaubt oder verweigert wird?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Action"
+        },
+        {
+          "id": "b",
+          "text": "Resource"
+        },
+        {
+          "id": "c",
+          "text": "Effect"
+        },
+        {
+          "id": "d",
+          "text": "Principal"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Das 'Effect'-Element hat den Wert 'Allow' oder 'Deny'. 'Action' definiert die erlaubten/verbotenen Aktionen, 'Resource' das Ziel."
+    },
+    {
+      "id": "sec-101",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was ist der Unterschied zwischen Verschluesselung 'at Rest' und 'in Transit'?",
+      "options": [
+        {
+          "id": "a",
+          "text": "At Rest schuetzt gespeicherte Daten, in Transit schuetzt Daten waehrend der Uebertragung"
+        },
+        {
+          "id": "b",
+          "text": "At Rest verschluesselt nur S3-Daten, in Transit nur EC2-Daten"
+        },
+        {
+          "id": "c",
+          "text": "At Rest ist kostenlos, in Transit kostenpflichtig"
+        },
+        {
+          "id": "d",
+          "text": "Es gibt keinen Unterschied, beide Begriffe sind synonym"
+        }
+      ],
+      "correctAnswers": [
+        "a"
+      ],
+      "explanation": "At Rest = gespeicherte Daten (z.B. auf Festplatte, in S3). In Transit = Daten waehrend der Uebertragung (z.B. HTTPS, TLS)."
+    },
+    {
+      "id": "sec-102",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher AWS-Service verwaltet Verschluesselungsschluessel zentral?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Shield"
+        },
+        {
+          "id": "b",
+          "text": "AWS KMS (Key Management Service)"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Macie"
+        },
+        {
+          "id": "d",
+          "text": "AWS Config"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS KMS ist der zentrale Service fuer Erstellung, Verwaltung und Rotation von Verschluesselungsschluesseln."
+    },
+    {
+      "id": "sec-103",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche S3-Verschluesselungsoption verwendet vom Kunden bereitgestellte Schluessel, die AWS NICHT speichert?",
+      "options": [
+        {
+          "id": "a",
+          "text": "SSE-S3"
+        },
+        {
+          "id": "b",
+          "text": "SSE-KMS"
+        },
+        {
+          "id": "c",
+          "text": "SSE-C"
+        },
+        {
+          "id": "d",
+          "text": "Client-Side Encryption"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "SSE-C (Server-Side Encryption with Customer-Provided Keys): Der Kunde sendet den Schluessel mit jeder Anfrage, AWS speichert ihn nicht."
+    },
+    {
+      "id": "sec-104",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service bietet DDoS-Schutz fuer alle AWS-Kunden ohne zusaetzliche Kosten?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS WAF"
+        },
+        {
+          "id": "b",
+          "text": "AWS Shield Standard"
+        },
+        {
+          "id": "c",
+          "text": "AWS Shield Advanced"
+        },
+        {
+          "id": "d",
+          "text": "Amazon GuardDuty"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Shield Standard ist automatisch fuer alle AWS-Kunden aktiv und schuetzt gegen gaengige DDoS-Angriffe (Layer 3/4). Shield Advanced ist kostenpflichtig und bietet erweiterten Schutz."
+    },
+    {
+      "id": "sec-105",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was ist die Hauptfunktion von AWS WAF?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Verschluesselung von Daten in S3"
+        },
+        {
+          "id": "b",
+          "text": "Filtern von Web-Traffic anhand von Regeln (z.B. SQL Injection, XSS)"
+        },
+        {
+          "id": "c",
+          "text": "Automatische Skalierung von EC2-Instances"
+        },
+        {
+          "id": "d",
+          "text": "Ueberwachung von API-Aufrufen"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS WAF (Web Application Firewall) filtert HTTP/HTTPS-Traffic anhand konfigurierbarer Regeln und schuetzt gegen OWASP-Top-10-Angriffe."
+    },
+    {
+      "id": "sec-106",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service erkennt Bedrohungen durch Analyse von VPC Flow Logs, DNS-Logs und CloudTrail-Events mittels Machine Learning?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon Inspector"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Macie"
+        },
+        {
+          "id": "c",
+          "text": "Amazon GuardDuty"
+        },
+        {
+          "id": "d",
+          "text": "AWS Security Hub"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "GuardDuty analysiert VPC Flow Logs, DNS-Logs und CloudTrail-Events mit ML, um Bedrohungen wie ungewoehnliche API-Aufrufe oder Kryptowaehrungs-Mining zu erkennen."
+    },
+    {
+      "id": "sec-107",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service scannt EC2-Instances und Container-Images automatisch auf Software-Schwachstellen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon GuardDuty"
+        },
+        {
+          "id": "b",
+          "text": "Amazon Inspector"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Macie"
+        },
+        {
+          "id": "d",
+          "text": "AWS Trusted Advisor"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Amazon Inspector fuehrt automatisiertes Vulnerability Scanning fuer EC2-Instances und ECR-Container-Images durch und bewertet Schwachstellen nach Schweregrad."
+    },
+    {
+      "id": "sec-108",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher Service erkennt sensible Daten wie personenbezogene Informationen (PII) in S3-Buckets?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon Inspector"
+        },
+        {
+          "id": "b",
+          "text": "Amazon GuardDuty"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Macie"
+        },
+        {
+          "id": "d",
+          "text": "AWS CloudTrail"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Amazon Macie nutzt ML und Pattern Matching, um sensible Daten (PII, Kreditkartennummern, etc.) in S3-Buckets zu entdecken und zu klassifizieren."
+    },
+    {
+      "id": "sec-109",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Unternehmen muss nachweisen, wer wann welche API-Aufrufe in seinem AWS-Account getaetigt hat. Welcher Service liefert diese Informationen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Config"
+        },
+        {
+          "id": "b",
+          "text": "VPC Flow Logs"
+        },
+        {
+          "id": "c",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "id": "d",
+          "text": "Amazon CloudWatch"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "CloudTrail protokolliert alle API-Aufrufe (wer, wann, was, von wo) und ist damit das zentrale Audit-Tool fuer AWS-Accounts."
+    },
+    {
+      "id": "sec-110",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Worin unterscheidet sich AWS Config von AWS CloudTrail?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Config protokolliert API-Aufrufe, CloudTrail trackt Konfigurationsaenderungen"
+        },
+        {
+          "id": "b",
+          "text": "Config trackt Konfigurationsaenderungen ueber Zeit, CloudTrail protokolliert API-Aufrufe"
+        },
+        {
+          "id": "c",
+          "text": "Config ist kostenlos, CloudTrail ist kostenpflichtig"
+        },
+        {
+          "id": "d",
+          "text": "Config ersetzt CloudTrail vollstaendig"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Config erfasst den Konfigurationsverlauf von Ressourcen und prueft Compliance-Regeln. CloudTrail protokolliert API-Aktivitaeten. Sie ergaenzen sich."
+    },
+    {
+      "id": "sec-111",
+      "category": "security-services",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was protokollieren VPC Flow Logs?",
+      "options": [
+        {
+          "id": "a",
+          "text": "API-Aufrufe an AWS-Services"
+        },
+        {
+          "id": "b",
+          "text": "Konfigurationsaenderungen an VPC-Ressourcen"
+        },
+        {
+          "id": "c",
+          "text": "IP-Traffic-Informationen fuer Netzwerk-Interfaces in einer VPC"
+        },
+        {
+          "id": "d",
+          "text": "DNS-Anfragen innerhalb einer VPC"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "VPC Flow Logs erfassen IP-Traffic-Metadaten (Quell-/Ziel-IP, Ports, Protokoll, Accept/Reject) fuer Netzwerk-Interfaces in einer VPC."
+    },
+    {
+      "id": "sec-112",
+      "category": "security-services",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI Services eignen sich zum Speichern von Secrets wie Datenbank-Passwoertern? (Waehle ZWEI)",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Secrets Manager"
+        },
+        {
+          "id": "b",
+          "text": "AWS Systems Manager Parameter Store (SecureString)"
+        },
+        {
+          "id": "c",
+          "text": "Amazon S3 mit Versionierung"
+        },
+        {
+          "id": "d",
+          "text": "AWS CloudFormation"
+        },
+        {
+          "id": "e",
+          "text": "Amazon DynamoDB"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b"
+      ],
+      "explanation": "Secrets Manager bietet automatische Rotation und ist fuer Datenbank-Credentials optimiert. Parameter Store (SecureString) speichert verschluesselte Werte kostenguenstig."
+    },
+    {
+      "id": "cg-101",
+      "category": "compliance-governance",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Wo koennen Kunden AWS-Compliance-Berichte und Zertifizierungen (z.B. SOC, ISO) herunterladen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Marketplace"
+        },
+        {
+          "id": "b",
+          "text": "AWS Artifact"
+        },
+        {
+          "id": "c",
+          "text": "AWS Config"
+        },
+        {
+          "id": "d",
+          "text": "AWS Trusted Advisor"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Artifact ist das Self-Service-Portal fuer Compliance-Berichte, Zertifizierungen und Vereinbarungen (z.B. BAA, NDA)."
+    },
+    {
+      "id": "cg-102",
+      "category": "compliance-governance",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service bietet automatisierte Empfehlungen in den Kategorien Kosten, Leistung, Sicherheit, Fehlertoleranz und Service-Limits?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Config"
+        },
+        {
+          "id": "b",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "id": "c",
+          "text": "AWS Trusted Advisor"
+        },
+        {
+          "id": "d",
+          "text": "AWS Security Hub"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Trusted Advisor prueft den AWS-Account in 5 Kategorien und gibt Empfehlungen. Der Umfang haengt vom Support-Plan ab (Basic: begrenzt, Business/Enterprise: alle Checks)."
+    },
+    {
+      "id": "cg-103",
+      "category": "compliance-governance",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was ist der Hauptzweck von AWS Organizations?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Verschluesselung aller S3-Buckets in einem Account"
+        },
+        {
+          "id": "b",
+          "text": "Zentrales Management mehrerer AWS-Accounts mit konsolidierter Abrechnung"
+        },
+        {
+          "id": "c",
+          "text": "Automatische Skalierung von EC2-Instances"
+        },
+        {
+          "id": "d",
+          "text": "Verwaltung von DNS-Eintraegen"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Organizations ermoeglicht Multi-Account-Management mit konsolidierter Abrechnung, SCPs als Leitplanken und organisatorischer Gruppierung (OUs)."
+    },
+    {
+      "id": "cg-104",
+      "category": "compliance-governance",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welcher Service richtet eine sichere Multi-Account-Umgebung (Landing Zone) mit vorkonfigurierten Guardrails ein?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Organizations"
+        },
+        {
+          "id": "b",
+          "text": "AWS Control Tower"
+        },
+        {
+          "id": "c",
+          "text": "AWS Config"
+        },
+        {
+          "id": "d",
+          "text": "AWS CloudFormation"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Control Tower automatisiert die Einrichtung einer Landing Zone mit Best-Practice-Guardrails (praeventiv und detektiv) auf Basis von AWS Organizations."
+    },
+    {
+      "id": "cg-105",
+      "category": "compliance-governance",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher AWS-Service prueft automatisiert, ob Ressourcenkonfigurationen bestimmten Compliance-Regeln entsprechen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "id": "b",
+          "text": "AWS Config Rules"
+        },
+        {
+          "id": "c",
+          "text": "Amazon Inspector"
+        },
+        {
+          "id": "d",
+          "text": "AWS Artifact"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Config Rules pruefen kontinuierlich, ob Ressourcen definierten Regeln entsprechen (z.B. 'S3-Buckets muessen verschluesselt sein'). Noncompliant-Ressourcen werden markiert."
+    },
+    {
+      "id": "cg-106",
+      "category": "compliance-governance",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Unternehmen betreibt in der EU gehostete Workloads und muss sicherstellen, dass Daten die EU nicht verlassen. Welche Kombination ist am geeignetsten?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Artifact fuer Compliance-Nachweis + S3-Bucket-Policy mit Region-Bedingung"
+        },
+        {
+          "id": "b",
+          "text": "AWS Organizations SCPs, die nur eu-Regionen erlauben + AWS Config Rules zur Ueberwachung"
+        },
+        {
+          "id": "c",
+          "text": "AWS Shield + AWS WAF fuer Datenresidenz"
+        },
+        {
+          "id": "d",
+          "text": "Amazon Macie + VPC Flow Logs"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "SCPs koennen den Zugriff auf bestimmte Regionen beschraenken (praeventiv). AWS Config Rules ueberwachen, ob Ressourcen nur in erlaubten Regionen erstellt werden (detektiv)."
+    },
+    {
+      "id": "cg-107",
+      "category": "compliance-governance",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI Aussagen ueber AWS Trusted Advisor sind korrekt? (Waehle ZWEI)",
+      "options": [
+        {
+          "id": "a",
+          "text": "Alle Checks sind mit jedem Support-Plan verfuegbar"
+        },
+        {
+          "id": "b",
+          "text": "Mit Basic-Support sind nur ausgewaehlte Core-Checks verfuegbar"
+        },
+        {
+          "id": "c",
+          "text": "Trusted Advisor prueft in der Kategorie Sicherheit z.B. offene Security-Group-Ports"
+        },
+        {
+          "id": "d",
+          "text": "Trusted Advisor erstellt automatisch CloudFormation-Templates"
+        },
+        {
+          "id": "e",
+          "text": "Trusted Advisor ist ein regionaler Service"
+        }
+      ],
+      "correctAnswers": [
+        "b",
+        "c"
+      ],
+      "explanation": "Mit Basic/Developer-Support sind nur Core-Checks verfuegbar (z.B. S3-Bucket-Permissions, MFA auf Root). Voller Zugriff erfordert Business- oder Enterprise-Support."
+    },
+    {
+      "id": "cg-108",
+      "category": "compliance-governance",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher Service fasst Sicherheitsergebnisse aus GuardDuty, Inspector, Macie und anderen Services in einem zentralen Dashboard zusammen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "id": "b",
+          "text": "AWS Config"
+        },
+        {
+          "id": "c",
+          "text": "AWS Security Hub"
+        },
+        {
+          "id": "d",
+          "text": "AWS Trusted Advisor"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "AWS Security Hub aggregiert Findings aus mehreren Security-Services und prueft gegen Standards wie CIS AWS Foundations Benchmark."
     }
   ]
 }

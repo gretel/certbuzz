@@ -170,18 +170,30 @@ export function ConfidenceGrid({
         <div className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-gray-900/80 border-2 border-white/30 -translate-x-1/2 -translate-y-1/2" />
       </div>
 
-      {/* Zone boundary rings — always visible, high contrast */}
-      <div className="absolute inset-0 pointer-events-none z-5">
-        {/* Inner ring ~35% */}
+      {/* Zone boundary rings with multiplier annotations */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+        {/* Inner ring — Garantiert ×2 */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/40"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-yellow-300/50"
           style={{ width: '35%', height: '35%' }}
-        />
-        {/* Middle ring ~65% */}
+        >
+          <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-200 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
+            Garantiert ×2
+          </span>
+        </div>
+        {/* Middle ring — Sicher ×1.5 */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/25"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-white/30"
           style={{ width: '65%', height: '65%' }}
-        />
+        >
+          <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white/10 text-white/60 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
+            Sicher ×1.5
+          </span>
+        </div>
+        {/* Outer label — Unsicher ×1 (no ring, just a label near the edge) */}
+        <span className="absolute top-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white/5 text-white/40 text-[10px] font-bold whitespace-nowrap">
+          Unsicher ×1
+        </span>
       </div>
 
       {/* Other players' emoji badges */}
