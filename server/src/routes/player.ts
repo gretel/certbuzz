@@ -19,10 +19,29 @@ router.post('/join', (req, res) => {
       return res.status(404).json({ error: 'Session nicht gefunden oder beendet' });
     }
 
-    // Check if this nickname already exists in this session - delete old player if so
+    // Check if this nickname already exists in this session — reuse existing player
     const existingPlayer = queries.getPlayerBySessionAndNickname(sessionCode, nickname.trim());
     if (existingPlayer) {
-      queries.deletePlayer(existingPlayer.playerId);
+      // Reuse existing player — preserve their score and answers
+      const players = queries.getSessionPlayers(sessionCode);
+      io.to(sessionCode).emit('buzzer-players-update', {
+        players: players.map(p => ({
+          playerId: p.playerId,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })),
+      });
+      io.to(sessionCode).emit('training-players-update', {
+        players: players.map(p => ({
+          playerId: p.playerId,
+          nickname: p.nickname,
+          emoji: p.emoji,
+          score: p.score,
+        })),
+      });
+
+      return res.json({ playerId: existingPlayer.playerId, emoji: existingPlayer.emoji });
     }
 
     const playerId = uuidv4();
@@ -39,6 +58,14 @@ router.post('/join', (req, res) => {
     // Notify dozent panel / arena of updated player list
     const players = queries.getSessionPlayers(sessionCode);
     io.to(sessionCode).emit('buzzer-players-update', {
+      players: players.map(p => ({
+        playerId: p.playerId,
+        nickname: p.nickname,
+        emoji: p.emoji,
+        score: p.score,
+      })),
+    });
+    io.to(sessionCode).emit('training-players-update', {
       players: players.map(p => ({
         playerId: p.playerId,
         nickname: p.nickname,

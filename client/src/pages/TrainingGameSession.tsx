@@ -7,6 +7,7 @@ import type { Vote } from '../components/game/ConfidenceGrid';
 import { TrainingReveal } from '../components/game/TrainingReveal';
 import { TransitionScreen } from '../components/buzzer/TransitionScreen';
 import { MarkdownText } from '../components/shared/MarkdownText';
+import { computeDenseRanks, getRankStyle } from '../utils/ranking';
 
 type TrainingPhase = 'lobby' | 'question' | 'reveal' | 'result' | 'transition' | 'finished';
 
@@ -364,7 +365,9 @@ export function TrainingGameSession({
   if (phase === 'finished') {
     const myEntry = leaderboard.find(p => p.nickname === nickname && p.emoji === emoji);
     const myScore = myEntry?.score ?? 0;
-    const myRank = myEntry ? leaderboard.indexOf(myEntry) + 1 : 0;
+    const denseRanks = computeDenseRanks(leaderboard);
+    const myIndex = myEntry ? leaderboard.indexOf(myEntry) : -1;
+    const myRank = myIndex >= 0 ? denseRanks[myIndex] : 0;
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-cb-dark to-gray-900 flex items-center justify-center p-4">
@@ -383,7 +386,9 @@ export function TrainingGameSession({
           <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/10">
             <h3 className="font-semibold text-white/80 mb-3 text-center">Endstand</h3>
             <ul className="space-y-2">
-              {leaderboard.slice(0, 10).map((player, index) => (
+              {leaderboard.slice(0, 10).map((player, index) => {
+                const rank = denseRanks[index];
+                return (
                 <li
                   key={player.nickname}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg ${
@@ -394,17 +399,9 @@ export function TrainingGameSession({
                 >
                   <div className="flex items-center gap-2">
                     <span
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                        index === 0
-                          ? 'bg-yellow-400 text-yellow-900'
-                          : index === 1
-                          ? 'bg-gray-300 text-gray-700'
-                          : index === 2
-                          ? 'bg-orange-300 text-orange-900'
-                          : 'bg-white/10 text-white/60'
-                      }`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${getRankStyle(rank)}`}
                     >
-                      {index + 1}
+                      {rank}
                     </span>
                     <span className="text-xl">{player.emoji}</span>
                     <span className="font-medium text-white">{player.nickname}</span>
@@ -414,7 +411,8 @@ export function TrainingGameSession({
                     <span className="text-sm text-white/50 ml-2">({player.correct_answers} richtig)</span>
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
 

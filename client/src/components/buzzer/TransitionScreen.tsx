@@ -1,5 +1,6 @@
 import { ParticleEffects } from '../effects/ParticleEffects';
 import { MarkdownText } from '../shared/MarkdownText';
+import { computeDenseRanks, getRankStyle } from '../../utils/ranking';
 
 interface LeaderboardEntry {
   nickname: string;
@@ -199,26 +200,27 @@ export function TransitionScreen({
                 Aktueller Stand
               </h3>
               <div className="space-y-2">
-                {leaderboard.slice(0, 8).map((player, index) => (
-                  <div 
-                    key={player.nickname}
-                    className="flex items-center justify-between px-3 py-2 bg-white/5 rounded-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
-                        index === 0 ? 'bg-yellow-400 text-yellow-900' :
-                        index === 1 ? 'bg-gray-300 text-gray-700' :
-                        index === 2 ? 'bg-orange-400 text-orange-900' :
-                        'bg-white/10 text-white/60'
-                      }`}>
-                        {index + 1}
-                      </span>
-                      <span className="text-xl">{player.emoji}</span>
-                      <span className="font-medium text-white">{player.nickname}</span>
+                {(() => {
+                  const denseRanks = computeDenseRanks(leaderboard);
+                  return leaderboard.slice(0, 8).map((player, index) => {
+                    const rank = denseRanks[index];
+                    return (
+                    <div 
+                      key={player.nickname}
+                      className="flex items-center justify-between px-3 py-2 bg-white/5 rounded-xl"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${getRankStyle(rank)}`}>
+                          {rank}
+                        </span>
+                        <span className="text-xl">{player.emoji}</span>
+                        <span className="font-medium text-white">{player.nickname}</span>
+                      </div>
+                      <span className="font-bold text-cb-accent text-lg">{player.score}</span>
                     </div>
-                    <span className="font-bold text-cb-accent text-lg">{player.score}</span>
-                  </div>
-                ))}
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>

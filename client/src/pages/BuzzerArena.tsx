@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSocket } from '../hooks/useSocket';
 import { ParticleEffects } from '../components/effects/ParticleEffects';
+import { computeDenseRanks, getRankStyle } from '../utils/ranking';
 
 interface Question {
   id: string;
@@ -397,63 +398,70 @@ export function BuzzerArena() {
           </div>
 
           {/* Podium */}
-          <div className="flex justify-center items-end gap-4 mb-12">
-            {/* 2nd Place */}
-            {leaderboard[1] && (
-              <div className="text-center">
-                <div className="text-6xl mb-2">{leaderboard[1].emoji}</div>
-                <div className="bg-gradient-to-b from-gray-300 to-gray-400 w-32 h-24 rounded-t-lg flex flex-col items-center justify-center border-t-4 border-gray-200">
-                  <span className="text-4xl font-black text-gray-700">2</span>
+          {(() => {
+            const finishedRanks = computeDenseRanks(leaderboard);
+            return (
+            <>
+            <div className="flex justify-center items-end gap-4 mb-12">
+              {/* 2nd Place */}
+              {leaderboard[1] && (
+                <div className="text-center">
+                  <div className="text-6xl mb-2">{leaderboard[1].emoji}</div>
+                  <div className="bg-gradient-to-b from-gray-300 to-gray-400 w-32 h-24 rounded-t-lg flex flex-col items-center justify-center border-t-4 border-gray-200">
+                    <span className="text-4xl font-black text-gray-700">{finishedRanks[1]}</span>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur p-3 rounded-b-lg border border-white/20">
+                    <div className="font-bold text-white">{leaderboard[1].nickname}</div>
+                    <div className="text-sm text-gray-300">{leaderboard[1].score} Punkte</div>
+                  </div>
                 </div>
-                <div className="bg-white/10 backdrop-blur p-3 rounded-b-lg border border-white/20">
-                  <div className="font-bold text-white">{leaderboard[1].nickname}</div>
-                  <div className="text-sm text-gray-300">{leaderboard[1].score} Punkte</div>
+              )}
+              
+              {/* 1st Place */}
+              {leaderboard[0] && (
+                <div className="text-center">
+                  <div className="text-8xl mb-2">{leaderboard[0].emoji}</div>
+                  <div className="bg-gradient-to-b from-yellow-400 to-yellow-500 w-40 h-32 rounded-t-lg flex flex-col items-center justify-center border-t-4 border-yellow-300">
+                    <span className="text-5xl font-black text-yellow-900">{finishedRanks[0]}</span>
+                  </div>
+                  <div className="bg-yellow-500/30 backdrop-blur p-3 rounded-b-lg border border-yellow-400/50">
+                    <div className="font-bold text-yellow-300 text-xl">{leaderboard[0].nickname}</div>
+                    <div className="text-yellow-200">{leaderboard[0].score} Punkte</div>
+                  </div>
                 </div>
-              </div>
-            )}
-            
-            {/* 1st Place */}
-            {leaderboard[0] && (
-              <div className="text-center">
-                <div className="text-8xl mb-2">{leaderboard[0].emoji}</div>
-                <div className="bg-gradient-to-b from-yellow-400 to-yellow-500 w-40 h-32 rounded-t-lg flex flex-col items-center justify-center border-t-4 border-yellow-300">
-                  <span className="text-5xl font-black text-yellow-900">1</span>
+              )}
+              
+              {/* 3rd Place */}
+              {leaderboard[2] && (
+                <div className="text-center">
+                  <div className="text-6xl mb-2">{leaderboard[2].emoji}</div>
+                  <div className="bg-gradient-to-b from-orange-300 to-orange-400 w-32 h-20 rounded-t-lg flex flex-col items-center justify-center border-t-4 border-orange-200">
+                    <span className="text-4xl font-black text-orange-800">{finishedRanks[2]}</span>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur p-3 rounded-b-lg border border-white/20">
+                    <div className="font-bold text-white">{leaderboard[2].nickname}</div>
+                    <div className="text-sm text-gray-300">{leaderboard[2].score} Punkte</div>
+                  </div>
                 </div>
-                <div className="bg-yellow-500/30 backdrop-blur p-3 rounded-b-lg border border-yellow-400/50">
-                  <div className="font-bold text-yellow-300 text-xl">{leaderboard[0].nickname}</div>
-                  <div className="text-yellow-200">{leaderboard[0].score} Punkte</div>
-                </div>
-              </div>
-            )}
-            
-            {/* 3rd Place */}
-            {leaderboard[2] && (
-              <div className="text-center">
-                <div className="text-6xl mb-2">{leaderboard[2].emoji}</div>
-                <div className="bg-gradient-to-b from-orange-300 to-orange-400 w-32 h-20 rounded-t-lg flex flex-col items-center justify-center border-t-4 border-orange-200">
-                  <span className="text-4xl font-black text-orange-800">3</span>
-                </div>
-                <div className="bg-white/10 backdrop-blur p-3 rounded-b-lg border border-white/20">
-                  <div className="font-bold text-white">{leaderboard[2].nickname}</div>
-                  <div className="text-sm text-gray-300">{leaderboard[2].score} Punkte</div>
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Rest of leaderboard */}
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
-            {leaderboard.slice(3, 10).map((player, index) => (
-              <div key={player.nickname} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
-                <div className="flex items-center gap-4">
-                  <span className="w-8 text-2xl font-bold text-white/40">{index + 4}</span>
-                  <span className="text-3xl">{player.emoji}</span>
-                  <span className="text-xl font-medium">{player.nickname}</span>
+            {/* Rest of leaderboard */}
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
+              {leaderboard.slice(3, 10).map((player, index) => (
+                <div key={player.nickname} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
+                  <div className="flex items-center gap-4">
+                    <span className="w-8 text-2xl font-bold text-white/40">{finishedRanks[index + 3]}</span>
+                    <span className="text-3xl">{player.emoji}</span>
+                    <span className="text-xl font-medium">{player.nickname}</span>
+                  </div>
+                  <span className="text-xl font-bold text-cb-accent">{player.score}</span>
                 </div>
-                <span className="text-xl font-bold text-cb-accent">{player.score}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            </>
+            );
+          })()}
         </div>
       </div>
     );
@@ -698,24 +706,25 @@ export function BuzzerArena() {
             <div className="bg-white/5 rounded-2xl p-4 flex-1 overflow-auto min-h-0">
               <div className="text-sm text-gray-400 mb-3">RANGLISTE</div>
               <div className="space-y-2">
-                {leaderboard.slice(0, 10).map((player, index) => (
-                  <div
-                    key={player.nickname}
-                    className="flex items-center gap-3 p-2 rounded-lg bg-white/5"
-                  >
-                    <span className={`w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold ${
-                      index === 0 ? 'bg-yellow-500 text-yellow-900' :
-                      index === 1 ? 'bg-gray-400 text-gray-900' :
-                      index === 2 ? 'bg-orange-400 text-orange-900' :
-                      'bg-white/10'
-                    }`}>
-                      {index + 1}
-                    </span>
-                    <span className="text-lg">{player.emoji}</span>
-                    <span className="flex-1 font-medium truncate">{player.nickname}</span>
-                    <span className="font-bold text-cb-accent">{player.score}</span>
-                  </div>
-                ))}
+                {(() => {
+                  const sidebarRanks = computeDenseRanks(leaderboard);
+                  return leaderboard.slice(0, 10).map((player, index) => {
+                    const rank = sidebarRanks[index];
+                    return (
+                    <div
+                      key={player.nickname}
+                      className="flex items-center gap-3 p-2 rounded-lg bg-white/5"
+                    >
+                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold ${getRankStyle(rank)}`}>
+                        {rank}
+                      </span>
+                      <span className="text-lg">{player.emoji}</span>
+                      <span className="flex-1 font-medium truncate">{player.nickname}</span>
+                      <span className="font-bold text-cb-accent">{player.score}</span>
+                    </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>

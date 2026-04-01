@@ -46,6 +46,7 @@ export function GameSession() {
   useEffect(() => { soundsRef.current = sounds; }, [sounds]);
   const [sessionDeleted, setSessionDeleted] = useState(false);
   const [hasPlayedStart, setHasPlayedStart] = useState(false);
+  const autoJoinAttempted = useRef(false);
 
   // Try to restore nickname: 1. From this tab's session, 2. Last used globally
   const [nickname, setNickname] = useState(() => {
@@ -122,6 +123,18 @@ export function GameSession() {
     }
   }, [code]);
 
+  // Auto-submit join form when returning with a saved nickname
+  useEffect(() => {
+    if (sessionData && !playerId && !autoJoinAttempted.current) {
+      const lastNickname = localStorage.getItem('lastNickname');
+      if (lastNickname && sessionData.gameState !== 'finished') {
+        autoJoinAttempted.current = true;
+        setNickname(lastNickname);
+        performJoin(lastNickname);
+      }
+    }
+  }, [sessionData, playerId]);
+
   useEffect(() => {
     if (!socket || !playerId || !code) return;
 
@@ -169,20 +182,15 @@ export function GameSession() {
     fetchFinalStats();
   }, [currentQuestionIndex, sessionData?.totalQuestions, playerId]);
 
-  const handleJoin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!code || !nickname.trim()) return;
-
+  const performJoin = async (joinNickname: string) => {
     try {
       const response = await fetch('/api/player/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionCode: code, nickname: nickname.trim() }),
+        body: JSON.stringify({ sessionCode: code, nickname: joinNickname }),
       });
 
-      if (!response.ok) {
-        throw new Error('Konnte nicht beitreten');
-      }
+      if (!response.ok) throw new Error('Join failed');
 
       const data = await response.json();
       setPlayerId(data.playerId);
@@ -193,12 +201,10 @@ export function GameSession() {
         setHasPlayedStart(true);
       }
 
-      // Store in localStorage to persist across page reloads
       sessionStorage.setItem(`session_${code}_playerId`, data.playerId);
-      sessionStorage.setItem(`session_${code}_nickname`, nickname.trim());
+      sessionStorage.setItem(`session_${code}_nickname`, joinNickname);
       sessionStorage.setItem(`session_${code}_emoji`, data.emoji);
-      // Also store globally for quick re-use in future sessions
-      localStorage.setItem('lastNickname', nickname.trim());
+      localStorage.setItem('lastNickname', joinNickname);
 
       // Pre-populate order questions with default order
       if (sessionData && sessionData.questions.length > 0) {
@@ -208,8 +214,15 @@ export function GameSession() {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Beitreten');
+      // Auto-join failed — show join form (do nothing, playerId stays null)
+      console.warn('Auto-join failed:', err);
     }
+  };
+
+  const handleJoin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code || !nickname.trim()) return;
+    await performJoin(nickname.trim());
   };
 
   const handleSubmitAnswer = () => {
