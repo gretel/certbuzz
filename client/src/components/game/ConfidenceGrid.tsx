@@ -171,28 +171,32 @@ export function ConfidenceGrid({
         <div className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-gray-900/80 border-2 border-white/30 -translate-x-1/2 -translate-y-1/2" />
       </div>
 
-      {/* Zone boundary rings with multiplier annotations */}
-      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-        {/* Inner ring — Garantiert ×2 (50% of normalized distance) */}
+      {/* Zone boundary rings with multiplier annotations.
+          normDist = hypot((nx-0.5)*2, (ny-0.5)*2) / 1.4
+          CSS ring at center with width/height P% has normDist = (P/100) / 1.4 along axis.
+          → For normDist threshold T: CSS% = T * 1.4 * 100
+          normDist 0.50 → CSS 70%,  normDist 0.80 → CSS 112% (clips at edges — correct) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl" style={{ zIndex: 5 }}>
+        {/* Inner ring — Garantiert ×2 (normDist < 0.50 → CSS 70%) */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-yellow-300/50"
-          style={{ width: '50%', height: '50%' }}
+          style={{ width: '70%', height: '70%' }}
         >
           <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-200 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
             Garantiert ×2
           </span>
         </div>
-        {/* Middle ring — Sicher ×1.5 (80% of normalized distance) */}
+        {/* Outer ring — Sicher ×1.5 (normDist < 0.80 → CSS 112%, clips at edges) */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-white/30"
-          style={{ width: '80%', height: '80%' }}
+          style={{ width: '112%', height: '112%' }}
         >
           <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white/10 text-white/60 text-[10px] font-bold whitespace-nowrap backdrop-blur-sm">
             Sicher ×1.5
           </span>
         </div>
-        {/* Outer label — Unsicher ×1 */}
-        <span className="absolute top-1 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-white/5 text-white/40 text-[10px] font-bold whitespace-nowrap">
+        {/* Outer label — Unsicher ×1 (corners only) */}
+        <span className="absolute top-1 right-2 px-2 py-0.5 rounded bg-white/5 text-white/40 text-[10px] font-bold whitespace-nowrap">
           Unsicher ×1
         </span>
       </div>

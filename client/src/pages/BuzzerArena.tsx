@@ -760,55 +760,35 @@ export function BuzzerArena() {
                   </div>
                 </div>
 
-                {/* Confidence bar — narrow sidebar */}
-                <div className="w-24 flex flex-col justify-end gap-2 pb-2">
-                  {(() => {
-                    const z3 = trainingVotes.filter(v => v.confidenceZone === 3).length;
-                    const z2 = trainingVotes.filter(v => v.confidenceZone === 2).length;
-                    const z1 = trainingVotes.filter(v => v.confidenceZone === 1).length;
-                    const total = trainingVotes.length || 1;
-                    return (
-                      <>
-                        <div className="text-[10px] text-white/40 text-center font-semibold mb-1">
-                          {trainingVotes.length} Stimmen
-                        </div>
-                        {/* Vertical bars */}
-                        <div className="flex items-end gap-1 flex-1">
-                          <div className="flex flex-col items-center gap-1 flex-1 h-full">
-                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden flex-1">
-                              <div
-                                className="absolute bottom-0 w-full bg-yellow-400/60 rounded-t transition-all duration-500"
-                                style={{ height: `${(z3 / total) * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-yellow-300 text-xs font-bold">{z3}</span>
-                            <span className="text-[9px] text-white/40">×2</span>
+                {/* Single confidence bar — traffic light color */}
+                {trainingVotes.length > 0 && (
+                  <div className="w-16 flex flex-col items-center justify-end pb-2">
+                    {(() => {
+                      // Weighted average: zone3=100%, zone2=50%, zone1=0%
+                      const total = trainingVotes.length;
+                      const z3 = trainingVotes.filter(v => v.confidenceZone === 3).length;
+                      const z2 = trainingVotes.filter(v => v.confidenceZone === 2).length;
+                      const pct = Math.round(((z3 * 1.0 + z2 * 0.5) / total) * 100);
+                      // Traffic light: red < 33%, yellow 33-66%, green > 66%
+                      const color = pct >= 66 ? 'bg-green-500' : pct >= 33 ? 'bg-yellow-400' : 'bg-red-500';
+                      const textColor = pct >= 66 ? 'text-green-300' : pct >= 33 ? 'text-yellow-300' : 'text-red-300';
+                      return (
+                        <>
+                          <div className={`text-lg font-bold ${textColor} mb-1`}>{pct}%</div>
+                          <div className="w-8 bg-white/10 rounded-full relative overflow-hidden flex-1">
+                            <div
+                              className={`absolute bottom-0 w-full ${color} rounded-full transition-all duration-700`}
+                              style={{ height: `${pct}%` }}
+                            />
                           </div>
-                          <div className="flex flex-col items-center gap-1 flex-1 h-full">
-                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden flex-1">
-                              <div
-                                className="absolute bottom-0 w-full bg-white/40 rounded-t transition-all duration-500"
-                                style={{ height: `${(z2 / total) * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-white/70 text-xs font-bold">{z2}</span>
-                            <span className="text-[9px] text-white/40">×1.5</span>
+                          <div className="text-[9px] text-white/30 mt-1 text-center leading-tight">
+                            Über-<br/>zeugung
                           </div>
-                          <div className="flex flex-col items-center gap-1 flex-1 h-full">
-                            <div className="w-full bg-white/10 rounded-t relative overflow-hidden flex-1">
-                              <div
-                                className="absolute bottom-0 w-full bg-red-400/40 rounded-t transition-all duration-500"
-                                style={{ height: `${(z1 / total) * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-red-300/70 text-xs font-bold">{z1}</span>
-                            <span className="text-[9px] text-white/40">×1</span>
-                          </div>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             )}
 
