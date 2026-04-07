@@ -2,7 +2,13 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import { queries, GameMode } from '../db/queries.js';
 import { generateSessionCode, shuffleArray } from '../utils/helpers.js';
-import { getQuestions, getAvailableBanks, getCategories } from '../questions/questionBank.js';
+import {
+  getQuestions,
+  getAvailableBanks,
+  getCategories,
+  getExamInfo,
+  sampleExamQuestions,
+} from '../questions/questionBank.js';
 import { cleanupBuzzerGame } from '../socket/buzzerGame.js';
 import { cleanupTrainingGame } from '../socket/trainingGame.js';
 import { io } from '../server.js';
@@ -13,39 +19,61 @@ router.post('/create-session', authenticate, (req, res) => {
   try {
     const { totalQuestions, categories, gameMode = 'racing', questionBank } = req.body;
 
-    if (!totalQuestions || totalQuestions < 5 || totalQuestions > 50) {
-      return res.status(400).json({ error: 'Anzahl der Fragen muss zwischen 5 und 50 liegen' });
-    }
-
-    // Validate game mode
-    if (gameMode !== 'racing' && gameMode !== 'buzzer' && gameMode !== 'training') {
+    // Validate game mode first
+    const validModes: GameMode[] = ['racing', 'buzzer', 'training', 'exam'];
+    if (!validModes.includes(gameMode)) {
       return res.status(400).json({ error: 'Ungültiger Spielmodus' });
     }
 
     const bankId = questionBank || 'azure-az104';
-    const allQuestions = getQuestions(bankId);
-
-    // Filter questions by selected categories
-    let filteredQuestions = allQuestions;
-    if (categories && Array.isArray(categories) && categories.length > 0) {
-      filteredQuestions = allQuestions.filter(q => categories.includes(q.category));
-    }
-
-    // For training mode: only use single-choice questions with exactly 4 options
-    if (gameMode === 'training') {
-      filteredQuestions = filteredQuestions.filter(
-        (q: any) => q.type === 'single' && q.options.length === 4
-      );
-    }
-
-    if (filteredQuestions.length === 0) {
-      return res.status(400).json({ error: 'Keine Fragen in den ausgewählten Kategorien verfügbar' });
-    }
-
-    // If requested questions exceed available, use all available
-    const actualQuestionCount = Math.min(totalQuestions, filteredQuestions.length);
-    const selectedQuestions = shuffleArray(filteredQuestions).slice(0, actualQuestionCount);
+    let actualQuestionCount: number;
+    let selectedQuestionIds: string[];
     const sessionCode = generateSessionCode();
+
+    if (gameMode === 'exam') {
+      // Exam mode: ignore client totalQuestions/categories, use bank metadata
+      const examInfo = getExamInfo(bankId);
+      if (!examInfo || !examInfo.domains || examInfo.domains.length === 0) {
+        return res.status(400).json({
+          error: `Fragenbank '${bankId}' hat keine Prüfungsmetadaten konfiguriert`,
+        });
+      }
+      try {
+        selectedQuestionIds = sampleExamQuestions(bankId);
+        actualQuestionCount = selectedQuestionIds.length;
+      } catch (err: any) {
+        return res.status(500).json({ error: err?.message ?? 'Stichprobenauswahl fehlgeschlagen' });
+      }
+    } else {
+      // Racing / buzzer / training path (existing logic, max bumped to 200)
+      if (!totalQuestions || totalQuestions < 5 || totalQuestions > 200) {
+        return res.status(400).json({ error: 'Anzahl der Fragen muss zwischen 5 und 200 liegen' });
+      }
+
+      const allQuestions = getQuestions(bankId);
+
+      // Filter questions by selected categories
+      let filteredQuestions = allQuestions;
+      if (categories && Array.isArray(categories) && categories.length > 0) {
+        filteredQuestions = allQuestions.filter(q => categories.includes(q.category));
+      }
+
+      // For training mode: only use single-choice questions with exactly 4 options
+      if (gameMode === 'training') {
+        filteredQuestions = filteredQuestions.filter(
+          (q: any) => q.type === 'single' && q.options.length === 4
+        );
+      }
+
+      if (filteredQuestions.length === 0) {
+        return res.status(400).json({ error: 'Keine Fragen in den ausgewählten Kategorien verfügbar' });
+      }
+
+      // If requested questions exceed available, use all available
+      actualQuestionCount = Math.min(totalQuestions, filteredQuestions.length);
+      const selectedQuestions = shuffleArray(filteredQuestions).slice(0, actualQuestionCount);
+      selectedQuestionIds = selectedQuestions.map(q => q.id);
+    }
 
     queries.createSession({
       sessionCode,
@@ -53,7 +81,7 @@ router.post('/create-session', authenticate, (req, res) => {
       startedAt: Date.now(),
       status: 'active',
       totalQuestions: actualQuestionCount,
-      questionIds: JSON.stringify(selectedQuestions.map(q => q.id)),
+      questionIds: JSON.stringify(selectedQuestionIds),
       gameMode: gameMode as GameMode,
       questionBank: bankId,
     });
