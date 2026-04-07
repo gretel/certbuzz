@@ -184,3 +184,76 @@ export function computeProportionalCounts(
   }
   return result;
 }
+
+function shuffleArray<T>(arr: T[]): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+/**
+ * Sample questions for an exam session using proportional domain weighting.
+ * Returns exactly `meta.exam.totalQuestions` question IDs.
+ *
+ * Algorithm:
+ *   1. Compute per-domain quotas via largest-remainder method.
+ *   2. For each domain, shuffle its in-scope questions and take N.
+ *   3. If a domain's pool is smaller than its quota, take all of it and
+ *      the shortfall will be filled from the global remainder pool.
+ *   4. Top-up from remaining in-scope questions if still short.
+ *   5. Final shuffle so exam order isn't clumped by topic.
+ *
+ * Throws if the bank has no `meta.exam.domains` configuration.
+ */
+export function sampleExamQuestions(bankId: string): string[] {
+  const bank = loadBank(bankId);
+  const exam = bank.meta.exam;
+  if (!exam || !exam.domains || exam.domains.length === 0) {
+    throw new Error(`Bank '${bankId}' has no exam domains configured`);
+  }
+  const total = exam.totalQuestions;
+
+  // Per-domain quotas
+  const counts = computeProportionalCounts(exam.domains, total);
+
+  // Union of all in-scope categories (excludes anything not mapped — e.g. gap-topics)
+  const inScopeCategories = new Set<string>();
+  for (const dom of exam.domains) {
+    for (const cat of dom.categories) inScopeCategories.add(cat);
+  }
+
+  const selectedIds = new Set<string>();
+  const selected: string[] = [];
+
+  for (const dom of exam.domains) {
+    const pool = shuffleArray(
+      bank.questions.filter(q => dom.categories.includes(q.category))
+    );
+    const quota = counts[dom.id];
+    const take = Math.min(quota, pool.length);
+    for (let i = 0; i < take; i++) {
+      selected.push(pool[i].id);
+      selectedIds.add(pool[i].id);
+    }
+  }
+
+  // Top up from the global in-scope remainder if any domain was short
+  if (selected.length < total) {
+    const remainder = shuffleArray(
+      bank.questions.filter(q =>
+        inScopeCategories.has(q.category) && !selectedIds.has(q.id)
+      )
+    );
+    for (const q of remainder) {
+      if (selected.length >= total) break;
+      selected.push(q.id);
+      selectedIds.add(q.id);
+    }
+  }
+
+  // Final shuffle and truncate (in case top-up over-ran)
+  return shuffleArray(selected).slice(0, total);
+}
