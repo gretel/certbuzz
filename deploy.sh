@@ -21,6 +21,23 @@ log()  { echo "--- $*"; }
 die()  { echo "ERROR: $*" >&2; exit 1; }
 ssh_() { ssh -i "$SSH_KEY" $SSH_OPTS "ubuntu@$IP" "$@"; }
 
+# --- Ensure security group + rules (idempotent, runs every deploy) ---
+ensure_sg() {
+  SG_ID=$(aws ec2 describe-security-groups --group-names "$SG_NAME" --region "$REGION" \
+    --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || echo "")
+  if [[ -z "$SG_ID" || "$SG_ID" == "None" ]]; then
+    SG_ID=$(aws ec2 create-security-group --group-name "$SG_NAME" --description "CertBuzz" \
+      --region "$REGION" --query 'GroupId' --output text)
+    log "Created security group $SG_ID"
+  fi
+
+  # Ensure SSH (22), HTTP (80), HTTPS (443) are open — re-add any that were removed
+  for port in 22 80 443; do
+    aws ec2 authorize-security-group-ingress --group-id "$SG_ID" \
+      --protocol tcp --port "$port" --cidr 0.0.0.0/0 --region "$REGION" 2>/dev/null || true
+  done
+}
+
 # --- Resolve or provision instance ---
 resolve_instance() {
   local info
@@ -48,19 +65,6 @@ resolve_instance() {
 }
 
 provision_instance() {
-  # Security group
-  local sg_id
-  sg_id=$(aws ec2 describe-security-groups --group-names "$SG_NAME" --region "$REGION" \
-    --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || \
-    aws ec2 create-security-group --group-name "$SG_NAME" --description "CertBuzz" \
-    --region "$REGION" --query 'GroupId' --output text)
-
-  # Allow SSH (22), HTTP (80), HTTPS (443)
-  for port in 22 80 443; do
-    aws ec2 authorize-security-group-ingress --group-id "$sg_id" \
-      --protocol tcp --port "$port" --cidr 0.0.0.0/0 --region "$REGION" 2>/dev/null || true
-  done
-
   # SSH key
   if [[ ! -f "$SSH_KEY" ]]; then
     aws ec2 create-key-pair --key-name "$KEY_NAME" --region "$REGION" \
@@ -71,7 +75,7 @@ provision_instance() {
   # Launch
   INSTANCE_ID=$(aws ec2 run-instances \
     --image-id "$UBUNTU_AMI" --count 1 --instance-type "$INSTANCE_TYPE" \
-    --key-name "$KEY_NAME" --security-group-ids "$sg_id" \
+    --key-name "$KEY_NAME" --security-group-ids "$SG_ID" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$INSTANCE_NAME}]" \
     --region "$REGION" --query 'Instances[0].InstanceId' --output text)
   log "Launched $INSTANCE_ID"
@@ -211,6 +215,7 @@ log "CertBuzz deploy"
 aws sts get-caller-identity >/dev/null 2>&1 || die "AWS CLI not configured — run 'aws configure'"
 
 FIRST_DEPLOY=""
+ensure_sg
 resolve_instance
 wait_for_ssh
 

@@ -1,11 +1,11 @@
 {
   "meta": {
-    "id": "clf-c02-w1w2w3",
-    "label": "CLF-C02 – Woche 1–3 (komplett)",
-    "description": "95 Fragen zu Cloud Concepts, Technology & Services, Security & Compliance (Domaene 1–3)",
+    "id": "clf-c02-complete",
+    "label": "CLF-C02 – komplett (alle Domänen)",
+    "description": "134 Fragen zu allen CLF-C02 Domänen (1–4) inkl. W4 Billing/Pricing/Support und Lücken-Themen.",
     "exam": {
       "passPercent": 70,
-      "totalQuestions": 95,
+      "totalQuestions": 134,
       "info": "Die Prüfung umfasst 65 Fragen (50 gewertet + 15 ungewertet). Mindestpunktzahl: 700/1000 (ca. 70%). Fragetypen: Multiple Choice (1 richtig, 3 falsch) und Mehrfachantwort (2+ richtig aus 5+ Optionen). Raten ohne Abzüge möglich."
     },
     "categories": {
@@ -52,6 +52,22 @@
       "compliance-governance": {
         "label": "Compliance & Governance",
         "icon": "📜"
+      },
+      "billing-pricing": {
+        "label": "Billing, Pricing & Support",
+        "icon": "💶"
+      },
+      "support-resources": {
+        "label": "Support-Ressourcen (Domäne 4.4)",
+        "icon": "🆘"
+      },
+      "advanced-networking": {
+        "label": "VPC Endpoints & Global Accelerator",
+        "icon": "🔌"
+      },
+      "gap-topics": {
+        "label": "Directory, RAM, Backup, Step Functions, Marketplace",
+        "icon": "🧩"
       }
     }
   },
@@ -141,7 +157,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Bei PaaS (z.B. Elastic Beanstalk) verwaltet AWS die Infrastruktur und Laufzeitumgebung. Der Kunde kümmert sich nur um den Anwendungscode."
+      "explanation": "Bei PaaS (z. B. Elastic Beanstalk) verwaltet AWS die Infrastruktur und Laufzeitumgebung. Der Kunde kümmert sich nur um den Anwendungscode."
     },
     {
       "id": "cc-104",
@@ -228,7 +244,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Cloud Computing wandelt Vorab-Investitionen (Serveranschaffung) in variable Kosten (Pay-as-you-go) um."
+      "explanation": "Cloud Computing wandelt Vorab-Investitionen (CapEx für Serveranschaffung) in variable Kosten (OpEx, Pay-as-you-go) um. Rightsizing und Economy of Scale sind andere Cloud-Vorteile, TCO ist eine Gesamtkosten-Metrik – aber keiner dieser Begriffe beschreibt den CapEx→OpEx-Wechsel."
     },
     {
       "id": "ce-102",
@@ -257,7 +273,7 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "Rehost (Lift and Shift) bedeutet, Anwendungen ohne Änderungen auf AWS-Infrastruktur zu verschieben, z.B. VMs auf EC2."
+      "explanation": "Rehost (Lift and Shift) bedeutet, Anwendungen ohne Änderungen auf AWS-Infrastruktur zu verschieben, z. B. VMs auf EC2."
     },
     {
       "id": "ce-103",
@@ -490,7 +506,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Eine AWS Region ist ein geografischer Bereich (z.B. eu-central-1 in Frankfurt) mit mindestens 3 isolierten Availability Zones."
+      "explanation": "Eine AWS Region ist ein geografischer Bereich (z. B. eu-central-1 in Frankfurt) mit mindestens 3 isolierten Availability Zones."
     },
     {
       "id": "gi-102",
@@ -519,7 +535,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS Lambda führt Code serverless und event-driven aus. Man zahlt nur pro Aufruf und Ausführungsdauer."
+      "explanation": "AWS Lambda führt Code serverless und event-driven aus; abgerechnet wird pro Aufruf und Ausführungsdauer. EC2 braucht laufende Instanzen, ECS benötigt einen Cluster (außer Fargate), Lightsail ist ein VPS-Angebot mit festen Monatspreisen."
     },
     {
       "id": "gi-103",
@@ -559,7 +575,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Datenschutz-Compliance (z.B. DSGVO)"
+          "text": "Datenschutz-Compliance (z. B. DSGVO)"
         },
         {
           "id": "b",
@@ -897,7 +913,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Read Replicas sind asynchrone Kopien der Datenbank für Lesezugriffe. Multi-AZ ist für Failover zuständig."
+      "explanation": "Read Replicas sind asynchrone Kopien der DB für Lesezugriffe und entlasten die Primary. Multi-AZ dagegen ist für automatisches Failover zuständig – es erhöht nicht die Lese-Kapazität."
     },
     {
       "id": "sd-107",
@@ -955,7 +971,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Amazon Redshift ist ein Data-Warehouse-Service für Petabyte-Scale-Analysen mit SQL-Abfragen."
+      "explanation": "Amazon Redshift ist ein Data-Warehouse-Service für Petabyte-Scale-Analysen mit SQL. DynamoDB ist eine NoSQL-Key-Value-DB, ElastiCache ist ein In-Memory-Cache, DocumentDB ist MongoDB-kompatibel – keines davon ist ein Data Warehouse."
     },
     {
       "id": "sd-109",
@@ -984,7 +1000,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Lifecycle Policies verschieben Objekte automatisch z.B. von Standard nach Glacier oder löschen sie nach einer definierten Zeit."
+      "explanation": "Lifecycle Policies verschieben Objekte automatisch z. B. von Standard nach Glacier oder löschen sie nach einer definierten Zeit."
     },
     {
       "id": "sd-110",
@@ -1130,7 +1146,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Route 53 ist der DNS-Service von AWS. Er bietet Domainregistrierung, DNS-Routing und Health Checks."
+      "explanation": "Route 53 ist der DNS-Service von AWS mit Domainregistrierung, DNS-Routing und Health Checks. CloudFront ist ein CDN, ELB verteilt Traffic innerhalb einer Region, Transit Gateway verbindet VPCs – keiner dieser Services ist ein DNS-Dienst."
     },
     {
       "id": "nw-105",
@@ -1159,7 +1175,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "CloudFront ist das CDN (Content Delivery Network) von AWS. Es cached Inhalte an Edge Locations weltweit."
+      "explanation": "CloudFront ist das CDN (Content Delivery Network) von AWS und cached Inhalte an Edge Locations weltweit. Global Accelerator nutzt zwar auch Edges, aber ohne Caching, und Route 53 ist DNS, nicht Caching."
     },
     {
       "id": "nw-106",
@@ -1188,7 +1204,7 @@
       "correctAnswers": [
         "a"
       ],
-      "explanation": "Ein NAT Gateway erlaubt Instances in Private Subnets, ausgehenden Internetzugang (z.B. für Updates), blockiert aber eingehenden Traffic."
+      "explanation": "Ein NAT Gateway erlaubt Instances in Private Subnets, ausgehenden Internetzugang (z. B. für Updates), blockiert aber eingehenden Traffic."
     },
     {
       "id": "nw-107",
@@ -1334,7 +1350,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "CloudWatch sammelt Metriken, Logs und Alarme zur Überwachung von AWS-Ressourcen und Anwendungen."
+      "explanation": "CloudWatch sammelt Metriken, Logs und Alarme zur Überwachung von Ressourcen und Anwendungen. CloudTrail dagegen protokolliert API-Aufrufe (Audit), Config verfolgt Konfigurationsänderungen, X-Ray ist für Application-Tracing."
     },
     {
       "id": "sm-102",
@@ -1450,7 +1466,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Amazon Athena ermöglicht serverless SQL-Abfragen direkt auf S3-Daten (z.B. CSV, JSON, Parquet). Man zahlt nur pro Abfrage."
+      "explanation": "Amazon Athena ermöglicht serverless SQL-Abfragen direkt auf S3-Daten (z. B. CSV, JSON, Parquet). Man zahlt nur pro Abfrage."
     },
     {
       "id": "sm-106",
@@ -1537,7 +1553,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Amazon Kinesis verarbeitet Echtzeit-Streaming-Daten in großem Umfang (Logs, IoT-Daten, Clickstreams)."
+      "explanation": "Amazon Kinesis verarbeitet Echtzeit-Streaming-Daten in großem Umfang (Logs, IoT, Clickstreams). SQS ist eine klassische Message-Queue ohne Streaming-Semantik, Athena ist SQL auf S3, Batch ist für Batch-Jobs – keiner davon ist für Echtzeit-Streams ausgelegt."
     },
     {
       "id": "sm-109",
@@ -1665,15 +1681,15 @@
       "options": [
         {
           "id": "a",
-          "text": "IaaS (z.B. EC2)"
+          "text": "IaaS (z. B. EC2)"
         },
         {
           "id": "b",
-          "text": "PaaS (z.B. Elastic Beanstalk)"
+          "text": "PaaS (z. B. Elastic Beanstalk)"
         },
         {
           "id": "c",
-          "text": "SaaS (z.B. Amazon WorkMail)"
+          "text": "SaaS (z. B. Amazon WorkMail)"
         },
         {
           "id": "d",
@@ -1712,7 +1728,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Datenverwaltung und Zugriffsberechtigungen sind IMMER Kundenverantwortung, egal ob IaaS, PaaS oder SaaS."
+      "explanation": "Datenverwaltung und Zugriffsberechtigungen sind IMMER Kundenverantwortung – auch bei SaaS. Netzwerk-Hardware, Hypervisor-Betrieb und physische Sicherheit liegen dagegen vollständig bei AWS."
     },
     {
       "id": "sr-105",
@@ -1894,7 +1910,7 @@
       "category": "cloud-economics",
       "type": "single",
       "difficulty": "hard",
-      "question": "Welche Migrationsstrategie beschreibt den Wechsel zu einem komplett anderen Produkt, z.B. von On-Premise-CRM zu Salesforce?",
+      "question": "Welche Migrationsstrategie beschreibt den Wechsel zu einem komplett anderen Produkt, z. B. von On-Premise-CRM zu Salesforce?",
       "options": [
         {
           "id": "a",
@@ -1916,7 +1932,7 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "Repurchase (Drop and Shop) bedeutet den Wechsel zu einem neuen SaaS-Produkt, z.B. von eigenem CRM zu Salesforce oder von Exchange zu WorkMail."
+      "explanation": "Repurchase (Drop and Shop) bedeutet den Wechsel zu einem neuen SaaS-Produkt, z. B. von eigenem CRM zu Salesforce oder von Exchange zu WorkMail."
     },
     {
       "id": "wa-105",
@@ -1952,7 +1968,7 @@
       "category": "iam",
       "type": "single",
       "difficulty": "easy",
-      "question": "Welche IAM-Entitaet repraesentiert eine Person oder Anwendung, die mit AWS interagiert?",
+      "question": "Welche IAM-Entität repräsentiert eine Person oder Anwendung, die mit AWS interagiert?",
       "options": [
         {
           "id": "a",
@@ -1974,18 +1990,18 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Ein IAM User repraesentiert eine einzelne Person oder Anwendung. Groups buendeln User, Policies definieren Berechtigungen, Roles werden temporaer angenommen."
+      "explanation": "Ein IAM User repräsentiert eine einzelne Person oder Anwendung. Groups bündeln User, Policies definieren Berechtigungen, Roles werden temporär angenommen."
     },
     {
       "id": "iam-102",
       "category": "iam",
       "type": "single",
       "difficulty": "easy",
-      "question": "Warum empfiehlt AWS, den Root-Account nicht fuer alltaegliche Aufgaben zu nutzen?",
+      "question": "Warum empfiehlt AWS, den Root-Account nicht für alltägliche Aufgaben zu nutzen?",
       "options": [
         {
           "id": "a",
-          "text": "Der Root-Account hat eingeschraenkte Berechtigungen"
+          "text": "Der Root-Account hat eingeschränkte Berechtigungen"
         },
         {
           "id": "b",
@@ -2003,14 +2019,14 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Der Root-Account hat uneingeschraenkten Zugriff und kann nicht durch IAM-Policies beschraenkt werden. Deshalb sollte er nur fuer Kontoverwaltungsaufgaben genutzt werden."
+      "explanation": "Der Root-Account hat uneingeschränkten Zugriff und kann nicht durch IAM-Policies beschränkt werden. Deshalb sollte er nur für Kontoverwaltungsaufgaben genutzt werden."
     },
     {
       "id": "iam-103",
       "category": "iam",
       "type": "single",
       "difficulty": "medium",
-      "question": "Welches Sicherheitsprinzip besagt, dass Benutzer nur die Berechtigungen erhalten sollen, die sie fuer ihre Aufgabe benoetigen?",
+      "question": "Welches Sicherheitsprinzip besagt, dass Benutzer nur die Berechtigungen erhalten sollen, die sie für ihre Aufgabe benötigen?",
       "options": [
         {
           "id": "a",
@@ -2032,7 +2048,7 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "Least Privilege (Prinzip der geringsten Berechtigung) bedeutet: nur so viele Rechte wie noetig, so wenige wie moeglich."
+      "explanation": "Least Privilege (Prinzip der geringsten Berechtigung) bedeutet: nur so viele Rechte wie nötig, so wenige wie möglich."
     },
     {
       "id": "iam-104",
@@ -2047,57 +2063,57 @@
         },
         {
           "id": "b",
-          "text": "Rollen werden temporaer angenommen und haben keine permanenten Anmeldedaten"
+          "text": "Rollen werden temporär angenommen und haben keine permanenten Anmeldedaten"
         },
         {
           "id": "c",
-          "text": "Rollen koennen nur von AWS-Services genutzt werden"
+          "text": "Rollen können nur von AWS-Services genutzt werden"
         },
         {
           "id": "d",
-          "text": "Rollen koennen keine Policies zugewiesen bekommen"
+          "text": "Rollen können keine Policies zugewiesen bekommen"
         }
       ],
       "correctAnswers": [
         "b"
       ],
-      "explanation": "IAM-Rollen stellen temporaere Sicherheitsanmeldedaten bereit (via STS). Sie haben keine permanenten Passwoerter oder Access Keys wie IAM-User."
+      "explanation": "IAM-Rollen stellen temporäre Sicherheitsanmeldedaten bereit (via STS). Sie haben keine permanenten Passwörter oder Access Keys wie IAM-User."
     },
     {
       "id": "iam-105",
       "category": "iam",
       "type": "single",
       "difficulty": "medium",
-      "question": "Welche Aussage ueber IAM-Gruppen ist korrekt?",
+      "question": "Welche Aussage über IAM-Gruppen ist korrekt?",
       "options": [
         {
           "id": "a",
-          "text": "Gruppen koennen verschachtelt werden (Gruppen in Gruppen)"
+          "text": "Gruppen können verschachtelt werden (Gruppen in Gruppen)"
         },
         {
           "id": "b",
-          "text": "Gruppen koennen sich bei AWS anmelden"
+          "text": "Gruppen können sich bei AWS anmelden"
         },
         {
           "id": "c",
-          "text": "Policies werden an Gruppen angehaengt und von allen Mitgliedern geerbt"
+          "text": "Policies werden an Gruppen angehängt und von allen Mitgliedern geerbt"
         },
         {
           "id": "d",
-          "text": "Ein User kann nur einer einzigen Gruppe angehoeren"
+          "text": "Ein User kann nur einer einzigen Gruppe angehören"
         }
       ],
       "correctAnswers": [
         "c"
       ],
-      "explanation": "IAM-Gruppen buendeln User und vererben angehaengte Policies. Gruppen koennen nicht verschachtelt werden, sich nicht anmelden, und ein User kann mehreren Gruppen angehoeren."
+      "explanation": "IAM-Gruppen bündeln User und vererben angehängte Policies. Gruppen können nicht verschachtelt werden, sich nicht anmelden, und ein User kann mehreren Gruppen angehören."
     },
     {
       "id": "iam-106",
       "category": "iam",
       "type": "single",
       "difficulty": "hard",
-      "question": "Ein Unternehmen moechte seinen Mitarbeitern ermoeglichen, sich mit ihren bestehenden Firmen-Zugangsdaten bei AWS anzumelden, ohne separate IAM-User zu erstellen. Welcher Service ist dafuer geeignet?",
+      "question": "Ein Unternehmen möchte seinen Mitarbeitern ermöglichen, sich mit ihren bestehenden Firmen-Zugangsdaten bei AWS anzumelden, ohne separate IAM-User zu erstellen. Welcher Service ist dafür geeignet?",
       "options": [
         {
           "id": "a",
@@ -2119,22 +2135,22 @@
       "correctAnswers": [
         "a"
       ],
-      "explanation": "IAM Identity Center (frueher AWS SSO) ermoeglicht Federation mit bestehenden Identitaetsanbietern (Active Directory, SAML 2.0) fuer den Zugriff auf AWS-Konten."
+      "explanation": "IAM Identity Center (früher AWS SSO) ermöglicht Federation mit bestehenden Identitätsanbietern (Active Directory, SAML 2.0) für den Zugriff auf AWS-Konten."
     },
     {
       "id": "iam-107",
       "category": "iam",
       "type": "multiple",
       "difficulty": "hard",
-      "question": "Welche zwei Massnahmen empfiehlt AWS zum Schutz des Root-Accounts? (Waehle ZWEI)",
+      "question": "Welche zwei Massnahmen empfiehlt AWS zum Schutz des Root-Accounts? (Wähle ZWEI)",
       "options": [
         {
           "id": "a",
-          "text": "MFA fuer den Root-Account aktivieren"
+          "text": "MFA für den Root-Account aktivieren"
         },
         {
           "id": "b",
-          "text": "Root-Account-Zugangsdaten loeschen"
+          "text": "Root-Account-Zugangsdaten löschen"
         },
         {
           "id": "c",
@@ -2142,7 +2158,7 @@
         },
         {
           "id": "d",
-          "text": "Root-Account nicht fuer alltaegliche Aufgaben verwenden"
+          "text": "Root-Account nicht für alltägliche Aufgaben verwenden"
         },
         {
           "id": "e",
@@ -2153,7 +2169,7 @@
         "a",
         "d"
       ],
-      "explanation": "AWS empfiehlt: MFA aktivieren und den Root-Account nur fuer Aufgaben verwenden, die ihn erfordern (z.B. Account-Einstellungen aendern). Keine alltaegliche Nutzung."
+      "explanation": "AWS empfiehlt: MFA aktivieren und den Root-Account nur für Aufgaben verwenden, die ihn erfordern (z. B. Account-Einstellungen ändern). Keine alltägliche Nutzung."
     },
     {
       "id": "iam-108",
@@ -2193,15 +2209,15 @@
       "options": [
         {
           "id": "a",
-          "text": "Sie erteilen Berechtigungen fuer einzelne IAM-User"
+          "text": "Sie erteilen Berechtigungen für einzelne IAM-User"
         },
         {
           "id": "b",
-          "text": "Sie setzen maximale Berechtigungsgrenzen fuer Accounts in einer Organisation"
+          "text": "Sie setzen maximale Berechtigungsgrenzen für Accounts in einer Organisation"
         },
         {
           "id": "c",
-          "text": "Sie verschluesseln Daten in S3-Buckets"
+          "text": "Sie verschlüsseln Daten in S3-Buckets"
         },
         {
           "id": "d",
@@ -2211,7 +2227,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "SCPs definieren die maximalen Berechtigungen fuer Accounts in AWS Organizations. Sie erteilen selbst keine Rechte, sondern setzen Grenzen (Guardrails)."
+      "explanation": "SCPs definieren die maximalen Berechtigungen für Accounts in AWS Organizations. Sie erteilen selbst keine Rechte, sondern setzen Grenzen (Guardrails)."
     },
     {
       "id": "iam-110",
@@ -2247,15 +2263,15 @@
       "category": "security-services",
       "type": "single",
       "difficulty": "easy",
-      "question": "Was ist der Unterschied zwischen Verschluesselung 'at Rest' und 'in Transit'?",
+      "question": "Was ist der Unterschied zwischen Verschlüsselung 'at Rest' und 'in Transit'?",
       "options": [
         {
           "id": "a",
-          "text": "At Rest schuetzt gespeicherte Daten, in Transit schuetzt Daten waehrend der Uebertragung"
+          "text": "At Rest schützt gespeicherte Daten, in Transit schützt Daten während der Übertragung"
         },
         {
           "id": "b",
-          "text": "At Rest verschluesselt nur S3-Daten, in Transit nur EC2-Daten"
+          "text": "At Rest verschlüsselt nur S3-Daten, in Transit nur EC2-Daten"
         },
         {
           "id": "c",
@@ -2269,14 +2285,14 @@
       "correctAnswers": [
         "a"
       ],
-      "explanation": "At Rest = gespeicherte Daten (z.B. auf Festplatte, in S3). In Transit = Daten waehrend der Uebertragung (z.B. HTTPS, TLS)."
+      "explanation": "At Rest = gespeicherte Daten (z. B. auf Festplatte, in S3). In Transit = Daten während der Übertragung (z. B. HTTPS, TLS)."
     },
     {
       "id": "sec-102",
       "category": "security-services",
       "type": "single",
       "difficulty": "easy",
-      "question": "Welcher AWS-Service verwaltet Verschluesselungsschluessel zentral?",
+      "question": "Welcher AWS-Service verwaltet Verschlüsselungsschlüssel zentral?",
       "options": [
         {
           "id": "a",
@@ -2298,14 +2314,14 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS KMS ist der zentrale Service fuer Erstellung, Verwaltung und Rotation von Verschluesselungsschluesseln."
+      "explanation": "AWS KMS ist der zentrale Service zur Erstellung, Verwaltung und Rotation von Verschlüsselungsschlüsseln. Shield schützt vor DDoS, Macie klassifiziert S3-Daten (PII), Config überwacht Ressourcen-Konfigurationen – keiner davon verwaltet Schlüssel."
     },
     {
       "id": "sec-103",
       "category": "security-services",
       "type": "single",
       "difficulty": "medium",
-      "question": "Welche S3-Verschluesselungsoption verwendet vom Kunden bereitgestellte Schluessel, die AWS NICHT speichert?",
+      "question": "Welche S3-Verschlüsselungsoption verwendet vom Kunden bereitgestellte Schlüssel, die AWS NICHT speichert?",
       "options": [
         {
           "id": "a",
@@ -2327,14 +2343,14 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "SSE-C (Server-Side Encryption with Customer-Provided Keys): Der Kunde sendet den Schluessel mit jeder Anfrage, AWS speichert ihn nicht."
+      "explanation": "SSE-C (Server-Side Encryption with Customer-Provided Keys): Der Kunde sendet den Schlüssel mit jeder Anfrage, AWS speichert ihn nicht."
     },
     {
       "id": "sec-104",
       "category": "security-services",
       "type": "single",
       "difficulty": "medium",
-      "question": "Welcher Service bietet DDoS-Schutz fuer alle AWS-Kunden ohne zusaetzliche Kosten?",
+      "question": "Welcher Service bietet DDoS-Schutz für alle AWS-Kunden ohne zusätzliche Kosten?",
       "options": [
         {
           "id": "a",
@@ -2356,7 +2372,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS Shield Standard ist automatisch fuer alle AWS-Kunden aktiv und schuetzt gegen gaengige DDoS-Angriffe (Layer 3/4). Shield Advanced ist kostenpflichtig und bietet erweiterten Schutz."
+      "explanation": "AWS Shield Standard ist automatisch für alle AWS-Kunden aktiv und schützt gegen gängige DDoS-Angriffe (Layer 3/4). Shield Advanced ist kostenpflichtig und bietet erweiterten Schutz."
     },
     {
       "id": "sec-105",
@@ -2367,11 +2383,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Verschluesselung von Daten in S3"
+          "text": "Verschlüsselung von Daten in S3"
         },
         {
           "id": "b",
-          "text": "Filtern von Web-Traffic anhand von Regeln (z.B. SQL Injection, XSS)"
+          "text": "Filtern von Web-Traffic anhand von Regeln (z. B. SQL Injection, XSS)"
         },
         {
           "id": "c",
@@ -2379,13 +2395,13 @@
         },
         {
           "id": "d",
-          "text": "Ueberwachung von API-Aufrufen"
+          "text": "Überwachung von API-Aufrufen"
         }
       ],
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS WAF (Web Application Firewall) filtert HTTP/HTTPS-Traffic anhand konfigurierbarer Regeln und schuetzt gegen OWASP-Top-10-Angriffe."
+      "explanation": "AWS WAF (Web Application Firewall) filtert HTTP/HTTPS-Traffic anhand konfigurierbarer Regeln und schützt gegen OWASP-Top-10-Angriffe."
     },
     {
       "id": "sec-106",
@@ -2414,7 +2430,7 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "GuardDuty analysiert VPC Flow Logs, DNS-Logs und CloudTrail-Events mit ML, um Bedrohungen wie ungewoehnliche API-Aufrufe oder Kryptowaehrungs-Mining zu erkennen."
+      "explanation": "GuardDuty analysiert VPC Flow Logs, DNS-Logs und CloudTrail-Events mit ML, um Bedrohungen wie ungewöhnliche API-Aufrufe oder Kryptowährungs-Mining zu erkennen."
     },
     {
       "id": "sec-107",
@@ -2443,7 +2459,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "Amazon Inspector fuehrt automatisiertes Vulnerability Scanning fuer EC2-Instances und ECR-Container-Images durch und bewertet Schwachstellen nach Schweregrad."
+      "explanation": "Amazon Inspector führt automatisiertes Vulnerability Scanning für EC2-Instances und ECR-Container-Images durch und bewertet Schwachstellen nach Schweregrad."
     },
     {
       "id": "sec-108",
@@ -2479,7 +2495,7 @@
       "category": "security-services",
       "type": "single",
       "difficulty": "hard",
-      "question": "Ein Unternehmen muss nachweisen, wer wann welche API-Aufrufe in seinem AWS-Account getaetigt hat. Welcher Service liefert diese Informationen?",
+      "question": "Ein Unternehmen muss nachweisen, wer wann welche API-Aufrufe in seinem AWS-Account getätigt hat. Welcher Service liefert diese Informationen?",
       "options": [
         {
           "id": "a",
@@ -2501,7 +2517,7 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "CloudTrail protokolliert alle API-Aufrufe (wer, wann, was, von wo) und ist damit das zentrale Audit-Tool fuer AWS-Accounts."
+      "explanation": "CloudTrail protokolliert alle API-Aufrufe (wer, wann, was, von wo) und ist damit das zentrale Audit-Tool für AWS-Accounts."
     },
     {
       "id": "sec-110",
@@ -2512,11 +2528,11 @@
       "options": [
         {
           "id": "a",
-          "text": "Config protokolliert API-Aufrufe, CloudTrail trackt Konfigurationsaenderungen"
+          "text": "Config protokolliert API-Aufrufe, CloudTrail trackt Konfigurationsänderungen"
         },
         {
           "id": "b",
-          "text": "Config trackt Konfigurationsaenderungen ueber Zeit, CloudTrail protokolliert API-Aufrufe"
+          "text": "Config trackt Konfigurationsänderungen über Zeit, CloudTrail protokolliert API-Aufrufe"
         },
         {
           "id": "c",
@@ -2524,13 +2540,13 @@
         },
         {
           "id": "d",
-          "text": "Config ersetzt CloudTrail vollstaendig"
+          "text": "Config ersetzt CloudTrail vollständig"
         }
       ],
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS Config erfasst den Konfigurationsverlauf von Ressourcen und prueft Compliance-Regeln. CloudTrail protokolliert API-Aktivitaeten. Sie ergaenzen sich."
+      "explanation": "AWS Config erfasst den Konfigurationsverlauf von Ressourcen und prüft Compliance-Regeln. CloudTrail protokolliert API-Aktivitäten. Sie ergänzen sich."
     },
     {
       "id": "sec-111",
@@ -2545,11 +2561,11 @@
         },
         {
           "id": "b",
-          "text": "Konfigurationsaenderungen an VPC-Ressourcen"
+          "text": "Konfigurationsänderungen an VPC-Ressourcen"
         },
         {
           "id": "c",
-          "text": "IP-Traffic-Informationen fuer Netzwerk-Interfaces in einer VPC"
+          "text": "IP-Traffic-Informationen für Netzwerk-Interfaces in einer VPC"
         },
         {
           "id": "d",
@@ -2559,14 +2575,14 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "VPC Flow Logs erfassen IP-Traffic-Metadaten (Quell-/Ziel-IP, Ports, Protokoll, Accept/Reject) fuer Netzwerk-Interfaces in einer VPC."
+      "explanation": "VPC Flow Logs erfassen IP-Traffic-Metadaten (Quell-/Ziel-IP, Ports, Protokoll, Accept/Reject) für Netzwerk-Interfaces in einer VPC."
     },
     {
       "id": "sec-112",
       "category": "security-services",
       "type": "multiple",
       "difficulty": "hard",
-      "question": "Welche ZWEI Services eignen sich zum Speichern von Secrets wie Datenbank-Passwoertern? (Waehle ZWEI)",
+      "question": "Welche ZWEI Services eignen sich zum Speichern von Secrets wie Datenbank-Passwörtern? (Wähle ZWEI)",
       "options": [
         {
           "id": "a",
@@ -2593,14 +2609,14 @@
         "a",
         "b"
       ],
-      "explanation": "Secrets Manager bietet automatische Rotation und ist fuer Datenbank-Credentials optimiert. Parameter Store (SecureString) speichert verschluesselte Werte kostenguenstig."
+      "explanation": "Secrets Manager bietet automatische Rotation und ist für Datenbank-Credentials optimiert. Parameter Store (SecureString) speichert verschlüsselte Werte kostengünstig."
     },
     {
       "id": "cg-101",
       "category": "compliance-governance",
       "type": "single",
       "difficulty": "easy",
-      "question": "Wo koennen Kunden AWS-Compliance-Berichte und Zertifizierungen (z.B. SOC, ISO) herunterladen?",
+      "question": "Wo können Kunden AWS-Compliance-Berichte und Zertifizierungen (z. B. SOC, ISO) herunterladen?",
       "options": [
         {
           "id": "a",
@@ -2622,7 +2638,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS Artifact ist das Self-Service-Portal fuer Compliance-Berichte, Zertifizierungen und Vereinbarungen (z.B. BAA, NDA)."
+      "explanation": "AWS Artifact ist das Self-Service-Portal für Compliance-Berichte, Zertifizierungen und Vereinbarungen (z. B. BAA, NDA)."
     },
     {
       "id": "cg-102",
@@ -2651,7 +2667,7 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "Trusted Advisor prueft den AWS-Account in 5 Kategorien und gibt Empfehlungen. Der Umfang haengt vom Support-Plan ab (Basic: begrenzt, Business/Enterprise: alle Checks)."
+      "explanation": "Trusted Advisor prüft den AWS-Account in 5 Kategorien und gibt Empfehlungen. Der Umfang hängt vom Support-Plan ab (Basic: begrenzt, Business/Enterprise: alle Checks)."
     },
     {
       "id": "cg-103",
@@ -2662,7 +2678,7 @@
       "options": [
         {
           "id": "a",
-          "text": "Verschluesselung aller S3-Buckets in einem Account"
+          "text": "Verschlüsselung aller S3-Buckets in einem Account"
         },
         {
           "id": "b",
@@ -2674,13 +2690,13 @@
         },
         {
           "id": "d",
-          "text": "Verwaltung von DNS-Eintraegen"
+          "text": "Verwaltung von DNS-Einträgen"
         }
       ],
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS Organizations ermoeglicht Multi-Account-Management mit konsolidierter Abrechnung, SCPs als Leitplanken und organisatorischer Gruppierung (OUs)."
+      "explanation": "AWS Organizations ermöglicht Multi-Account-Management mit konsolidierter Abrechnung, SCPs als Leitplanken und organisatorischer Gruppierung (OUs)."
     },
     {
       "id": "cg-104",
@@ -2709,14 +2725,14 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS Control Tower automatisiert die Einrichtung einer Landing Zone mit Best-Practice-Guardrails (praeventiv und detektiv) auf Basis von AWS Organizations."
+      "explanation": "AWS Control Tower automatisiert die Einrichtung einer Landing Zone mit Best-Practice-Guardrails (präventiv und detektiv) auf Basis von AWS Organizations."
     },
     {
       "id": "cg-105",
       "category": "compliance-governance",
       "type": "single",
       "difficulty": "medium",
-      "question": "Welcher AWS-Service prueft automatisiert, ob Ressourcenkonfigurationen bestimmten Compliance-Regeln entsprechen?",
+      "question": "Welcher AWS-Service prüft automatisiert, ob Ressourcenkonfigurationen bestimmten Compliance-Regeln entsprechen?",
       "options": [
         {
           "id": "a",
@@ -2738,7 +2754,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "AWS Config Rules pruefen kontinuierlich, ob Ressourcen definierten Regeln entsprechen (z.B. 'S3-Buckets muessen verschluesselt sein'). Noncompliant-Ressourcen werden markiert."
+      "explanation": "AWS Config Rules prüfen kontinuierlich, ob Ressourcen definierten Regeln entsprechen (z. B. 'S3-Buckets müssen verschlüsselt sein'). Noncompliant-Ressourcen werden markiert."
     },
     {
       "id": "cg-106",
@@ -2749,15 +2765,15 @@
       "options": [
         {
           "id": "a",
-          "text": "AWS Artifact fuer Compliance-Nachweis + S3-Bucket-Policy mit Region-Bedingung"
+          "text": "AWS Artifact für Compliance-Nachweis + S3-Bucket-Policy mit Region-Bedingung"
         },
         {
           "id": "b",
-          "text": "AWS Organizations SCPs, die nur eu-Regionen erlauben + AWS Config Rules zur Ueberwachung"
+          "text": "AWS Organizations SCPs, die nur eu-Regionen erlauben + AWS Config Rules zur Überwachung"
         },
         {
           "id": "c",
-          "text": "AWS Shield + AWS WAF fuer Datenresidenz"
+          "text": "AWS Shield + AWS WAF für Datenresidenz"
         },
         {
           "id": "d",
@@ -2767,26 +2783,26 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "SCPs koennen den Zugriff auf bestimmte Regionen beschraenken (praeventiv). AWS Config Rules ueberwachen, ob Ressourcen nur in erlaubten Regionen erstellt werden (detektiv)."
+      "explanation": "SCPs können den Zugriff auf bestimmte Regionen beschränken (präventiv). AWS Config Rules überwachen, ob Ressourcen nur in erlaubten Regionen erstellt werden (detektiv)."
     },
     {
       "id": "cg-107",
       "category": "compliance-governance",
       "type": "multiple",
       "difficulty": "hard",
-      "question": "Welche ZWEI Aussagen ueber AWS Trusted Advisor sind korrekt? (Waehle ZWEI)",
+      "question": "Welche ZWEI Aussagen über AWS Trusted Advisor sind korrekt? (Wähle ZWEI)",
       "options": [
         {
           "id": "a",
-          "text": "Alle Checks sind mit jedem Support-Plan verfuegbar"
+          "text": "Alle Checks sind mit jedem Support-Plan verfügbar"
         },
         {
           "id": "b",
-          "text": "Mit Basic-Support sind nur ausgewaehlte Core-Checks verfuegbar"
+          "text": "Mit Basic-Support sind nur ausgewählte Core-Checks verfügbar"
         },
         {
           "id": "c",
-          "text": "Trusted Advisor prueft in der Kategorie Sicherheit z.B. offene Security-Group-Ports"
+          "text": "Trusted Advisor prüft in der Kategorie Sicherheit z. B. offene Security-Group-Ports"
         },
         {
           "id": "d",
@@ -2801,7 +2817,7 @@
         "b",
         "c"
       ],
-      "explanation": "Mit Basic/Developer-Support sind nur Core-Checks verfuegbar (z.B. S3-Bucket-Permissions, MFA auf Root). Voller Zugriff erfordert Business- oder Enterprise-Support."
+      "explanation": "Mit Basic/Developer-Support sind nur Core-Checks verfügbar (z. B. S3-Bucket-Permissions, MFA auf Root). Voller Zugriff erfordert Business- oder Enterprise-Support. Hinweis: Seit 2025 hat jeder Account-Plan Zugriff auf 56 Trusted-Advisor-Checks; Business Support+/Enterprise schalten zusätzliche 426 frei (gesamt 482). Das CLF-C02-Exam testet aber noch das klassische Core-Checks-Modell."
     },
     {
       "id": "cg-108",
@@ -2830,7 +2846,1149 @@
       "correctAnswers": [
         "c"
       ],
-      "explanation": "AWS Security Hub aggregiert Findings aus mehreren Security-Services und prueft gegen Standards wie CIS AWS Foundations Benchmark."
+      "explanation": "AWS Security Hub aggregiert Findings aus mehreren Security-Services und prüft gegen Standards wie CIS AWS Foundations Benchmark."
+    },
+    {
+      "id": "bp-101",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welches AWS-Tool eignet sich am besten, um die **voraussichtlichen** Kosten einer geplanten Architektur vor dem Deployment zu schätzen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Cost Explorer"
+        },
+        {
+          "id": "b",
+          "text": "AWS Budgets"
+        },
+        {
+          "id": "c",
+          "text": "AWS Pricing Calculator"
+        },
+        {
+          "id": "d",
+          "text": "AWS Trusted Advisor"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Der Pricing Calculator ist das Planungs-/Prognose-Tool. Cost Explorer analysiert *bestehende* Kosten, Budgets warnt vor Überschreitung."
+    },
+    {
+      "id": "bp-102",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welches EC2-Preismodell bietet bis zu 90 % Rabatt, kann aber mit kurzer Vorwarnzeit unterbrochen werden?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Reserved Instances"
+        },
+        {
+          "id": "b",
+          "text": "Spot Instances"
+        },
+        {
+          "id": "c",
+          "text": "Dedicated Hosts"
+        },
+        {
+          "id": "d",
+          "text": "Savings Plans"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Spot Instances nutzen ungenutzte Kapazität – höchster Rabatt, aber jederzeit zurückforderbar."
+    },
+    {
+      "id": "bp-103",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Ein Kunde hat eine stabile EC2-Workload, will aber später flexibel zwischen Instance-Familien, Regionen und sogar Fargate/Lambda wechseln können. Welche Einsparoption passt am besten?",
+      "options": [
+        {
+          "id": "a",
+          "text": "EC2 Instance Savings Plan"
+        },
+        {
+          "id": "b",
+          "text": "Compute Savings Plan"
+        },
+        {
+          "id": "c",
+          "text": "Standard Reserved Instance"
+        },
+        {
+          "id": "d",
+          "text": "Spot Fleet"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Der Compute Savings Plan ist regions- und familienübergreifend und deckt auch Fargate und Lambda ab."
+    },
+    {
+      "id": "bp-104",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Aussage zum **EC2 Instance Savings Plan** trifft zu?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Er gilt auch für Lambda und Fargate"
+        },
+        {
+          "id": "b",
+          "text": "Er ist an eine Instance-Familie und eine Region gebunden, bietet aber höheren Rabatt als der Compute SP"
+        },
+        {
+          "id": "c",
+          "text": "Er kann im RI-Marketplace weiterverkauft werden"
+        },
+        {
+          "id": "d",
+          "text": "Er erlaubt beliebigen Wechsel zwischen Regionen"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "EC2 Instance SP: höherer Rabatt (~72 %) im Tausch gegen geringere Flexibilität (eine Familie, eine Region, nur EC2)."
+    },
+    {
+      "id": "bp-105",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Unterschied besteht zwischen Standard und Convertible Reserved Instances?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Standard darf Instance-Familie ändern, Convertible nicht"
+        },
+        {
+          "id": "b",
+          "text": "Convertible darf Instance-Familie, OS und Tenancy ändern, bietet aber weniger Rabatt"
+        },
+        {
+          "id": "c",
+          "text": "Standard gilt nur 1 Jahr, Convertible 3 Jahre"
+        },
+        {
+          "id": "d",
+          "text": "Convertible ist nur für Windows verfügbar"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Convertible RI = mehr Flexibilität, weniger Rabatt. Standard RI = fix, dafür höchster Rabatt."
+    },
+    {
+      "id": "bp-106",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher Traffic ist in AWS grundsätzlich kostenlos?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Egress ins Internet"
+        },
+        {
+          "id": "b",
+          "text": "Ingress ins AWS-Netzwerk"
+        },
+        {
+          "id": "c",
+          "text": "Cross-Region Traffic"
+        },
+        {
+          "id": "d",
+          "text": "Cross-AZ Traffic"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Eingehender Traffic (Ingress) ist immer kostenlos. Egress und Cross-Region kosten."
+    },
+    {
+      "id": "bp-107",
+      "category": "billing-pricing",
+      "type": "multiple",
+      "difficulty": "medium",
+      "question": "Welche ZWEI Maßnahmen reduzieren typischerweise die Data-Transfer-Kosten in AWS?",
+      "options": [
+        {
+          "id": "a",
+          "text": "VPC Gateway Endpoints für S3 nutzen"
+        },
+        {
+          "id": "b",
+          "text": "Cross-Region Replikation aktivieren"
+        },
+        {
+          "id": "c",
+          "text": "CloudFront vor Backends schalten"
+        },
+        {
+          "id": "d",
+          "text": "Mehr Elastic IPs zuweisen"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "c"
+      ],
+      "explanation": "Gateway Endpoints vermeiden NAT-Gateway-Gebühren beim Zugriff auf S3. CloudFront cached Inhalte am Edge und senkt Origin-Egress."
+    },
+    {
+      "id": "bp-108",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welches AWS-Tool zeigt historische Kosten und Nutzung und erlaubt Aufschlüsselung nach Service, Region und Tag?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Pricing Calculator"
+        },
+        {
+          "id": "b",
+          "text": "AWS Cost Explorer"
+        },
+        {
+          "id": "c",
+          "text": "AWS Budgets"
+        },
+        {
+          "id": "d",
+          "text": "AWS Organizations"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Cost Explorer ist das Analysetool für vergangene und aktuelle Kosten."
+    },
+    {
+      "id": "bp-109",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was ist ein typischer Vorteil von Consolidated Billing in AWS Organizations?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Kostenlose Cross-Region-Kopien"
+        },
+        {
+          "id": "b",
+          "text": "Aggregierte Volumen-Rabatte über alle Accounts hinweg"
+        },
+        {
+          "id": "c",
+          "text": "Automatische Umstellung aller Accounts auf Savings Plans"
+        },
+        {
+          "id": "d",
+          "text": "Kostenlose Reserved Instances für alle Accounts"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Consolidated Billing aggregiert die Nutzung – Volumen-Rabatte (z. B. S3) und RI-/SP-Nutzung gelten über Accounts hinweg."
+    },
+    {
+      "id": "bp-110",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Ab welchem Support-Plan ist ein dedizierter **Technical Account Manager (TAM)** enthalten?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Developer"
+        },
+        {
+          "id": "b",
+          "text": "Business"
+        },
+        {
+          "id": "c",
+          "text": "Enterprise On-Ramp"
+        },
+        {
+          "id": "d",
+          "text": "Enterprise"
+        }
+      ],
+      "correctAnswers": [
+        "d"
+      ],
+      "explanation": "Ein dedizierter TAM ist nur im Enterprise-Plan enthalten. Enterprise On-Ramp bietet einen Pool-TAM. Hinweis: AWS baut die Support-Plans 2025/26 um – Enterprise On-Ramp läuft zum 1. Januar 2027 aus, Business wird durch Business Support+ ($29/Monat) ersetzt. Das CLF-C02-Exam testet aber weiterhin das klassische 4-Plan-Modell (Basic, Developer, Business, Enterprise)."
+    },
+    {
+      "id": "bp-111",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher AWS-Service setzt automatisch eine Benachrichtigung ab, wenn die monatlichen Kosten einen vordefinierten Schwellenwert überschreiten?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Cost Explorer"
+        },
+        {
+          "id": "b",
+          "text": "Trusted Advisor"
+        },
+        {
+          "id": "c",
+          "text": "AWS Budgets"
+        },
+        {
+          "id": "d",
+          "text": "CloudWatch Metrics"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "AWS Budgets löst Benachrichtigungen bei Überschreitung von Budget-Schwellen aus."
+    },
+    {
+      "id": "bp-112",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welches Feature ist **KEIN** Bestandteil des Basic-Support-Plans?",
+      "options": [
+        {
+          "id": "a",
+          "text": "24/7 Kundenservice für Account- und Billing-Fragen"
+        },
+        {
+          "id": "b",
+          "text": "AWS Trusted Advisor – Core Checks"
+        },
+        {
+          "id": "c",
+          "text": "Zugriff auf AWS Documentation und Whitepapers"
+        },
+        {
+          "id": "d",
+          "text": "Zugriff auf einen Technical Account Manager (TAM)"
+        }
+      ],
+      "correctAnswers": [
+        "d"
+      ],
+      "explanation": "TAM ist erst ab Enterprise enthalten. Basic Support enthält nur Billing-Support und die 7 Core Trusted-Advisor-Checks."
+    },
+    {
+      "id": "bp-113",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Ein Kunde hat Oracle-Software mit einer Lizenz, die an **physische Sockel** gebunden ist, und möchte diese in AWS nutzen. Welche Option erfüllt die Lizenzbedingungen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Standard On-Demand EC2"
+        },
+        {
+          "id": "b",
+          "text": "Spot Instances"
+        },
+        {
+          "id": "c",
+          "text": "Dedicated Hosts"
+        },
+        {
+          "id": "d",
+          "text": "Lambda"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Dedicated Hosts geben Sichtbarkeit auf physische Sockel/Cores und erlauben BYOL für sockel-gebundene Lizenzen."
+    },
+    {
+      "id": "bp-114",
+      "category": "billing-pricing",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was ist der AWS Free Tier?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ein dauerhaft kostenloser Support-Plan"
+        },
+        {
+          "id": "b",
+          "text": "Kostenloses Kontingent für neue Accounts (12-Monate, Always Free, Trials)"
+        },
+        {
+          "id": "c",
+          "text": "Ein Rabatt von 50 % auf alle Services im ersten Monat"
+        },
+        {
+          "id": "d",
+          "text": "Ein kostenloser Zugang zu AWS Marketplace"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Der Free Tier hat drei Typen: 12-Monate-Trials (z. B. t2.micro), Always Free (z. B. Lambda 1M Req) und Short-Term Trials."
+    },
+    {
+      "id": "bp-115",
+      "category": "billing-pricing",
+      "type": "multiple",
+      "difficulty": "medium",
+      "question": "Welche ZWEI Services sind vom **Gateway VPC Endpoint** abgedeckt – und damit ohne Internet-Traffic-Kosten erreichbar?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon S3"
+        },
+        {
+          "id": "b",
+          "text": "AWS KMS"
+        },
+        {
+          "id": "c",
+          "text": "Amazon DynamoDB"
+        },
+        {
+          "id": "d",
+          "text": "Amazon SQS"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "c"
+      ],
+      "explanation": "Gateway Endpoints unterstützen nur S3 und DynamoDB. Alles andere braucht Interface Endpoints (Interface = kostet)."
+    },
+    {
+      "id": "sup-101",
+      "category": "support-resources",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welche Plattform ist die offizielle **Community-Q&A** von AWS (Nachfolger der alten AWS Forums)?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Knowledge Center"
+        },
+        {
+          "id": "b",
+          "text": "AWS re:Post"
+        },
+        {
+          "id": "c",
+          "text": "AWS Trusted Advisor"
+        },
+        {
+          "id": "d",
+          "text": "AWS IQ"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS re:Post ist die moderierte Community-Q&A-Plattform, kostenlos nutzbar."
+    },
+    {
+      "id": "sup-102",
+      "category": "support-resources",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welche Dienstleistung wird **vom AWS Partner Network (APN)** erbracht?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS betreibt den Account des Kunden rund um die Uhr"
+        },
+        {
+          "id": "b",
+          "text": "Zertifizierte Consulting- und Technology-Partner bieten Beratung und Software-Integrationen an"
+        },
+        {
+          "id": "c",
+          "text": "AWS verhandelt Savings-Plan-Rabatte im Namen des Kunden"
+        },
+        {
+          "id": "d",
+          "text": "AWS schickt einen dedizierten TAM"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "APN ist das Partner-Ökosystem mit Consulting- und Technology-Partnern in verschiedenen Stufen."
+    },
+    {
+      "id": "sup-103",
+      "category": "support-resources",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Ein Kunde möchte, dass AWS seine Produktions-Workloads **direkt betreibt** (Patching, Monitoring, Incident Response). Welcher Service passt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Professional Services"
+        },
+        {
+          "id": "b",
+          "text": "AWS Managed Services (AMS)"
+        },
+        {
+          "id": "c",
+          "text": "AWS IQ"
+        },
+        {
+          "id": "d",
+          "text": "AWS Trusted Advisor"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AMS übernimmt den operativen Betrieb. ProServe berät/baut, AMS betreibt."
+    },
+    {
+      "id": "sup-104",
+      "category": "support-resources",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Ein Startup braucht kurzfristig einen zertifizierten AWS-Freelancer für ein kleines 2-Tage-Projekt. Welche Plattform ist dafür gedacht?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Marketplace"
+        },
+        {
+          "id": "b",
+          "text": "AWS IQ"
+        },
+        {
+          "id": "c",
+          "text": "AWS Trusted Advisor"
+        },
+        {
+          "id": "d",
+          "text": "AWS re:Post"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS IQ ist der Marktplatz für kurzfristige, projektbezogene Hilfe von Freelancern und kleinen Partnern."
+    },
+    {
+      "id": "sup-105",
+      "category": "support-resources",
+      "type": "multiple",
+      "difficulty": "easy",
+      "question": "Welche DREI Ressourcen sind kostenlos und benötigen **keinen** kostenpflichtigen Support-Plan?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Documentation"
+        },
+        {
+          "id": "b",
+          "text": "AWS Whitepapers"
+        },
+        {
+          "id": "c",
+          "text": "Technical Account Manager"
+        },
+        {
+          "id": "d",
+          "text": "AWS Knowledge Center"
+        },
+        {
+          "id": "e",
+          "text": "AWS re:Post"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b",
+        "d",
+        "e"
+      ],
+      "explanation": "Doku, Whitepapers, Knowledge Center und re:Post sind kostenlos. TAM ist erst ab Enterprise Support enthalten."
+    },
+    {
+      "id": "sup-106",
+      "category": "support-resources",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Aussage über AWS Professional Services ist **richtig**?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Es handelt sich um ein externes Partner-Programm"
+        },
+        {
+          "id": "b",
+          "text": "Es ist eine kostenlose Beratungsleistung für Free-Tier-Kunden"
+        },
+        {
+          "id": "c",
+          "text": "Es ist das AWS-eigene Beraterteam für große Migrationen und Architekturen"
+        },
+        {
+          "id": "d",
+          "text": "Es ersetzt den AWS Business Support"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Professional Services (ProServe) ist AWS-intern. Arbeitet oft mit APN-Partnern zusammen."
+    },
+    {
+      "id": "an-101",
+      "category": "advanced-networking",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Ein EC2 in einem privaten Subnet soll **privat und kostenlos** auf S3 zugreifen. Welche Komponente ist optimal?",
+      "options": [
+        {
+          "id": "a",
+          "text": "NAT Gateway"
+        },
+        {
+          "id": "b",
+          "text": "Internet Gateway"
+        },
+        {
+          "id": "c",
+          "text": "Gateway VPC Endpoint"
+        },
+        {
+          "id": "d",
+          "text": "Interface VPC Endpoint"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Gateway Endpoints sind kostenlos, über die Route Table konfiguriert und decken S3 sowie DynamoDB ab."
+    },
+    {
+      "id": "an-102",
+      "category": "advanced-networking",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Aussage zum **Interface VPC Endpoint** ist korrekt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Er ist kostenlos"
+        },
+        {
+          "id": "b",
+          "text": "Er ist nur für S3 und DynamoDB verfügbar"
+        },
+        {
+          "id": "c",
+          "text": "Er legt eine ENI mit privater IP im Subnet an und kostet pro Stunde + GB"
+        },
+        {
+          "id": "d",
+          "text": "Er ersetzt das Internet Gateway"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Interface Endpoints basieren auf PrivateLink, nutzen eine ENI und decken viele Services ab – kosten aber Stunde + Datenvolumen."
+    },
+    {
+      "id": "an-103",
+      "category": "advanced-networking",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service liefert **zwei statische Anycast-IP-Adressen** und leitet Traffic über das AWS-Backbone zum nächstgelegenen Backend weltweit?",
+      "options": [
+        {
+          "id": "a",
+          "text": "CloudFront"
+        },
+        {
+          "id": "b",
+          "text": "Global Accelerator"
+        },
+        {
+          "id": "c",
+          "text": "Route 53"
+        },
+        {
+          "id": "d",
+          "text": "Direct Connect"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Global Accelerator bietet statische Anycast-IPs und optimiertes Routing über das AWS-Backbone."
+    },
+    {
+      "id": "an-104",
+      "category": "advanced-networking",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was unterscheidet **AWS Global Accelerator** von **CloudFront**?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Global Accelerator macht HTTP-Caching, CloudFront nicht"
+        },
+        {
+          "id": "b",
+          "text": "CloudFront ist für TCP/UDP, Global Accelerator für HTTP"
+        },
+        {
+          "id": "c",
+          "text": "Global Accelerator ist für TCP/UDP und bietet statische IPs; CloudFront ist ein HTTP/HTTPS-CDN mit Caching"
+        },
+        {
+          "id": "d",
+          "text": "Beide machen dasselbe, Global Accelerator ist nur teurer"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Global Accelerator ist kein CDN – es cached nicht, sondern routet TCP/UDP-Traffic optimal über das AWS-Backbone."
+    },
+    {
+      "id": "an-105",
+      "category": "advanced-networking",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welche Technologie steht **hinter** AWS Interface Endpoints und erlaubt es auch Drittanbietern, Services privat zur Verfügung zu stellen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "VPC Peering"
+        },
+        {
+          "id": "b",
+          "text": "AWS PrivateLink"
+        },
+        {
+          "id": "c",
+          "text": "Transit Gateway"
+        },
+        {
+          "id": "d",
+          "text": "VPN CloudHub"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS PrivateLink ist die zugrundeliegende Technologie. Service-Provider exponieren einen NLB, Consumer verbinden sich via Interface Endpoint."
+    },
+    {
+      "id": "an-106",
+      "category": "advanced-networking",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI Aussagen über VPC Endpoints sind korrekt?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Gateway Endpoints kosten pro Stunde"
+        },
+        {
+          "id": "b",
+          "text": "Gateway Endpoints werden über die Route Table konfiguriert"
+        },
+        {
+          "id": "c",
+          "text": "Interface Endpoints legen eine ENI im Subnet an"
+        },
+        {
+          "id": "d",
+          "text": "Interface Endpoints sind kostenlos"
+        }
+      ],
+      "correctAnswers": [
+        "b",
+        "c"
+      ],
+      "explanation": "Gateway Endpoints: Route Table, kostenlos. Interface Endpoints: ENI + kostenpflichtig."
+    },
+    {
+      "id": "gt-101",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Ein Unternehmen hat bereits ein On-Premise Active Directory und möchte seinen Entwicklern per SSO Zugang zur AWS-Konsole geben, **ohne** das AD nach AWS zu replizieren. Welche Directory-Service-Variante ist passend?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Managed Microsoft AD"
+        },
+        {
+          "id": "b",
+          "text": "AD Connector"
+        },
+        {
+          "id": "c",
+          "text": "Simple AD"
+        },
+        {
+          "id": "d",
+          "text": "Cognito User Pool"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AD Connector ist ein Proxy zum existierenden On-Prem-AD. Nichts wird in AWS gespeichert."
+    },
+    {
+      "id": "gt-102",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was ist der Hauptunterschied zwischen **AWS IAM Identity Center** und **AWS Directory Service**?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Beide sind identisch"
+        },
+        {
+          "id": "b",
+          "text": "Identity Center ist ein SSO-Portal für AWS-Console/SaaS, Directory Service stellt das Directory für Windows-Workloads bereit"
+        },
+        {
+          "id": "c",
+          "text": "Identity Center ersetzt IAM komplett"
+        },
+        {
+          "id": "d",
+          "text": "Directory Service ist kostenlos, Identity Center kostenpflichtig"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Identity Center = SSO. Directory Service = eigentlicher AD-Dienst. Directory Service kann Identitätsquelle für Identity Center sein."
+    },
+    {
+      "id": "gt-103",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Welcher Service ermöglicht es, **Ressourcen wie VPC-Subnets oder Transit Gateways** zwischen mehreren AWS-Accounts zu teilen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Organizations"
+        },
+        {
+          "id": "b",
+          "text": "AWS Resource Access Manager (RAM)"
+        },
+        {
+          "id": "c",
+          "text": "AWS Control Tower"
+        },
+        {
+          "id": "d",
+          "text": "AWS Config"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "RAM teilt ausgewählte Ressourcen kostenlos über Accounts, ohne Duplikate."
+    },
+    {
+      "id": "gt-104",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service bietet **einen zentralen, policy-basierten Backup-Service** über viele AWS-Services hinweg (EBS, RDS, EFS, DynamoDB, FSx …)?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon S3 Glacier"
+        },
+        {
+          "id": "b",
+          "text": "AWS Backup"
+        },
+        {
+          "id": "c",
+          "text": "Storage Gateway"
+        },
+        {
+          "id": "d",
+          "text": "Snapshot Manager"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS Backup ist der zentrale Backup-Service mit Backup Plans, Vaults und Cross-Region/Cross-Account-Copy."
+    },
+    {
+      "id": "gt-105",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welcher Service **orchestriert** mehrere Lambda-Funktionen und andere Services als Workflow mit Retry, Error-Handling und Parallelisierung?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Amazon SQS"
+        },
+        {
+          "id": "b",
+          "text": "Amazon SNS"
+        },
+        {
+          "id": "c",
+          "text": "AWS Step Functions"
+        },
+        {
+          "id": "d",
+          "text": "Amazon EventBridge"
+        }
+      ],
+      "correctAnswers": [
+        "c"
+      ],
+      "explanation": "Step Functions definieren State Machines. SQS puffert, SNS fan-out, EventBridge routet Events – aber kein Workflow-Zustand."
+    },
+    {
+      "id": "gt-106",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "easy",
+      "question": "Was ist **AWS Marketplace**?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ein interner Produktkatalog innerhalb eines Accounts"
+        },
+        {
+          "id": "b",
+          "text": "Ein digitaler Store für Software, SaaS und Daten von Drittanbietern mit Abrechnung über die AWS-Rechnung"
+        },
+        {
+          "id": "c",
+          "text": "Der AWS Support-Plan-Store"
+        },
+        {
+          "id": "d",
+          "text": "Ein Reseller-Programm für AWS-Partner"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Marketplace = externer Store. Abrechnung läuft über die AWS-Rechnung, BYOL und Private Offers möglich."
+    },
+    {
+      "id": "gt-107",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Ein Unternehmen möchte, dass Entwickler nur **genehmigte, standardisierte Produkte** selbst-bedient starten dürfen. Welcher Service eignet sich?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Marketplace"
+        },
+        {
+          "id": "b",
+          "text": "AWS Service Catalog"
+        },
+        {
+          "id": "c",
+          "text": "AWS Organizations"
+        },
+        {
+          "id": "d",
+          "text": "AWS Control Tower"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Service Catalog erlaubt Admins, genehmigte CloudFormation-basierte Produkte bereitzustellen und Self-Service mit Governance zu verbinden."
+    },
+    {
+      "id": "gt-108",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Was ist der Unterschied zwischen **Marketplace** und **Service Catalog**?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Marketplace ist interner, Service Catalog externer Katalog"
+        },
+        {
+          "id": "b",
+          "text": "Marketplace ist der externe Store, Service Catalog der interne kuratierte Katalog der Organisation"
+        },
+        {
+          "id": "c",
+          "text": "Beide sind das gleiche Produkt"
+        },
+        {
+          "id": "d",
+          "text": "Marketplace ist kostenlos, Service Catalog kostenpflichtig"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Marketplace = außen (Drittanbieter). Service Catalog = innen (eigene kuratierte Produkte)."
+    },
+    {
+      "id": "gt-109",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Welcher Service hilft, die **Nutzung von BYOL-Softwarelizenzen** (z. B. Microsoft, Oracle) zentral zu verfolgen und Überschreitungen zu verhindern?",
+      "options": [
+        {
+          "id": "a",
+          "text": "AWS Trusted Advisor"
+        },
+        {
+          "id": "b",
+          "text": "AWS License Manager"
+        },
+        {
+          "id": "c",
+          "text": "AWS Config"
+        },
+        {
+          "id": "d",
+          "text": "AWS Cost Explorer"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "License Manager definiert Regeln (z. B. vCPU-Grenzen) und blockiert den Start neuer Instanzen bei Überschreitung."
+    },
+    {
+      "id": "gt-110",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "hard",
+      "question": "Darf ein AWS-Kunde **eigenständig** einen Penetrationstest gegen seine EC2- und RDS-Instanzen durchführen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Ja, auch DoS-Tests, ohne Ankündigung"
+        },
+        {
+          "id": "b",
+          "text": "Ja, für 8 erlaubte Services (u. a. EC2, RDS, ELB, Lambda, CloudFront) ohne Voranmeldung – DoS/DDoS jedoch nur mit Genehmigung"
+        },
+        {
+          "id": "c",
+          "text": "Nein, Pen-Tests sind in AWS grundsätzlich verboten"
+        },
+        {
+          "id": "d",
+          "text": "Nur mit einem Enterprise-Support-Plan"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "AWS erlaubt Pen-Tests auf 8 definierte Services ohne Anmeldung. DoS/DDoS-Tests sind nur mit expliziter Genehmigung erlaubt. Hinweis: Die klassische '8-Services'-Liste ist eine Merkhilfe aus älteren AWS-Trainings; AWS spricht aktuell nur von einer 'Permitted Services'-Liste und verlangt für C2- sowie DoS/DDoS-Tests explizite Genehmigung. Für CLF-C02 reicht die Kernaussage: Pen-Tests auf eigene Ressourcen sind erlaubt, DoS/DDoS nur mit Genehmigung."
+    },
+    {
+      "id": "gt-111",
+      "category": "gap-topics",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Wie meldet man Missbrauch (Spam, Port-Scans, Malware), der **von einer AWS-IP** ausgeht?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Man öffnet einen Support-Fall im AWS Business Support"
+        },
+        {
+          "id": "b",
+          "text": "Man meldet es an abuse@amazonaws.com"
+        },
+        {
+          "id": "c",
+          "text": "Man kontaktiert den TAM"
+        },
+        {
+          "id": "d",
+          "text": "Man meldet es über GuardDuty"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Das AWS Trust & Safety Team erreicht man unter abuse@amazonaws.com."
+    },
+    {
+      "id": "gt-112",
+      "category": "gap-topics",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche ZWEI Ressourcen können typischerweise über **AWS RAM** zwischen Accounts geteilt werden?",
+      "options": [
+        {
+          "id": "a",
+          "text": "IAM-Users"
+        },
+        {
+          "id": "b",
+          "text": "VPC-Subnets"
+        },
+        {
+          "id": "c",
+          "text": "Transit Gateway"
+        },
+        {
+          "id": "d",
+          "text": "EC2-Instanzen direkt"
+        }
+      ],
+      "correctAnswers": [
+        "b",
+        "c"
+      ],
+      "explanation": "RAM teilt u. a. Subnets, TGW, Route 53 Resolver Rules und License Manager Configurations. Users teilt man nicht."
     }
   ]
 }
