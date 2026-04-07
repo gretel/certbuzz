@@ -8,7 +8,7 @@ interface Session {
   status: 'active' | 'finished';
   totalQuestions: number;
   playerCount: number;
-  gameMode: 'racing' | 'buzzer' | 'training';
+  gameMode: 'racing' | 'buzzer' | 'training' | 'exam';
   gameState: string;
   questionBank: string;
   questionBankLabel: string;
@@ -114,7 +114,10 @@ export function Home() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">
-                        {session.gameMode === 'buzzer' ? '🔔' : '🏎️'}
+                        {session.gameMode === 'buzzer' ? '🔔'
+                          : session.gameMode === 'training' ? '🧠'
+                          : session.gameMode === 'exam' ? '🎓'
+                          : '🏎️'}
                       </span>
                       <div>
                         <code className="text-2xl font-mono font-black text-white group-hover:text-cb-accent transition-colors">
@@ -129,7 +132,10 @@ export function Home() {
                             {getStateLabel(session.gameState)}
                           </span>
                           <span className="text-xs text-white/50">
-                            {session.gameMode === 'buzzer' ? 'Buzzer-Modus' : session.gameMode === 'training' ? 'Team Training' : 'Racing-Modus'}
+                            {session.gameMode === 'buzzer' ? 'Buzzer-Modus'
+                              : session.gameMode === 'training' ? 'Team Training'
+                              : session.gameMode === 'exam' ? 'Prüfungssimulation'
+                              : 'Racing-Modus'}
                           </span>
                         </div>
                       </div>

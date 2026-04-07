@@ -7,6 +7,7 @@ import { MultipleChoice } from '../components/game/MultipleChoice';
 import { OrderQuestion } from '../components/game/OrderQuestion';
 import { BuzzerGameSession } from './BuzzerGameSession';
 import { TrainingGameSession } from './TrainingGameSession';
+import { ExamGameSession } from './ExamGameSession';
 import { MarkdownText } from '../components/shared/MarkdownText';
 
 interface Question {
@@ -31,7 +32,7 @@ interface SessionData {
   status: string;
   totalQuestions: number;
   questions: Question[];
-  gameMode: 'racing' | 'buzzer' | 'training';
+  gameMode: 'racing' | 'buzzer' | 'training' | 'exam';
   gameState: string;
   questionBank?: string;
   examInfo?: ExamInfo;
@@ -359,6 +360,19 @@ export function GameSession() {
         playerId={playerId}
         nickname={nickname}
         emoji={emoji}
+      />
+    );
+  }
+
+  if (sessionData.gameMode === 'exam') {
+    return (
+      <ExamGameSession
+        sessionCode={code!}
+        totalQuestions={sessionData.totalQuestions}
+        playerId={playerId}
+        nickname={nickname}
+        emoji={emoji}
+        questions={sessionData.questions}
       />
     );
   }

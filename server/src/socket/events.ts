@@ -22,6 +22,7 @@ import {
   getTrainingGame,
   initTrainingGame,
 } from './trainingGame.js';
+import { submitExamAnswer, type ExamAnswerPayload } from './examGame.js';
 
 export function broadcastLeaderboard(io: Server, sessionCode: string) {
   const leaderboard = queries.getLeaderboard(sessionCode);
@@ -387,6 +388,22 @@ export function setupSocketHandlers(io: Server) {
           score: p.score,
         })),
       });
+    });
+
+    // ========== EXAM MODE EVENTS ==========
+
+    socket.on('submit-exam-answer', (payload: ExamAnswerPayload, ack?: (res: any) => void) => {
+      try {
+        const result = submitExamAnswer(payload);
+        if (ack) ack(result);
+        // Also emit as a named event so clients that don't use ack callbacks still get it
+        socket.emit('exam-answer-ack', result);
+      } catch (err: any) {
+        console.error('[exam] submit-exam-answer error:', err);
+        const res = { ok: false, error: err?.message ?? 'unknown error' };
+        if (ack) ack(res);
+        socket.emit('exam-answer-ack', res);
+      }
     });
 
     socket.on('disconnect', () => {
