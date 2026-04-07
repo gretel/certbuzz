@@ -372,7 +372,6 @@ export function GameSession() {
         playerId={playerId}
         nickname={nickname}
         emoji={emoji}
-        questions={sessionData.questions}
       />
     );
   }

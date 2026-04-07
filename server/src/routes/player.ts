@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { queries } from '../db/queries.js';
 import { getRandomEmoji } from '../utils/helpers.js';
 import { io } from '../server.js';
-import { finalizeExam, getExamResults } from '../socket/examGame.js';
+import { finalizeExam, getExamResults, getPlayerExamQuestions, restartExam } from '../socket/examGame.js';
 import { getExamInfo } from '../questions/questionBank.js';
 
 const router = Router();
@@ -180,6 +180,40 @@ router.get('/:playerId/exam-review', (req, res) => {
   } catch (err: any) {
     console.error('[exam] exam-review error:', err);
     res.status(500).json({ error: err?.message ?? 'fetch failed' });
+  }
+});
+
+// GET /api/player/:playerId/exam-questions — full Question objects for this player
+// (uses per-player override after a retake, falls back to session questions)
+router.get('/:playerId/exam-questions', (req, res) => {
+  try {
+    const { playerId } = req.params;
+    const player = queries.getPlayer(playerId);
+    if (!player) return res.status(404).json({ error: 'player not found' });
+
+    const session = queries.getSession(player.sessionCode);
+    if (!session) return res.status(404).json({ error: 'session not found' });
+    if (session.gameMode !== 'exam') {
+      return res.status(400).json({ error: 'not an exam session' });
+    }
+
+    const questions = getPlayerExamQuestions(playerId);
+    res.json({ questions, totalQuestions: questions.length });
+  } catch (err: any) {
+    console.error('[exam] exam-questions error:', err);
+    res.status(500).json({ error: err?.message ?? 'fetch failed' });
+  }
+});
+
+// POST /api/player/:playerId/exam-restart — fresh question sample + reset progress
+router.post('/:playerId/exam-restart', (req, res) => {
+  try {
+    const { playerId } = req.params;
+    const result = restartExam(playerId);
+    res.json(result);
+  } catch (err: any) {
+    console.error('[exam] exam-restart error:', err);
+    res.status(500).json({ error: err?.message ?? 'restart failed' });
   }
 });
 

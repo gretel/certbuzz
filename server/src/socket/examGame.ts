@@ -1,6 +1,69 @@
 import { queries } from '../db/queries.js';
-import { getQuestion, getExamInfo, type Question, type ExamDomain } from '../questions/questionBank.js';
+import { getQuestion, getExamInfo, sampleExamQuestions, type Question, type ExamDomain } from '../questions/questionBank.js';
 import { checkAnswer } from '../utils/helpers.js';
+
+/**
+ * Resolve the effective exam question ID list for a player. Falls back from
+ * per-player overrides to session-wide IDs:
+ *   1. If player.question_ids is set (after a retake), use those.
+ *   2. Otherwise, use the session.questionIds (the original sampled set).
+ *
+ * The first attempt always uses the session-wide list; only retakes get a
+ * per-player override.
+ */
+export function getEffectivePlayerQuestionIds(playerId: string): string[] {
+  const player = queries.getPlayer(playerId);
+  if (!player) throw new Error('player not found');
+
+  if (player.questionIds && player.questionIds.length > 0) {
+    return player.questionIds;
+  }
+
+  const session = queries.getSession(player.sessionCode);
+  if (!session) throw new Error('session not found');
+  return session.questionIds;
+}
+
+/**
+ * Resolve full Question objects for a player's exam.
+ */
+export function getPlayerExamQuestions(playerId: string): Question[] {
+  const player = queries.getPlayer(playerId);
+  if (!player) throw new Error('player not found');
+
+  const session = queries.getSession(player.sessionCode);
+  if (!session) throw new Error('session not found');
+
+  const ids = getEffectivePlayerQuestionIds(playerId);
+  const questions: Question[] = [];
+  for (const id of ids) {
+    const q = getQuestion(session.questionBank, id);
+    if (q) questions.push(q);
+  }
+  return questions;
+}
+
+/**
+ * Restart a player's exam with a freshly sampled question set.
+ * Re-samples 65 questions, stores them as a per-player override, then
+ * resets player_answers / progress / score / finished_at / exam_started_at.
+ */
+export function restartExam(playerId: string): { ok: boolean; questionCount: number } {
+  const player = queries.getPlayer(playerId);
+  if (!player) throw new Error('player not found');
+
+  const session = queries.getSession(player.sessionCode);
+  if (!session) throw new Error('session not found');
+  if (session.gameMode !== 'exam') {
+    throw new Error('not an exam session');
+  }
+
+  const freshIds = sampleExamQuestions(session.questionBank);
+  queries.setPlayerQuestionIds(playerId, freshIds);
+  queries.resetPlayerExamState(playerId);
+
+  return { ok: true, questionCount: freshIds.length };
+}
 
 export interface ExamAnswerPayload {
   sessionCode: string;

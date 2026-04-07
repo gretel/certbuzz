@@ -28,6 +28,7 @@ export interface Player {
   lastActivity: number;
   finishedAt?: number;
   examStartedAt?: number | null;
+  questionIds?: string[] | null;
 }
 
 export interface PlayerAnswer {
@@ -120,6 +121,7 @@ export const queries = {
     if (result.length === 0 || result[0].values.length === 0) return undefined;
 
     const row = result[0].values[0];
+    const rawQuestionIds = row[11] as string | null;
     return {
       playerId: row[0] as string,
       sessionCode: row[1] as string,
@@ -132,6 +134,7 @@ export const queries = {
       lastActivity: row[8] as number,
       finishedAt: row[9] as number | undefined,
       examStartedAt: row[10] as number | null,
+      questionIds: rawQuestionIds ? JSON.parse(rawQuestionIds) : null,
     };
   },
 
@@ -212,6 +215,7 @@ export const queries = {
     if (result.length === 0 || result[0].values.length === 0) return undefined;
 
     const row = result[0].values[0];
+    const rawQuestionIds = row[11] as string | null;
     return {
       playerId: row[0] as string,
       sessionCode: row[1] as string,
@@ -224,6 +228,7 @@ export const queries = {
       lastActivity: row[8] as number,
       finishedAt: row[9] as number | undefined,
       examStartedAt: row[10] as number | null,
+      questionIds: rawQuestionIds ? JSON.parse(rawQuestionIds) : null,
     };
   },
 
@@ -277,19 +282,23 @@ export const queries = {
     const result = db.exec(`SELECT * FROM players WHERE session_code = ? ORDER BY score DESC`, [sessionCode]);
     if (result.length === 0) return [];
 
-    return result[0].values.map((row: any) => ({
-      playerId: row[0] as string,
-      sessionCode: row[1] as string,
-      nickname: row[2] as string,
-      emoji: row[3] as string,
-      currentQuestion: row[4] as number,
-      correctAnswers: row[5] as number,
-      totalTimeSeconds: row[6] as number,
-      score: row[7] as number,
-      lastActivity: row[8] as number,
-      finishedAt: row[9] as number | undefined,
-      examStartedAt: row[10] as number | null,
-    }));
+    return result[0].values.map((row: any) => {
+      const rawQuestionIds = row[11] as string | null;
+      return {
+        playerId: row[0] as string,
+        sessionCode: row[1] as string,
+        nickname: row[2] as string,
+        emoji: row[3] as string,
+        currentQuestion: row[4] as number,
+        correctAnswers: row[5] as number,
+        totalTimeSeconds: row[6] as number,
+        score: row[7] as number,
+        lastActivity: row[8] as number,
+        finishedAt: row[9] as number | undefined,
+        examStartedAt: row[10] as number | null,
+        questionIds: rawQuestionIds ? JSON.parse(rawQuestionIds) : null,
+      };
+    });
   },
 
   updatePlayerScore: (playerId: string, correctAnswers: number, score: number) => {
@@ -495,5 +504,38 @@ export const queries = {
       correct: (row[5] as number) === 1,
       selectedAnswers: JSON.parse(row[6] as string),
     };
+  },
+
+  // Store a per-player exam question list (used by exam-restart for fresh sampling)
+  setPlayerQuestionIds: (playerId: string, questionIds: string[]) => {
+    const db = getDatabase();
+    db.run(
+      `UPDATE players
+       SET question_ids = ?, last_activity = ?
+       WHERE player_id = ?`,
+      [JSON.stringify(questionIds), Date.now(), playerId]
+    );
+    saveDatabase();
+  },
+
+  // Reset a player's exam state for a retake: clear answers, progress, score,
+  // finished_at, exam_started_at. Does NOT touch question_ids — caller decides
+  // whether to set fresh ones (exam-restart) or leave existing.
+  resetPlayerExamState: (playerId: string) => {
+    const db = getDatabase();
+    db.run(`DELETE FROM player_answers WHERE player_id = ?`, [playerId]);
+    db.run(
+      `UPDATE players
+       SET current_question = 0,
+           correct_answers = 0,
+           total_time_seconds = 0,
+           score = 0,
+           finished_at = NULL,
+           exam_started_at = NULL,
+           last_activity = ?
+       WHERE player_id = ?`,
+      [Date.now(), playerId]
+    );
+    saveDatabase();
   },
 };

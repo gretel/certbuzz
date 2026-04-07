@@ -24,7 +24,6 @@ interface ExamGameSessionProps {
   playerId: string;
   nickname: string;
   emoji: string;
-  questions: ExamQuestion[];
 }
 
 type Stage = 'loading' | 'pre-exam' | 'in-progress' | 'submitting' | 'results';
@@ -66,10 +65,9 @@ interface ExamResults {
 
 export function ExamGameSession({
   sessionCode,
-  totalQuestions,
+  totalQuestions: initialTotalQuestions,
   playerId,
   nickname,
-  questions,
 }: ExamGameSessionProps) {
   const [stage, setStage] = useState<Stage>('loading');
   const [examStartedAt, setExamStartedAt] = useState<number | null>(null);
@@ -81,37 +79,57 @@ export function ExamGameSession({
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [results, setResults] = useState<ExamResults | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  // Fetched per-player so retakes can swap questions without leaving the page
+  const [questions, setQuestions] = useState<ExamQuestion[]>([]);
+  const [totalQuestions, setTotalQuestions] = useState<number>(initialTotalQuestions);
 
   const remaining = useExamTimer(examStartedAt, durationMinutes);
 
-  // === RESUME: fetch exam state on mount ===
+  // Fetch this player's effective question list (per-player override after retake,
+  // or session-wide list on first attempt). Returns the questions array.
+  const loadQuestions = useCallback(async (): Promise<ExamQuestion[]> => {
+    const res = await fetch(`/api/player/${playerId}/exam-questions`);
+    if (!res.ok) throw new Error(`exam-questions HTTP ${res.status}`);
+    const data = await res.json();
+    setQuestions(data.questions);
+    setTotalQuestions(data.totalQuestions);
+    return data.questions;
+  }, [playerId]);
+
+  // === RESUME: fetch exam state + questions on mount ===
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/player/${playerId}/exam-state`);
-        if (!res.ok) throw new Error(`exam-state HTTP ${res.status}`);
-        const state: ExamStateResponse = await res.json();
+        // Always fetch state first to know which stage to render
+        const stateRes = await fetch(`/api/player/${playerId}/exam-state`);
+        if (!stateRes.ok) throw new Error(`exam-state HTTP ${stateRes.status}`);
+        const state: ExamStateResponse = await stateRes.json();
         if (cancelled) return;
 
         setDurationMinutes(state.durationMinutes);
 
         if (state.finishedAt) {
-          // Already submitted — fetch review
+          // Already submitted — fetch review only (questions are embedded in review.review[].question)
           const reviewRes = await fetch(`/api/player/${playerId}/exam-review`);
           if (!reviewRes.ok) throw new Error(`exam-review HTTP ${reviewRes.status}`);
           const reviewData: ExamResults = await reviewRes.json();
           if (cancelled) return;
           setResults(reviewData);
           setStage('results');
-        } else if (state.examStartedAt) {
-          // In progress — resume at the correct question
-          setExamStartedAt(state.examStartedAt);
-          setCurrentIndex(state.currentQuestion);
-          setQuestionStartMs(Date.now());
-          setStage('in-progress');
         } else {
-          setStage('pre-exam');
+          // pre-exam or in-progress — both need the question list
+          await loadQuestions();
+          if (cancelled) return;
+
+          if (state.examStartedAt) {
+            setExamStartedAt(state.examStartedAt);
+            setCurrentIndex(state.currentQuestion);
+            setQuestionStartMs(Date.now());
+            setStage('in-progress');
+          } else {
+            setStage('pre-exam');
+          }
         }
       } catch (err: any) {
         console.error('[exam] failed to fetch state', err);
@@ -119,7 +137,7 @@ export function ExamGameSession({
       }
     })();
     return () => { cancelled = true; };
-  }, [playerId]);
+  }, [playerId, loadQuestions]);
 
   // Reset per-question start time whenever the question index changes while in-progress
   useEffect(() => {
@@ -158,7 +176,34 @@ export function ExamGameSession({
     }
   }, [playerId]);
 
-  const handleSubmitAnswer = async () => {
+  // Restart the exam with a freshly sampled question set. Server resamples,
+  // overrides player.question_ids, and clears all progress.
+  const handleRestart = useCallback(async () => {
+    if (!confirm('Erneut versuchen? Du bekommst eine neue Auswahl von 65 Fragen. Dein bisheriges Ergebnis wird verworfen.')) {
+      return;
+    }
+    setStage('loading');
+    try {
+      const restartRes = await fetch(`/api/player/${playerId}/exam-restart`, { method: 'POST' });
+      if (!restartRes.ok) throw new Error(`exam-restart HTTP ${restartRes.status}`);
+
+      // Reload fresh questions and reset all client state
+      await loadQuestions();
+      setExamStartedAt(null);
+      setCurrentIndex(0);
+      setSelectedAnswers([]);
+      setQuestionStartMs(Date.now());
+      setResults(null);
+      setStage('pre-exam');
+    } catch (err: any) {
+      console.error('[exam] restart failed', err);
+      alert(`Fehler beim Neustart: ${err?.message ?? 'unbekannt'}`);
+      // Try to recover by going back to results
+      setStage('results');
+    }
+  }, [playerId, loadQuestions]);
+
+  const handleSubmitAnswer = useCallback(async () => {
     if (isSubmitting || selectedAnswers.length === 0) return;
     const question = questions[currentIndex];
     if (!question) return;
@@ -200,7 +245,64 @@ export function ExamGameSession({
     } else {
       setCurrentIndex(next);
     }
-  };
+  }, [
+    isSubmitting,
+    selectedAnswers,
+    questions,
+    currentIndex,
+    questionStartMs,
+    sessionCode,
+    playerId,
+    totalQuestions,
+    handleFinalize,
+  ]);
+
+  // Keyboard shortcuts during the exam: digits 1..9 select/toggle options,
+  // Enter submits the current answer. Order questions don't get number
+  // shortcuts (drag-and-drop), but Enter still advances if a valid order is set.
+  useEffect(() => {
+    if (stage !== 'in-progress') return;
+    const question = questions[currentIndex];
+    if (!question) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Don't hijack browser shortcuts or shortcuts inside text inputs
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      // Digit shortcut: select option by index (1 -> first option, 2 -> second, ...)
+      if (e.key >= '1' && e.key <= '9') {
+        const idx = parseInt(e.key, 10) - 1;
+        if (idx >= question.options.length) return;
+        const optId = question.options[idx].id;
+
+        if (question.type === 'single') {
+          e.preventDefault();
+          setSelectedAnswers([optId]);
+        } else if (question.type === 'multiple') {
+          e.preventDefault();
+          setSelectedAnswers(prev =>
+            prev.includes(optId) ? prev.filter(id => id !== optId) : [...prev, optId]
+          );
+        }
+        return;
+      }
+
+      // Enter: advance to next question / finalize on last
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (selectedAnswers.length > 0 && !isSubmitting) {
+          handleSubmitAnswer();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [stage, questions, currentIndex, selectedAnswers, isSubmitting, handleSubmitAnswer]);
 
   // ============ RENDER ============
 
@@ -335,6 +437,10 @@ export function ExamGameSession({
                 ? 'Prüfung beenden'
                 : 'Nächste Frage'}
           </button>
+
+          <div className="mt-3 text-center text-xs text-white/40">
+            Tipp: <kbd className="px-1.5 py-0.5 bg-white/10 rounded">1</kbd>–<kbd className="px-1.5 py-0.5 bg-white/10 rounded">{Math.min(9, question.options.length)}</kbd> Antwort wählen · <kbd className="px-1.5 py-0.5 bg-white/10 rounded">Enter</kbd> bestätigen
+          </div>
         </div>
 
         {/* Submit-early confirmation modal */}
@@ -445,12 +551,20 @@ export function ExamGameSession({
             </div>
           </div>
 
-          <button
-            onClick={() => (window.location.href = '/')}
-            className="w-full bg-cb-accent hover:brightness-110 py-3 rounded-lg font-bold"
-          >
-            Zurück zur Startseite
-          </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              onClick={handleRestart}
+              className="bg-yellow-600 hover:bg-yellow-500 text-white py-3 rounded-lg font-bold transition-all"
+            >
+              🔄 Erneut versuchen
+            </button>
+            <button
+              onClick={() => (window.location.href = '/')}
+              className="bg-cb-accent hover:brightness-110 py-3 rounded-lg font-bold"
+            >
+              Zurück zur Startseite
+            </button>
+          </div>
         </div>
       </div>
     );

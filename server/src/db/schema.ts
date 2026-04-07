@@ -48,6 +48,7 @@ export async function initializeDatabase() {
       last_activity INTEGER NOT NULL,
       finished_at INTEGER,
       exam_started_at INTEGER,
+      question_ids TEXT,
       FOREIGN KEY (session_code) REFERENCES sessions(session_code)
     );
 
@@ -197,6 +198,21 @@ export async function initializeDatabase() {
       console.log('✅ exam_started_at migration complete');
     } catch (e) {
       console.error('❌ exam_started_at migration failed:', e);
+    }
+  }
+
+  // Migration: Add per-player question_ids column for exam mode retake
+  // Re-read player columns since the previous migration may have added one
+  const playerColsAfter = db.exec(`PRAGMA table_info(players)`);
+  const hasPlayerQuestionIds = playerColsAfter.length > 0 &&
+    playerColsAfter[0].values.some((row: any) => row[1] === 'question_ids');
+  if (!hasPlayerQuestionIds) {
+    console.log('🔄 Migrating database: adding players.question_ids...');
+    try {
+      db.run(`ALTER TABLE players ADD COLUMN question_ids TEXT`);
+      console.log('✅ players.question_ids migration complete');
+    } catch (e) {
+      console.error('❌ players.question_ids migration failed:', e);
     }
   }
 
