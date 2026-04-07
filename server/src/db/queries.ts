@@ -1,6 +1,6 @@
 import { getDatabase, saveDatabase } from './schema.js';
 
-export type GameMode = 'racing' | 'buzzer' | 'training';
+export type GameMode = 'racing' | 'buzzer' | 'training' | 'exam';
 export type GameState = 'lobby' | 'question' | 'enrolling' | 'answering' | 'result' | 'finished';
 
 export interface GameSession {
@@ -27,6 +27,7 @@ export interface Player {
   score: number;
   lastActivity: number;
   finishedAt?: number;
+  examStartedAt?: number | null;
 }
 
 export interface PlayerAnswer {
@@ -130,6 +131,7 @@ export const queries = {
       score: row[7] as number,
       lastActivity: row[8] as number,
       finishedAt: row[9] as number | undefined,
+      examStartedAt: row[10] as number | null,
     };
   },
 
@@ -221,6 +223,7 @@ export const queries = {
       score: row[7] as number,
       lastActivity: row[8] as number,
       finishedAt: row[9] as number | undefined,
+      examStartedAt: row[10] as number | null,
     };
   },
 
@@ -285,6 +288,7 @@ export const queries = {
       score: row[7] as number,
       lastActivity: row[8] as number,
       finishedAt: row[9] as number | undefined,
+      examStartedAt: row[10] as number | null,
     }));
   },
 
@@ -410,5 +414,86 @@ export const queries = {
     db.run(`DELETE FROM player_answers`);
     db.run(`DELETE FROM players`);
     saveDatabase();
+  },
+
+  // ========== EXAM MODE HELPERS ==========
+
+  setExamStartedAt: (playerId: string) => {
+    const db = getDatabase();
+    db.run(
+      `UPDATE players
+       SET exam_started_at = ?, last_activity = ?
+       WHERE player_id = ? AND exam_started_at IS NULL`,
+      [Date.now(), Date.now(), playerId]
+    );
+    saveDatabase();
+  },
+
+  advanceExamPlayer: (playerId: string) => {
+    const db = getDatabase();
+    db.run(
+      `UPDATE players
+       SET current_question = current_question + 1,
+           last_activity = ?
+       WHERE player_id = ?`,
+      [Date.now(), playerId]
+    );
+    saveDatabase();
+  },
+
+  markPlayerFinished: (playerId: string, finalScore: number) => {
+    const db = getDatabase();
+    db.run(
+      `UPDATE players
+       SET finished_at = ?,
+           score = ?,
+           last_activity = ?
+       WHERE player_id = ?`,
+      [Date.now(), finalScore, Date.now(), playerId]
+    );
+    saveDatabase();
+  },
+
+  getPlayerAnswers: (playerId: string): PlayerAnswer[] => {
+    const db = getDatabase();
+    const result = db.exec(
+      `SELECT answer_id, player_id, question_id, answered_at, time_seconds, correct, selected_answers
+       FROM player_answers
+       WHERE player_id = ?
+       ORDER BY answered_at ASC`,
+      [playerId]
+    );
+    if (result.length === 0) return [];
+    return result[0].values.map((row: any) => ({
+      answerId: row[0] as number,
+      playerId: row[1] as string,
+      questionId: row[2] as string,
+      answeredAt: row[3] as number,
+      timeSeconds: row[4] as number,
+      correct: (row[5] as number) === 1,
+      selectedAnswers: JSON.parse(row[6] as string),
+    }));
+  },
+
+  getPlayerAnswerByQuestion: (playerId: string, questionId: string): PlayerAnswer | undefined => {
+    const db = getDatabase();
+    const result = db.exec(
+      `SELECT answer_id, player_id, question_id, answered_at, time_seconds, correct, selected_answers
+       FROM player_answers
+       WHERE player_id = ? AND question_id = ?
+       LIMIT 1`,
+      [playerId, questionId]
+    );
+    if (result.length === 0 || result[0].values.length === 0) return undefined;
+    const row = result[0].values[0];
+    return {
+      answerId: row[0] as number,
+      playerId: row[1] as string,
+      questionId: row[2] as string,
+      answeredAt: row[3] as number,
+      timeSeconds: row[4] as number,
+      correct: (row[5] as number) === 1,
+      selectedAnswers: JSON.parse(row[6] as string),
+    };
   },
 };
