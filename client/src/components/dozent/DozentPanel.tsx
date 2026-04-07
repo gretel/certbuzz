@@ -20,7 +20,7 @@ interface Session {
   status: 'active' | 'finished';
   totalQuestions: number;
   playerCount: number;
-  gameMode: 'racing' | 'buzzer' | 'training';
+  gameMode: 'racing' | 'buzzer' | 'training' | 'exam';
   gameState: string;
   questionBank?: string;
 }
@@ -48,7 +48,7 @@ interface BuzzerGameStatus {
   }>;
 }
 
-type GameMode = 'racing' | 'buzzer' | 'training';
+type GameMode = 'racing' | 'buzzer' | 'training' | 'exam';
 
 export function DozentPanel({ onLogout }: DozentPanelProps) {
   const socket = getSocket();
@@ -477,7 +477,8 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
   }, [socket, sessionCode]);
 
   const handleCreateSession = async () => {
-    if (selectedCategories.length === 0) {
+    // Exam mode skips category/count requirements — server fills from bank.meta.exam
+    if (gameMode !== 'exam' && selectedCategories.length === 0) {
       setError('Bitte wählen Sie mindestens eine Kategorie aus');
       return;
     }
@@ -490,10 +491,11 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           password: localStorage.getItem('dozent-password'),
-          totalQuestions: questionCount,
-          categories: selectedCategories,
+          // Exam mode: server pulls totalQuestions/categories from bank meta.exam
+          totalQuestions: gameMode === 'exam' ? undefined : questionCount,
+          categories: gameMode === 'exam' ? undefined : selectedCategories,
           gameMode: gameMode,
-          questionBank: selectedBank,
+          questionBank: gameMode === 'exam' ? 'clf-c02-complete' : selectedBank,
         }),
       });
 
@@ -731,7 +733,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                     <label className="block text-sm font-medium text-white/70 mb-3">
                       Spielmodus
                     </label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <button
                         type="button"
                         onClick={() => setGameMode('racing')}
@@ -777,54 +779,87 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                           Gemeinsam abstimmen mit Konfidenz-Tipp.
                         </div>
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setGameMode('exam')}
+                        className={`p-4 rounded-xl border-2 transition-all text-left ${
+                          gameMode === 'exam'
+                            ? 'border-yellow-400 bg-yellow-500/30 shadow-lg'
+                            : 'border-white/20 bg-white/5 hover:border-white/40'
+                        }`}
+                      >
+                        <div className="text-3xl mb-2">🎓</div>
+                        <div className="font-bold text-white">Prüfungssimulation</div>
+                        <div className="text-sm text-white/60 mt-1">
+                          AWS CLF-C02 · 65 Fragen · 90 Min
+                        </div>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Question Count */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-white/70 mb-2">
-                      Anzahl der Fragen
-                    </label>
-                    <input
-                      type="range"
-                      min="5"
-                      max="50"
-                      value={questionCount}
-                      onChange={(e) => setQuestionCount(Number(e.target.value))}
-                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-cb-accent"
-                    />
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-sm text-white/50">5</span>
-                      <span className="text-2xl font-bold text-cb-accent">{questionCount}</span>
-                      <span className="text-sm text-white/50">50</span>
+                  {gameMode === 'exam' ? (
+                    /* Exam mode: count and categories are auto-determined by bank metadata */
+                    <div className="mb-6 p-5 bg-yellow-500/10 border border-yellow-400/30 rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <div className="text-3xl">🎓</div>
+                        <div className="flex-1 text-sm text-white/80 space-y-1">
+                          <div><strong>AWS CLF-C02 Prüfungssimulation</strong></div>
+                          <div>📝 65 Fragen · ⏱️ 90 Minuten · 🎯 Bestehen ab 700/1000</div>
+                          <div>📊 Alle 4 AWS-Domänen anteilig (16/19/22/8)</div>
+                          <div>🚫 Keine Erklärungen während der Prüfung</div>
+                          <div>💤 Resumable — Spieler können pausieren und später fortsetzen</div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      {/* Question Count */}
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-white/70 mb-2">
+                          Anzahl der Fragen
+                        </label>
+                        <input
+                          type="range"
+                          min="5"
+                          max="50"
+                          value={questionCount}
+                          onChange={(e) => setQuestionCount(Number(e.target.value))}
+                          className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-cb-accent"
+                        />
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="text-sm text-white/50">5</span>
+                          <span className="text-2xl font-bold text-cb-accent">{questionCount}</span>
+                          <span className="text-sm text-white/50">50</span>
+                        </div>
+                      </div>
 
-                  {/* Categories */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-white/70 mb-3">
-                      Themenkomplexe
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {categories.map(category => (
-                        <button
-                          key={category.id}
-                          onClick={() => toggleCategory(category.id)}
-                          className={`p-3 rounded-lg text-left transition-all ${
-                            selectedCategories.includes(category.id)
-                              ? 'bg-cb-primary text-white shadow-md'
-                              : 'bg-white/10 text-white/70 hover:bg-white/20'
-                          }`}
-                        >
-                          <span className="text-xl mr-2">{category.icon}</span>
-                          <span className="text-sm font-medium">{category.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-sm text-white/50 mt-2">
-                      {selectedCategories.length} von {categories.length} ausgewählt
-                    </p>
-                  </div>
+                      {/* Categories */}
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-white/70 mb-3">
+                          Themenkomplexe
+                        </label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {categories.map(category => (
+                            <button
+                              key={category.id}
+                              onClick={() => toggleCategory(category.id)}
+                              className={`p-3 rounded-lg text-left transition-all ${
+                                selectedCategories.includes(category.id)
+                                  ? 'bg-cb-primary text-white shadow-md'
+                                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+                              }`}
+                            >
+                              <span className="text-xl mr-2">{category.icon}</span>
+                              <span className="text-sm font-medium">{category.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <p className="text-sm text-white/50 mt-2">
+                          {selectedCategories.length} von {categories.length} ausgewählt
+                        </p>
+                      </div>
+                    </>
+                  )}
 
                   {error && (
                     <div className="mb-4 p-4 bg-red-500/20 border border-red-400/30 rounded-lg text-red-300">
@@ -834,7 +869,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
 
                   <button
                     onClick={handleCreateSession}
-                    disabled={loading || selectedCategories.length === 0}
+                    disabled={loading || (gameMode !== 'exam' && selectedCategories.length === 0)}
                     className="w-full bg-gradient-to-r from-cb-primary to-cb-accent hover:from-cb-accent hover:to-cb-primary text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg"
                   >
                     {loading ? (
@@ -846,7 +881,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                         Erstelle Session...
                       </span>
                     ) : (
-                      `${gameMode === 'buzzer' ? '🔔' : gameMode === 'training' ? '🧠' : '🏎️'} Session starten`
+                      `${gameMode === 'buzzer' ? '🔔' : gameMode === 'training' ? '🧠' : gameMode === 'exam' ? '🎓' : '🏎️'} Session starten`
                     )}
                   </button>
                 </>
@@ -857,14 +892,14 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <span className="text-3xl">
-                          {createdGameMode === 'buzzer' ? '🔔' : createdGameMode === 'training' ? '🧠' : '🏎️'}
+                          {createdGameMode === 'buzzer' ? '🔔' : createdGameMode === 'training' ? '🧠' : createdGameMode === 'exam' ? '🎓' : '🏎️'}
                         </span>
                         <div>
                           <p className="text-green-300 font-bold text-lg">
                             Session aktiv
                           </p>
                           <p className="text-green-400/70 text-sm">
-                            {createdGameMode === 'buzzer' ? 'Buzzer-Modus' : createdGameMode === 'training' ? 'Team Training' : 'Racing-Modus'}
+                            {createdGameMode === 'buzzer' ? 'Buzzer-Modus' : createdGameMode === 'training' ? 'Team Training' : createdGameMode === 'exam' ? 'Prüfungssimulation' : 'Racing-Modus'}
                           </p>
                         </div>
                       </div>
