@@ -5,7 +5,37 @@
     "description": "134 Fragen zu allen CLF-C02 Domänen (1–4) inkl. W4 Billing/Pricing/Support und Lücken-Themen.",
     "exam": {
       "passPercent": 70,
-      "totalQuestions": 134,
+      "totalQuestions": 65,
+      "durationMinutes": 90,
+      "passingScore": 700,
+      "scaleMin": 100,
+      "scaleMax": 1000,
+      "domains": [
+        {
+          "id": "concepts",
+          "label": "Cloud Concepts",
+          "weight": 24,
+          "categories": ["cloud-concepts", "cloud-economics", "well-architected"]
+        },
+        {
+          "id": "security",
+          "label": "Security and Compliance",
+          "weight": 30,
+          "categories": ["shared-responsibility", "iam", "security-services", "compliance-governance"]
+        },
+        {
+          "id": "tech",
+          "label": "Cloud Technology and Services",
+          "weight": 34,
+          "categories": ["global-infra-compute", "storage-databases", "networking", "services-ml", "advanced-networking"]
+        },
+        {
+          "id": "billing",
+          "label": "Billing, Pricing, and Support",
+          "weight": 12,
+          "categories": ["billing-pricing", "support-resources"]
+        }
+      ],
       "info": "Die Prüfung umfasst 65 Fragen (50 gewertet + 15 ungewertet). Mindestpunktzahl: 700/1000 (ca. 70%). Fragetypen: Multiple Choice (1 richtig, 3 falsch) und Mehrfachantwort (2+ richtig aus 5+ Optionen). Raten ohne Abzüge möglich."
     },
     "categories": {
