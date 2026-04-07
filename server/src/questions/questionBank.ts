@@ -34,10 +34,23 @@ export interface Question {
   references?: string[];
 }
 
+export interface ExamDomain {
+  id: string;
+  label: string;
+  weight: number;         // 0-100, weights across all domains sum to 100
+  categories: string[];   // bank category slugs that belong to this domain
+}
+
 export interface ExamInfo {
   passPercent: number;
   totalQuestions: number;
   info: string;
+  // Optional exam-mode extensions — if absent, bank cannot be used in exam mode
+  durationMinutes?: number;
+  passingScore?: number;
+  scaleMin?: number;
+  scaleMax?: number;
+  domains?: ExamDomain[];
 }
 
 interface BankMeta {
@@ -117,4 +130,57 @@ export function getAvailableBanks(): BankMetadata[] {
       categories: getCategories(bankId),
     };
   });
+}
+
+// ========== EXAM MODE SAMPLING ==========
+
+/**
+ * Distribute a total count across domains proportionally to their weights
+ * using the largest-remainder (Hare quota) method. Always returns exactly
+ * `total` items summed across all domains.
+ *
+ * Tie-break: when two domains share the same fractional remainder, the one
+ * declared earlier in the input array wins the +1 allocation.
+ */
+export function computeProportionalCounts(
+  domains: ExamDomain[],
+  total: number
+): Record<string, number> {
+  if (domains.length === 0) return {};
+  if (total === 0) {
+    return Object.fromEntries(domains.map(d => [d.id, 0]));
+  }
+
+  const exact = domains.map((d, idx) => ({
+    id: d.id,
+    originalIndex: idx,
+    exactValue: (total * d.weight) / 100,
+  }));
+
+  const floored = exact.map(e => ({
+    id: e.id,
+    originalIndex: e.originalIndex,
+    count: Math.floor(e.exactValue),
+    remainder: e.exactValue - Math.floor(e.exactValue),
+  }));
+
+  const baseSum = floored.reduce((sum, f) => sum + f.count, 0);
+  const leftover = total - baseSum;
+
+  // Sort by remainder descending; ties broken by original declaration order
+  const sorted = [...floored].sort((a, b) => {
+    if (b.remainder !== a.remainder) return b.remainder - a.remainder;
+    return a.originalIndex - b.originalIndex;
+  });
+
+  for (let i = 0; i < leftover; i++) {
+    sorted[i].count += 1;
+  }
+
+  // Return in a stable map keyed by domain id (restore original order)
+  const result: Record<string, number> = {};
+  for (const d of domains) {
+    result[d.id] = sorted.find(s => s.id === d.id)!.count;
+  }
+  return result;
 }
