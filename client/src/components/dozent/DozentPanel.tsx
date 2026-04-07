@@ -789,7 +789,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                         }`}
                       >
                         <div className="text-3xl mb-2">🎓</div>
-                        <div className="font-bold text-white">Prüfungssimulation</div>
+                        <div className="font-bold text-white">Exam</div>
                         <div className="text-sm text-white/60 mt-1">
                           AWS CLF-C02 · 65 Fragen · 90 Min
                         </div>
@@ -803,7 +803,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                       <div className="flex items-start gap-3">
                         <div className="text-3xl">🎓</div>
                         <div className="flex-1 text-sm text-white/80 space-y-1">
-                          <div><strong>AWS CLF-C02 Prüfungssimulation</strong></div>
+                          <div><strong>AWS CLF-C02 — Exam</strong></div>
                           <div>📝 65 Fragen · ⏱️ 90 Minuten · 🎯 Bestehen ab 700/1000</div>
                           <div>📊 Alle 4 AWS-Domänen anteilig (16/19/22/8)</div>
                           <div>🚫 Keine Erklärungen während der Prüfung</div>
@@ -899,7 +899,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                             Session aktiv
                           </p>
                           <p className="text-green-400/70 text-sm">
-                            {createdGameMode === 'buzzer' ? 'Buzzer-Modus' : createdGameMode === 'training' ? 'Team Training' : createdGameMode === 'exam' ? 'Prüfungssimulation' : 'Racing-Modus'}
+                            {createdGameMode === 'buzzer' ? 'Buzzer-Modus' : createdGameMode === 'training' ? 'Team Training' : createdGameMode === 'exam' ? 'Exam' : 'Racing-Modus'}
                           </p>
                         </div>
                       </div>

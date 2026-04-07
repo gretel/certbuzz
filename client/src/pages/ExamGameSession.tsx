@@ -289,7 +289,7 @@ export function ExamGameSession({
             onClick={() => setShowSubmitConfirm(true)}
             className="bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded text-sm font-bold whitespace-nowrap"
           >
-            Abgeben
+            Beenden
           </button>
         </div>
 
@@ -332,7 +332,7 @@ export function ExamGameSession({
             {isSubmitting
               ? 'Speichern...'
               : isLast
-                ? 'Prüfung abgeben'
+                ? 'Prüfung beenden'
                 : 'Nächste Frage'}
           </button>
         </div>
@@ -341,7 +341,7 @@ export function ExamGameSession({
         {showSubmitConfirm && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-20">
             <div className="bg-cb-primary rounded-lg p-6 max-w-md text-white shadow-2xl">
-              <h2 className="text-xl font-bold mb-3">Prüfung wirklich abgeben?</h2>
+              <h2 className="text-xl font-bold mb-3">Prüfung wirklich beenden?</h2>
               <p className="text-sm opacity-80 mb-6">
                 Du bist bei Frage {currentIndex + 1} von {totalQuestions}. Die restlichen
                 Fragen zählen als falsch.
@@ -357,7 +357,7 @@ export function ExamGameSession({
                   onClick={() => { setShowSubmitConfirm(false); handleFinalize(); }}
                   className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded font-bold"
                 >
-                  Abgeben
+                  Beenden
                 </button>
               </div>
             </div>
@@ -376,7 +376,10 @@ export function ExamGameSession({
   }
 
   if (stage === 'results' && results) {
-    const minutes = Math.floor(results.elapsedSeconds / 60);
+    // mm:ss format so short test runs show meaningfully (e.g., 1:07 not "1 Minuten")
+    const elapsedMin = Math.floor(results.elapsedSeconds / 60);
+    const elapsedSec = results.elapsedSeconds % 60;
+    const elapsedFormatted = `${elapsedMin}:${elapsedSec.toString().padStart(2, '0')}`;
 
     return (
       <div className="min-h-screen bg-cb-dark text-white p-4">
@@ -398,7 +401,7 @@ export function ExamGameSession({
               {results.correctCount} von {results.totalQuestions} richtig ({results.percentage.toFixed(1)}%)
             </div>
             <div className="text-sm mt-2 opacity-70">
-              Dauer: {minutes} Minuten · Bestehensgrenze: {results.passingScore}
+              Verwendete Zeit: {elapsedFormatted} Minuten · Bestehensgrenze: {results.passingScore}
             </div>
           </div>
 
@@ -434,7 +437,7 @@ export function ExamGameSession({
 
           {/* Question review */}
           <div className="bg-white/10 backdrop-blur rounded-2xl border border-white/20 p-6">
-            <h2 className="text-xl font-bold mb-4">Fragen-Review ({results.review.length})</h2>
+            <h2 className="text-xl font-bold mb-4">Review ({results.review.length})</h2>
             <div className="space-y-3">
               {results.review.map((item, idx) => (
                 <ReviewCard key={item.question.id} index={idx} item={item} />
@@ -457,8 +460,8 @@ export function ExamGameSession({
 }
 
 function ReviewCard({ index, item }: { index: number; item: ReviewItem }) {
-  // Auto-expand the first few wrong answers so the user sees their biggest misses immediately
-  const [expanded, setExpanded] = useState(index < 3 && !item.correct);
+  // All cards start collapsed — user expands what they want to review
+  const [expanded, setExpanded] = useState(false);
   const q = item.question;
   const correctSet = new Set<string>(q.correctAnswers ?? []);
   const selectedSet = new Set<string>(item.selectedAnswers);
