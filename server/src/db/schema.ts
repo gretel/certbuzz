@@ -30,7 +30,7 @@ export async function initializeDatabase() {
       status TEXT NOT NULL CHECK(status IN ('active', 'finished')),
       total_questions INTEGER NOT NULL,
       question_ids TEXT NOT NULL,
-      game_mode TEXT NOT NULL DEFAULT 'racing' CHECK(game_mode IN ('racing', 'buzzer', 'training')),
+      game_mode TEXT NOT NULL DEFAULT 'racing' CHECK(game_mode IN ('racing', 'buzzer', 'training', 'exam')),
       game_state TEXT DEFAULT 'lobby' CHECK(game_state IN ('lobby', 'question', 'enrolling', 'answering', 'result', 'finished')),
       current_question_index INTEGER DEFAULT 0,
       question_bank TEXT NOT NULL DEFAULT 'azure-az104'
@@ -47,6 +47,7 @@ export async function initializeDatabase() {
       score REAL DEFAULT 0,
       last_activity INTEGER NOT NULL,
       finished_at INTEGER,
+      exam_started_at INTEGER,
       FOREIGN KEY (session_code) REFERENCES sessions(session_code)
     );
 
@@ -152,6 +153,50 @@ export async function initializeDatabase() {
       console.log('✅ training game_mode migration complete');
     } catch (e) {
       console.error('❌ training migration failed:', e);
+    }
+  }
+
+  // Migration: Add 'exam' to game_mode CHECK constraint
+  const tableInfo3 = db.exec(`SELECT sql FROM sqlite_master WHERE type='table' AND name='sessions'`);
+  const tableSql3 = tableInfo3.length > 0 ? (tableInfo3[0].values[0][0] as string) : '';
+  const needsExamMigration = tableSql3.includes('game_mode') && !tableSql3.includes("'exam'");
+  if (needsExamMigration) {
+    console.log('🔄 Migrating database: adding exam game_mode...');
+    try {
+      db.run(`ALTER TABLE sessions RENAME TO sessions_old_exam`);
+      db.run(`
+        CREATE TABLE sessions (
+          session_code TEXT PRIMARY KEY,
+          created_at INTEGER NOT NULL,
+          started_at INTEGER NOT NULL,
+          status TEXT NOT NULL CHECK(status IN ('active', 'finished')),
+          total_questions INTEGER NOT NULL,
+          question_ids TEXT NOT NULL,
+          game_mode TEXT NOT NULL DEFAULT 'racing' CHECK(game_mode IN ('racing', 'buzzer', 'training', 'exam')),
+          game_state TEXT DEFAULT 'lobby' CHECK(game_state IN ('lobby', 'question', 'enrolling', 'answering', 'result', 'finished')),
+          current_question_index INTEGER DEFAULT 0,
+          question_bank TEXT NOT NULL DEFAULT 'azure-az104'
+        )
+      `);
+      db.run(`INSERT INTO sessions SELECT * FROM sessions_old_exam`);
+      db.run(`DROP TABLE sessions_old_exam`);
+      console.log('✅ exam game_mode migration complete');
+    } catch (e) {
+      console.error('❌ exam migration failed:', e);
+    }
+  }
+
+  // Migration: Add exam_started_at column to players if missing
+  const playerCols = db.exec(`PRAGMA table_info(players)`);
+  const hasExamStartedAt = playerCols.length > 0 &&
+    playerCols[0].values.some((row: any) => row[1] === 'exam_started_at');
+  if (!hasExamStartedAt) {
+    console.log('🔄 Migrating database: adding players.exam_started_at...');
+    try {
+      db.run(`ALTER TABLE players ADD COLUMN exam_started_at INTEGER`);
+      console.log('✅ exam_started_at migration complete');
+    } catch (e) {
+      console.error('❌ exam_started_at migration failed:', e);
     }
   }
 
