@@ -6,6 +6,8 @@ packages:
   - ca-certificates
   - curl
   - gnupg
+  - certbot
+  - python3-certbot-nginx
 
 runcmd:
   # --- Node.js 20.x ---
@@ -13,24 +15,31 @@ runcmd:
   - apt-get install -y nodejs
   - npm i -g pm2
 
-  # --- Self-signed TLS cert ---
+  # --- Fallback self-signed TLS cert (replaced by Let's Encrypt later) ---
   - mkdir -p /etc/nginx/ssl
   - openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/nginx/ssl/certbuzz.key -out /etc/nginx/ssl/certbuzz.crt -subj "/CN=${fqdn}" -addext "subjectAltName=DNS:${fqdn}"
 
-  # --- Nginx reverse proxy config ---
+  # --- Nginx reverse proxy config (acme-challenge on port 80, HTTPS backend) ---
   - |
-    cat > /etc/nginx/sites-available/default <<'NGINX'
+    cat > /etc/nginx/sites-available/certbuzz <<'NGINX'
     upstream certbuzz_app {
         server 127.0.0.1:8000;
         keepalive 64;
     }
     server {
         listen 80;
-        return 301 https://$host$request_uri;
+        server_name ${fqdn};
+
+        location /.well-known/acme-challenge/ {
+            root /var/www/html;
+        }
+        location / {
+            return 301 https://$host$request_uri;
+        }
     }
     server {
         listen 443 ssl http2;
-        server_name _;
+        server_name ${fqdn};
 
         ssl_certificate     /etc/nginx/ssl/certbuzz.crt;
         ssl_certificate_key /etc/nginx/ssl/certbuzz.key;
@@ -55,6 +64,8 @@ runcmd:
         }
     }
     NGINX
+  - rm -f /etc/nginx/sites-enabled/default
+  - ln -sf /etc/nginx/sites-available/certbuzz /etc/nginx/sites-enabled/certbuzz
   - nginx -t && systemctl reload nginx
   - systemctl enable nginx
   - systemctl start nginx

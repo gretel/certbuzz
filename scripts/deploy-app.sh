@@ -1,6 +1,6 @@
 #!/bin/bash
-# Deploy CertBuzz to an Azure VM. Builds locally, ships via SSH.
-# Polls cloud-init readiness before deploying.
+# Deploy CertBuzz to an Azure VM. Polls cloud-init, provisions Let's Encrypt
+# TLS cert, builds app, ships via SSH, starts PM2.
 #
 # Usage:
 #   ./scripts/deploy-app.sh "$(cd tofu && tofu output -raw resource_group)" "$(cd tofu && tofu output -raw vm_name)"
@@ -9,9 +9,6 @@ set -euo pipefail
 
 if [ $# -ne 2 ]; then
     echo "Usage: $0 <resource-group> <vm-name>"
-    echo ""
-    echo "Example:"
-    echo "  $0 \"\$(cd tofu && tofu output -raw resource_group)\" \"\$(cd tofu && tofu output -raw vm_name)\""
     exit 1
 fi
 
@@ -20,6 +17,7 @@ VM="$2"
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 REMOTE_DIR="/home/azureuser/certbuzz"
 SSH_KEY="$HOME/.ssh/id_rsa"
+LE_EMAIL="${LE_EMAIL:-admin@certbuzz.local}"
 
 echo "==> Getting VM IP..."
 IP=$(az network public-ip list --resource-group "$RG" --query '[0].ipAddress' -o tsv 2>/dev/null)
@@ -28,6 +26,13 @@ if [[ -z "$IP" ]]; then
     exit 1
 fi
 echo "   VM IP: $IP"
+
+FQDN=$(az network public-ip list --resource-group "$RG" --query '[0].dnsSettings.fqdn' -o tsv 2>/dev/null)
+if [[ -z "$FQDN" ]]; then
+    echo "ERROR: Could not get FQDN"
+    exit 1
+fi
+echo "   FQDN: $FQDN"
 
 echo "==> Waiting for cloud-init..."
 CLOUD_INIT_DONE=false
@@ -40,10 +45,20 @@ for _ in $(seq 1 60); do
     echo "   still waiting..."
     sleep 5
 done
-
 if [ "$CLOUD_INIT_DONE" != "true" ]; then
     echo "ERROR: cloud-init did not complete within timeout"
     exit 1
+fi
+
+echo "==> Provisioning Let's Encrypt TLS cert..."
+if ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "azureuser@$IP" "sudo certbot certificates 2>/dev/null | grep -q '$FQDN'"; then
+    echo "   cert already exists, skipping"
+else
+    echo "   requesting cert for $FQDN ..."
+    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "azureuser@$IP" \
+        "sudo certbot --nginx -d '$FQDN' --non-interactive --agree-tos --email '$LE_EMAIL' 2>&1" || {
+        echo "   Let's Encrypt failed, falling back to self-signed cert"
+    }
 fi
 
 echo "==> Building client..."
@@ -89,4 +104,4 @@ pm2 save
 echo 'Deploy OK'
 "
 
-echo "==> Done! Visit https://${IP}/"
+echo "==> Done! Visit https://${FQDN}/"
