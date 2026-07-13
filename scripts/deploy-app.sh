@@ -1,5 +1,6 @@
 #!/bin/bash
 # Deploy CertBuzz to an Azure VM. Builds locally, ships via SSH.
+# Polls cloud-init readiness before deploying.
 #
 # Usage:
 #   ./scripts/deploy-app.sh "$(cd tofu && tofu output -raw resource_group)" "$(cd tofu && tofu output -raw vm_name)"
@@ -24,23 +25,28 @@ echo "==> Getting VM IP..."
 IP=$(az vm show --resource-group "$RG" --name "$VM" --query publicIps -o tsv 2>/dev/null)
 if [[ -z "$IP" ]]; then
     echo "ERROR: Could not get IP for $VM (rg: $RG)"
-    echo "Try: az network public-ip list -g $RG --query '[].ip_address' -o tsv"
     exit 1
 fi
 echo "   VM IP: $IP"
 
+echo "==> Waiting for cloud-init..."
+for _ in $(seq 1 60); do
+    if ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o ConnectTimeout=5 "azureuser@$IP" "cloud-init status --wait 2>/dev/null; echo READY" 2>/dev/null | grep -q READY; then
+        echo "   cloud-init done"
+        break
+    fi
+    echo "   still waiting..."
+    sleep 5
+done
+
 echo "==> Building client..."
 cd "$APP_DIR/client"
-if [ ! -d node_modules ]; then
-    npm ci --silent
-fi
+if [ ! -d node_modules ]; then npm ci --silent; fi
 npm run build --silent 2>&1 | tail -3
 
 echo "==> Building server..."
 cd "$APP_DIR/server"
-if [ ! -d node_modules ]; then
-    npm ci --silent
-fi
+if [ ! -d node_modules ]; then npm ci --silent; fi
 npm run build --silent 2>&1 | tail -3
 
 cd "$APP_DIR"
@@ -51,29 +57,18 @@ tar cz \
     --exclude node_modules \
     --exclude '*.db' \
     --exclude '.env' \
-    server/dist \
-    server/package.json \
-    server/package-lock.json \
+    server/dist server/package.json server/package-lock.json \
     client/dist \
     questions/ \
-    package.json \
-    package-lock.json \
-    .env.example | ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "azureuser@$IP" "
+    package.json package-lock.json .env.example \
+    | ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "azureuser@$IP" "
 set -e
-
-mkdir -p $REMOTE_DIR
-cd $REMOTE_DIR
-
-# Extract
+mkdir -p $REMOTE_DIR && cd $REMOTE_DIR
 tar xz
 
-# Server deps
-cd $REMOTE_DIR/server
-npm ci --silent
-
+cd $REMOTE_DIR/server && npm ci --silent
 cd $REMOTE_DIR
 
-# Create .env if missing
 if [ ! -f .env ]; then
     cp .env.example .env
     sed -i 's/DOZENT_PASSWORD=changeme/DOZENT_PASSWORD=Dozent128/' .env
@@ -81,11 +76,9 @@ if [ ! -f .env ]; then
     echo 'NODE_ENV=production' >> .env
 fi
 
-# Restart app
 pm2 delete certbuzz 2>/dev/null || true
 pm2 start server/dist/server.js --name certbuzz
 pm2 save
-
 echo 'Deploy OK'
 "
 

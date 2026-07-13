@@ -5,10 +5,12 @@
 #
 # Usage:
 #   tofu init
-#   tofu apply -var dns_name=certbuzzdemo
-#   ./scripts/deploy-app.sh "$(tofu output -raw resource_group)" "$(tofu output -raw vm_name)"
+#   tofu apply -var dns_name=certbuzzdemo   # provisions infra + deploys app
 #   curl -k "$(tofu output -raw fqdn)"
 #   tofu destroy
+#
+# Re-deploy after code changes (no infra change):
+#   tofu apply -replace=null_resource.deploy
 
 terraform {
   required_version = ">= 1.6"
@@ -210,4 +212,16 @@ resource "azurerm_linux_virtual_machine" "main" {
   custom_data = base64encode(templatefile("${path.module}/cloud-init.tftpl", {
     fqdn = "${local.suffix}.${var.location}.cloudapp.azure.com"
   }))
+}
+
+# ─── Deploy app after VM ready ──────────────────────────────────
+
+resource "null_resource" "deploy" {
+  triggers = {
+    vm_id = azurerm_linux_virtual_machine.main.id
+  }
+
+  provisioner "local-exec" {
+    command = "${path.module}/../scripts/deploy-app.sh ${azurerm_resource_group.main.name} ${azurerm_linux_virtual_machine.main.name}"
+  }
 }

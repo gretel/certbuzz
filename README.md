@@ -41,9 +41,10 @@ JSON files in `questions/`. Add new certs by dropping a file. Bank metadata in `
 ## Deploy to Azure
 
 ```bash
-cd tofu && tofu init && tofu apply -var dns_name=certbuzzdemo  # provision
-./scripts/deploy-app.sh "$(tofu output -raw resource_group)" "$(tofu output -raw vm_name)"  # deploy
+cd tofu && tofu init && tofu apply -var dns_name=certbuzzdemo  # provision + deploy
 tofu destroy  # teardown
 ```
+
+Re-deploy after code changes: `./scripts/deploy-app.sh "$(tofu output -raw resource_group)" "$(tofu output -raw vm_name)"`
 
 See [`tofu/README.md`](tofu/README.md) for details.
