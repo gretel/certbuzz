@@ -93,10 +93,12 @@ cd $REMOTE_DIR
 
 if [ ! -f .env ]; then
     cp .env.example .env
-    sed -i 's/DOZENT_PASSWORD=changeme/DOZENT_PASSWORD=Dozent128/' .env
-    echo 'HOST=0.0.0.0' >> .env
-    echo 'NODE_ENV=production' >> .env
 fi
+sed -i 's/DOZENT_PASSWORD=changeme/DOZENT_PASSWORD=Dozent128/' .env
+sed -i 's|# ALLOWED_ORIGINS=https://your-domain.com|ALLOWED_ORIGINS=https://'"${FQDN}"'|' .env
+sed -i 's/^PORT=8000/PORT=8000/' .env
+grep -q '^HOST=' .env || echo 'HOST=0.0.0.0' >> .env
+grep -q '^NODE_ENV=' .env || echo 'NODE_ENV=production' >> .env
 
 pm2 delete certbuzz 2>/dev/null || true
 pm2 start server/dist/server.js --name certbuzz
