@@ -22,22 +22,29 @@ REMOTE_DIR="/home/azureuser/certbuzz"
 SSH_KEY="$HOME/.ssh/id_rsa"
 
 echo "==> Getting VM IP..."
-IP=$(az vm show --resource-group "$RG" --name "$VM" --query publicIps -o tsv 2>/dev/null)
+IP=$(az network public-ip list --resource-group "$RG" --query '[0].ipAddress' -o tsv 2>/dev/null)
 if [[ -z "$IP" ]]; then
-    echo "ERROR: Could not get IP for $VM (rg: $RG)"
+    echo "ERROR: Could not get public IP in resource group $RG"
     exit 1
 fi
 echo "   VM IP: $IP"
 
 echo "==> Waiting for cloud-init..."
+CLOUD_INIT_DONE=false
 for _ in $(seq 1 60); do
-    if ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o ConnectTimeout=5 "azureuser@$IP" "cloud-init status --wait 2>/dev/null; echo READY" 2>/dev/null | grep -q READY; then
+    if ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes "azureuser@$IP" "cloud-init status --wait 2>/dev/null; echo READY" 2>/dev/null | grep -q READY; then
+        CLOUD_INIT_DONE=true
         echo "   cloud-init done"
         break
     fi
     echo "   still waiting..."
     sleep 5
 done
+
+if [ "$CLOUD_INIT_DONE" != "true" ]; then
+    echo "ERROR: cloud-init did not complete within timeout"
+    exit 1
+fi
 
 echo "==> Building client..."
 cd "$APP_DIR/client"
