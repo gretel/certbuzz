@@ -17,7 +17,7 @@ VM="$2"
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 REMOTE_DIR="/home/azureuser/certbuzz"
 SSH_KEY="$HOME/.ssh/id_rsa"
-LE_EMAIL="${LE_EMAIL:-admin@certbuzz.local}"
+LE_EMAIL="${LE_EMAIL:-billing@jitter.eu}"
 
 echo "==> Getting VM IP..."
 IP=$(az network public-ip list --resource-group "$RG" --query '[0].ipAddress' -o tsv 2>/dev/null)
