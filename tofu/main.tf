@@ -120,7 +120,7 @@ resource "azurerm_network_security_group" "main" {
 
   security_rule {
     name                       = "SSH"
-    priority                   = 90
+    priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -132,7 +132,7 @@ resource "azurerm_network_security_group" "main" {
 
   security_rule {
     name                       = "HTTP"
-    priority                   = 100
+    priority                   = 110
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -144,7 +144,7 @@ resource "azurerm_network_security_group" "main" {
 
   security_rule {
     name                       = "HTTPS"
-    priority                   = 110
+    priority                   = 120
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
