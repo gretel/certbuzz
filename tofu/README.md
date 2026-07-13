@@ -1,6 +1,7 @@
 # CertBuzz — Azure Deployment
 
-OpenTofu config for a single Ubuntu 24.04 VM (Node 20 + PM2 + Nginx reverse proxy with self-signed TLS). Deploys the app automatically after provisioning.
+OpenTofu config for a single Ubuntu 24.04 VM (Node 20 + PM2 + Nginx).
+Auto-provisions infra and deploys app. TLS via Let's Encrypt (certbot).
 
 ## Prerequisites
 
@@ -12,12 +13,12 @@ OpenTofu config for a single Ubuntu 24.04 VM (Node 20 + PM2 + Nginx reverse prox
 
 ```bash
 tofu init
-tofu apply -var dns_name=certbuzzdemo   # provision + deploy in one shot
-curl -k "$(tofu output -raw fqdn)"      # verify
+tofu apply -var dns_name=certbuzzdemo   # provision + deploy + LE cert
+curl "$(tofu output -raw fqdn)"         # verify
 tofu destroy                             # teardown
 ```
 
-First run provisions infra and deploys the app. Subsequent `tofu apply` only re-deploys if VM changed. For code-only re-deploys:
+Re-deploy after code changes:
 
 ```bash
 ../scripts/deploy-app.sh "$(tofu output -raw resource_group)" "$(tofu output -raw vm_name)"
@@ -32,7 +33,10 @@ First run provisions infra and deploys the app. Subsequent `tofu apply` only re-
 | `vm_size` | `"Standard_B2ls_v2"` | VM SKU |
 | `ssh_public_key_path` | `"~/.ssh/id_rsa.pub"` | SSH key |
 
+Set `LE_EMAIL` env var to override the default Let's Encrypt registration email.
+
 ## Notes
 
-- Self-signed TLS. Expect browser warnings. Use `-k` with curl.
-- $0.5/month B2ats_v2 in swedencentral is cheapest option.
+- Let's Encrypt certs auto-renew via systemd timer.
+- Fallback to self-signed if certbot fails.
+- B2ats_v2 in swedencentral ~$0.50/mo.
