@@ -6,11 +6,11 @@
 # Usage:
 #   tofu init
 #   tofu apply -var dns_name=certbuzzdemo   # provisions infra + deploys app
-#   curl -k "$(tofu output -raw fqdn)"
+#   curl "$(tofu output -raw fqdn)"
 #   tofu destroy
 #
-# Re-deploy after code changes (no infra change):
-#   tofu apply -replace=null_resource.deploy
+# Re-deploy after code changes:
+#   ../scripts/deploy-app.sh "$(tofu output -raw resource_group)" "$(tofu output -raw vm_name)"
 
 terraform {
   required_version = ">= 1.6"
