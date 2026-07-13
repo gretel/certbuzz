@@ -32,3 +32,16 @@ client/node_modules/.vite/
 
 # Claude local settings
 .claude/
+
+# Scratch / temp
+tmp/
+
+# Planning artifacts
+.plans/
+
+# OpenTofu
+.tofu/
+tofu/.terraform/
+tofu/terraform.tfvars
+tofu/*.tfstate*
+tofu/*.tfstate.*.backup

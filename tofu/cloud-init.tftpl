@@ -1,0 +1,71 @@
+#cloud-config
+package_update: true
+packages:
+  - nginx
+  - openssl
+  - ca-certificates
+  - curl
+  - gnupg
+
+runcmd:
+  # --- Node.js 20.x ---
+  - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  - apt-get install -y nodejs
+  - npm i -g pm2
+
+  # --- Self-signed TLS cert ---
+  - mkdir -p /etc/nginx/ssl
+  - openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+      -keyout /etc/nginx/ssl/certbuzz.key \
+      -out /etc/nginx/ssl/certbuzz.crt \
+      -subj "/CN=${fqdn}" \
+      -addext "subjectAltName=DNS:${fqdn}"
+
+  # --- Nginx reverse proxy config ---
+  - |
+    cat > /etc/nginx/sites-available/default <<'NGINX'
+    upstream certbuzz_app {
+        server 127.0.0.1:8000;
+        keepalive 64;
+    }
+    server {
+        listen 80;
+        return 301 https://$host$request_uri;
+    }
+    server {
+        listen 443 ssl http2;
+        server_name _;
+
+        ssl_certificate     /etc/nginx/ssl/certbuzz.crt;
+        ssl_certificate_key /etc/nginx/ssl/certbuzz.key;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade     $http_upgrade;
+        proxy_set_header Connection  "upgrade";
+        proxy_set_header Host        $host;
+        proxy_set_header X-Real-IP   $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+
+        location / {
+            proxy_pass http://certbuzz_app;
+        }
+        location /socket.io/ {
+            proxy_pass http://certbuzz_app;
+            proxy_buffering off;
+        }
+    }
+    NGINX
+  - nginx -t && systemctl reload nginx
+  - systemctl enable nginx
+  - systemctl start nginx
+
+  # --- App directory for deploy script ---
+  - mkdir -p /home/azureuser/certbuzz
+  - chown azureuser:azureuser /home/azureuser/certbuzz
+
+  # --- PM2 startup hook ---
+  - env PATH=$PATH:/usr/bin pm2 startup systemd -u azureuser --hp /home/azureuser

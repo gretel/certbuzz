@@ -1,0 +1,12 @@
+# DNS label — becomes <label>.polandcentral.cloudapp.azure.com
+# Leave empty for auto-generated name (certbuzz-<random6>)
+dns_name = "certbuzz"
+
+# Azure region
+# location = "polandcentral"
+
+# VM size
+# vm_size = "Standard_B2ls_v2"
+
+# Path to SSH public key
+# ssh_public_key_path = "~/.ssh/id_rsa.pub"

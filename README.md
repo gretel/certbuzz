@@ -65,17 +65,51 @@ ALLOWED_ORIGINS=https://your-domain.com
 ## Project Structure
 
 ```
-├── client/           # React frontend
+├── client/           # React frontend (Vite + Tailwind)
 │   └── src/
 │       ├── components/
 │       ├── hooks/
 │       └── pages/
-├── server/           # Express backend
+├── server/           # Express + Socket.io backend
 │   └── src/
 │       ├── db/
-│       ├── questions/   # Question bank loader
+│       ├── questions/
 │       ├── routes/
 │       └── socket/
-└── questions/        # Question bank JSON files
-    └── azure-az104.json
+├── tofu/             # OpenTofu: Azure infra as code
+│   ├── main.tf       #   Resource group, VNet, NSG, VM
+│   ├── outputs.tf    #   FQDN, IP, SSH command
+│   ├── variables.tf
+│   └── cloud-init.tftpl
+├── scripts/          # Deployment helpers
+│   ├── deploy-app.sh #   Build + ship app to Azure VM
+│   └── tofu-apply.sh #   One-shot tofu init + apply
+├── questions/        # Question bank JSON files
+│   ├── azure-az104.json
+│   └── clf-c02-complete.json
+└── docs/
+    └── legacy/       # Historical AWS deployment scripts
 ```
+
+## Deploy to Azure
+
+Prerequisites: [OpenTofu](https://opentofu.org/), [Azure CLI](https://aka.ms/installazurecliwindows) (logged in with `az login`), and an SSH public key at `~/.ssh/id_rsa.pub`.
+
+```bash
+# 1. Provision Azure VM
+cd tofu
+tofu init
+tofu apply -var dns_name=certbuzzdemo
+
+# 2. Deploy app (after VM is ready, ~3 min for cloud-init)
+cd ..
+./scripts/deploy-app.sh "$(cd tofu && tofu output -raw resource_group)" "$(cd tofu && tofu output -raw vm_name)"
+
+# 3. Open in browser
+open "$(cd tofu && tofu output -raw fqdn)"
+
+# Tear down
+tofu destroy
+```
+
+See [`tofu/README.md`](tofu/README.md) for full details.
