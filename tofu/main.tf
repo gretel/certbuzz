@@ -72,6 +72,13 @@ resource "random_string" "suffix" {
   upper   = false
 }
 
+resource "random_password" "dozent_password" {
+  length           = 24
+  special          = true
+  override_special = "!@#_-+=.,"
+  min_special      = 2
+}
+
 locals {
   # Use var.dns_name if set (non-empty), otherwise auto-generate
   suffix = var.dns_name != "" ? var.dns_name : "certbuzz-${random_string.suffix.result}"
@@ -222,10 +229,14 @@ resource "azurerm_linux_virtual_machine" "main" {
 
 resource "null_resource" "deploy" {
   triggers = {
-    vm_id = azurerm_linux_virtual_machine.main.id
+    vm_id            = azurerm_linux_virtual_machine.main.id
+    deploy_key       = random_password.dozent_password.result
   }
 
   provisioner "local-exec" {
+    environment = {
+      DOZENT_PASSWORD = random_password.dozent_password.result
+    }
     command = "${path.module}/../scripts/deploy-app.sh ${azurerm_resource_group.main.name} ${azurerm_linux_virtual_machine.main.name}"
   }
 }

@@ -25,6 +25,12 @@ output "ssh" {
   value       = "ssh azureuser@${azurerm_public_ip.main.ip_address}"
 }
 
+output "dozent_password" {
+  description = "Dozent panel password"
+  value       = random_password.dozent_password.result
+  sensitive   = true
+}
+
 output "cleanup" {
   description = "Destroy everything"
   value       = "tofu destroy"

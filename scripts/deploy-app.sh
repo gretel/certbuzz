@@ -73,6 +73,10 @@ npm run build --silent 2>&1 | tail -3
 
 cd "$APP_DIR"
 
+# Generate random dozent password if not provided by tofu environment
+DOZENT_PASSWORD="${DOZENT_PASSWORD:-$(openssl rand -base64 18 | tr -d '\n')}"
+echo "==> Using dozent password: ${DOZENT_PASSWORD}"
+
 echo "==> Shipping app to $IP..."
 
 tar cz \
@@ -113,7 +117,8 @@ cd $REMOTE_DIR
 if [ ! -f .env ]; then
     cp .env.example .env
 fi
-sed -i 's/DOZENT_PASSWORD=changeme/DOZENT_PASSWORD=Dozent128/' .env
+sed -i "s/DOZENT_PASSWORD=changeme/DOZENT_PASSWORD=${DOZENT_PASSWORD}/" .env
+echo "   dozent password written to .env"
 sed -i 's|# ALLOWED_ORIGINS=https://your-domain.com|ALLOWED_ORIGINS=https://'"${FQDN}"'|' .env
 sed -i 's/^PORT=8000/PORT=8000/' .env
 grep -q '^HOST=' .env || echo 'HOST=0.0.0.0' >> .env
