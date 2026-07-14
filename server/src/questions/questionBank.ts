@@ -128,7 +128,11 @@ export function getQuestionBankMeta(bankId: string): BankMetadata | undefined {
 }
 
 export function getAvailableBanks(): BankMetadata[] {
-  const files = readdirSync(questionsDir).filter(f => f.endsWith('.json'));
+  const files = readdirSync(questionsDir)
+    .filter(f => f.endsWith('.json'))
+    // Exclude language variants (e.g. azure-az104-en.json) — these are resolved
+    // internally via getQuestion(..., lang) and should not appear as separate banks.
+    .filter(f => !/^(.+)-[a-z]{2}\.json$/.test(f));
   return files.map(f => {
     const bankId = f.replace('.json', '');
     const bank = loadBank(bankId);
