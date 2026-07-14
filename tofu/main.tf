@@ -235,7 +235,7 @@ resource "null_resource" "deploy" {
 
   provisioner "local-exec" {
     environment = {
-      DOZENT_PASSWORD = random_password.dozent_password.result
+      DOZENT_PASSWORD = nonsensitive(random_password.dozent_password.result)
     }
     command = "${path.module}/../scripts/deploy-app.sh ${azurerm_resource_group.main.name} ${azurerm_linux_virtual_machine.main.name}"
   }
