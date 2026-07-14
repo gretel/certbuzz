@@ -174,6 +174,10 @@ export function ExamGameSession({
       });
       if (!res.ok) throw new Error(`exam-start HTTP ${res.status}`);
       const data = await res.json();
+
+      // Re-fetch questions so they reflect the chosen language
+      await loadQuestions();
+
       setExamStartedAt(data.examStartedAt);
       setCurrentIndex(0);
       setQuestionStartMs(Date.now());
