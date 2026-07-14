@@ -941,7 +941,7 @@
       "category": "storage",
       "type": "single",
       "difficulty": "hard",
-      "question": "Welche Azure-Komponente wird für VM Disk Encryption Keys verwendet?",
+      "question": "Welche Azure-Komponente wird für VM Encryption Keys (encryption at host) verwendet?",
       "options": [
         {
           "id": "a",
@@ -963,7 +963,7 @@
       "correctAnswers": [
         "b"
       ],
-      "explanation": "**Azure Disk Encryption (ADE)** verwendet **Azure Key Vault** zur Speicherung und Verwaltung der Encryption Keys.\n\n**Verschlüsselungstechnologien:**\n- **Windows VMs**: BitLocker\n- **Linux VMs**: dm-crypt\n\n**Wichtige Unterscheidungen:**\n- **Azure Key Vault**: Speichert ADE-Schlüssel\n- **Disk Encryption Sets**: Server-Side Encryption (SSE) mit Customer-Managed Keys\n- **Storage Service Encryption**: Automatische Verschlüsselung at-rest mit Platform-Managed Keys\n\n*Prüfungstipp*: ADE verschlüsselt OS- und Data-Disks auf VM-Ebene, während SSE die Verschlüsselung auf Storage-Ebene übernimmt. Beide können kombiniert werden.",
+      "explanation": "**Encryption at host** und **Azure Disk Encryption (ADE)** verwenden **Azure Key Vault** zur Speicherung der Encryption Keys.\n\n**Encryption at host**:\n- Verschlüsselt Daten auf dem Hypervisor (Host, auf dem die VM läuft)\n- Keys werden in Azure Key Vault gespeichert\n- Aktiviert pro VM Disk über das Portal oder PowerShell/CLI\n\n**Azure Disk Encryption (ADE)**:\n- **Windows VMs**: BitLocker\n- **Linux VMs**: dm-crypt\n- Schlüssel ebenfalls in Key Vault\n\n**Wichtige Unterscheidungen:**\n- **Azure Key Vault**: Speichert Keys für ADE und Encryption at host\n- **Disk Encryption Sets**: Server-Side Encryption (SSE) mit Customer-Managed Keys\n- **Storage Service Encryption**: Automatische Verschlüsselung at-rest mit Platform-Managed Keys\n\n*Prüfungstipp*: Encryption at host wurde in der Prüfungsaktualisierung April 2026 als eigener Skill aufgenommen. ADE verschlüsselt OS- und Data-Disks auf VM-Ebene, SSE auf Storage-Ebene. Beide können kombiniert werden.",
       "references": [
         "https://learn.microsoft.com/en-us/azure/virtual-machines/disk-encryption-overview"
       ]
@@ -3324,6 +3324,170 @@
       "explanation": "**Azure Monitor Private Link Scope (AMPLS)** ermöglicht **private Connectivity** zu Azure Monitor Services.\n\n**Funktionsweise:**\n- Private Endpoints verbinden VNets oder On-Premises mit:\n  - Log Analytics Workspaces\n  - Application Insights\n\n**Vorteile:**\n\n1. **Data Exfiltration Protection**: Monitoring-Daten verlassen nie das private Netzwerk\n2. **Bypass Public Internet**: Traffic bleibt im Microsoft Backbone\n3. **Compliance**: Für regulierte Industries (Healthcare, Finance)\n\n**AMPLS definiert:**\nWelche Azure Monitor Resources über den Private Endpoint zugänglich sind.\n\n**Einschränkungen:**\nEinige Features wie Live Metrics benötigen Public Access.\n\n*Prüfungstipp*: AMPLS ist komplex und sollte nur bei Compliance-Requirements verwendet werden – für die meisten Szenarien ist Public Access ausreichend.",
       "references": [
         "https://learn.microsoft.com/en-us/azure/azure-monitor/logs/private-link-security"
+      ]
+    },
+    {
+      "id": "compute-021",
+      "category": "compute",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Welche Azure-Komponente wird benötigt, um ein benutzerdefiniertes SSL/TLS-Zertifikat für eine Azure App Service-Web-App bereitzustellen?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Azure Front Door"
+        },
+        {
+          "id": "b",
+          "text": "Azure Key Vault"
+        },
+        {
+          "id": "c",
+          "text": "Azure DNS Zone"
+        },
+        {
+          "id": "d",
+          "text": "Azure Traffic Manager"
+        }
+      ],
+      "correctAnswers": [
+        "b"
+      ],
+      "explanation": "Ein **App Service** kann ein **benutzerdefiniertes SSL/TLS-Zertifikat** auf drei Wegen bereitstellen:\n\n1. **Azure Key Vault** (empfohlen): Zertifikat aus Key Vault importieren – unterstützt automatische Rotation\n2. **App Service Managed Certificate**: Kostenloses, von Azure verwaltetes Zertifikat für benutzerdefinierte Domains\n3. **Hochladen**: eigener PFX-Datei\n\n**Azure Key Vault** ist der bevorzugte Weg, da er zentrale Verwaltung, Rotation und Zugriffskontrolle für TLS/SSL-Zertifikate bietet.\n\n*Prüfungstipp*: App Service benötigt ein Zertifikat auf **App Service Plan-Ebene** (Basic, Standard, Premium) – Free und Shared Plans unterstützen kein benutzerdefiniertes TLS/SSL.",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-certificate"
+      ]
+    },
+    {
+      "id": "compute-022",
+      "category": "compute",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Sie möchten einen benutzerdefinierten DNS-Namen (z.B. www.app.example.com) auf Ihre Azure App Service-Web-App zeigen. Welche DNS-Einträge müssen Sie konfigurieren?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Einen A-Record, der auf die öffentliche IP-Adresse der App zeigt, oder einen CNAME-Record, der auf den App Service-Standarddomainnamen zeigt"
+        },
+        {
+          "id": "b",
+          "text": "Nur einen MX-Record"
+        },
+        {
+          "id": "c",
+          "text": "Nur einen CNAME-Record – A-Records werden von App Service nicht unterstützt"
+        },
+        {
+          "id": "d",
+          "text": "Einen TXT-Record mit dem App Service-Standarddomainnamen"
+        }
+      ],
+      "correctAnswers": [
+        "a"
+      ],
+      "explanation": "Für einen benutzerdefinierten DNS-Namen auf eine **Azure App Service-Web-App** gibt es zwei Möglichkeiten:\n\n1. **A-Record**: Zeigt auf die öffentliche IP-Adresse der App. Zusätzlich muss ein **TXT-Record** mit `awverify.{domain}` auf den App Service-Standarddomainnamen gesetzt werden (Domain-Validierung).\n2. **CNAME-Record**: Zeigt auf den App Service-Standarddomainnamen (`{appname}.azurewebsites.net`).\n\n**Einschränkungen:**\n- **Apex-Domains** (z.B. `example.com`) können nur per A-Record konfiguriert werden, da CNAMEs für Apex nicht erlaubt sind\n- **Azure DNS** kann auch Alias-Records verwenden\n\n*Prüfungstipp*: Die `awverify`-TXT-Validierung ist nur für A-Records nötig, nicht für CNAME.",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain"
+      ]
+    },
+    {
+      "id": "compute-023",
+      "category": "compute",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche Aussagen zur App Service Backup-Funktion sind korrekt? (Wählen Sie 3 Antworten)",
+      "options": [
+        {
+          "id": "a",
+          "text": "Backups werden in einem Azure Storage Container gespeichert"
+        },
+        {
+          "id": "b",
+          "text":"Die App muss in einem Standard- oder Premium-App Service Plan laufen"
+        },
+        {
+          "id": "c",
+          "text": "Backups können auch die verbundene SQL-Datenbank automatisch sichern"
+        },
+        {
+          "id": "d",
+          "text": "Backups können nur manuell gestartet werden, automatische Zeitpläne werden nicht unterstützt"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "**App Service Backup**-Funktion:\n\n1. **Storage Container** (a): Backups werden in einem Azure Storage Container (Blob) gespeichert – korrekt.\n2. **Plan-Ebene** (b): Mindestens **Standard**-Plan erforderlich – Free und Shared unterstützen kein Backup – korrekt.\n3. **Datenbank-Backup** (c): Backup kann auch verbundene **SQL-Datenbanken** und **Azure Files** sichern – korrekt.\n4. **Automatische Zeitpläne** (d): Falsch – Backup kann per **Zeitplan** (stündlich, täglich) oder manuell konfiguriert werden.\n\n*Prüfungstipp*: App Service Backup speichert App-Inhalte (Files), Konfiguration und optional Datenbanken in einem Azure Storage Container. Retention: max. 30 Tage.",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/app-service/manage-backup"
+      ]
+    },
+    {
+      "id": "compute-024",
+      "category": "compute",
+      "type": "multiple",
+      "difficulty": "hard",
+      "question": "Welche Networking-Features können Sie für eine Azure App Service-Web-App konfigurieren? (Wählen Sie 3 Antworten)",
+      "options": [
+        {
+          "id": "a",
+          "text": "Inbound/Outbound Access Restrictions (IP-Whitelist)"
+        },
+        {
+          "id": "b",
+          "text": "VNet Integration für Zugriff auf Ressourcen im VNet"
+        },
+        {
+          "id": "c",
+          "text": "Private Endpoint für privaten Zugriff auf die App"
+        },
+        {
+          "id": "d",
+          "text": "Site-to-Site VPN-Gateway direkt im App Service Plan"
+        }
+      ],
+      "correctAnswers": [
+        "a",
+        "b",
+        "c"
+      ],
+      "explanation": "**App Service Networking-Features**:\n\n1. **Access Restrictions** (a): IP-Whitelist für eingehenden Traffic – korrekt.\n2. **VNet Integration** (b): Ermöglicht der App den Zugriff auf Ressourcen in einem VNet (Regional VNet Integration) – korrekt.\n3. **Private Endpoint** (c): Privater Zugriff über Private Link – korrekt.\n4. **Site-to-Site VPN** (d): Nicht direkt – die App kann über VNet Integration auf ein mit dem VNet verbundenes Gateway zugreifen, aber kein VPN-Gateway im Plan selbst.\n\n*Prüfungstipp*: App Service Networking unterscheidet:\n- **Inbound**: Private Endpoints, Access Restrictions, Service Endpoints\n- **Outbound**: Regional VNet Integration, Hybrid Connections",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/app-service/networking-features"
+      ]
+    },
+    {
+      "id": "compute-025",
+      "category": "compute",
+      "type": "single",
+      "difficulty": "medium",
+      "question": "Sie möchten, dass Ihre Azure App Service-Web-App automatisch horizontal skaliert, wenn die CPU-Auslastung über 80% steigt. Welche Azure-Komponente konfigurieren Sie?",
+      "options": [
+        {
+          "id": "a",
+          "text": "App Service Plan – Scale out (Autoscale Conditions)"
+        },
+        {
+          "id": "b",
+          "text": "Azure Load Balancer – Backend Pool"
+        },
+        {
+          "id": "c",
+          "text": "Azure Traffic Manager – Routing Method"
+        },
+        {
+          "id": "d",
+          "text": "App Service – Backup Schedule"
+        }
+      ],
+      "correctAnswers": [
+        "a"
+      ],
+      "explanation": "**Autoscale für App Service** wird auf **App Service Plan-Ebene** konfiguriert:\n\n1. **Scale out**: Instanzenanzahl erhöhen (horizontal scaling)\n   - **Autoscale Conditions**: Basiert auf Metriken wie CPU (>80%), Memory, Queue Length\n   - **Schedule**: Zu bestimmten Zeiten\n2. **Scale up**: Plan-Tarif ändern (vertikales Scaling – Standard → Premium)\n\n**Voraussetzung:**\n- App Service Plan muss **Standard** oder höher sein\n- Free und Shared Plans unterstützen kein Autoscaling\n\n*Prüfungstipp*: Autoscale wird auf **Plan-Ebene** konfiguriert, nicht auf App-Ebene. Alle Apps in einem Plan skalieren gemeinsam.",
+      "references": [
+        "https://learn.microsoft.com/en-us/azure/app-service/manage-scale-up"
       ]
     }
   ]
