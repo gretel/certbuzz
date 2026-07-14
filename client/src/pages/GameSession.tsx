@@ -24,7 +24,12 @@ interface Question {
 interface ExamInfo {
   passPercent: number;
   totalQuestions: number;
+  durationMinutes: number;
+  passingScore: number;
+  scaleMin: number;
+  scaleMax: number;
   info: string;
+  domains?: Array<{ id: string; label: string; weight: number; categories: string[] }>;
 }
 
 interface SessionData {
@@ -35,6 +40,7 @@ interface SessionData {
   gameMode: 'racing' | 'buzzer' | 'training' | 'exam';
   gameState: string;
   questionBank?: string;
+  bankLabel?: string;
   examInfo?: ExamInfo;
 }
 
@@ -399,6 +405,9 @@ export function GameSession() {
         playerId={playerId}
         nickname={nickname}
         emoji={emoji}
+        questionBank={sessionData.questionBank}
+        bankLabel={sessionData.bankLabel}
+        examInfo={sessionData.examInfo}
       />
     );
   }

@@ -116,6 +116,11 @@ export function getExamInfo(bankId: string): ExamInfo | undefined {
   return loadBank(bankId).meta.exam;
 }
 
+export function getQuestionBankMeta(bankId: string): BankMetadata | undefined {
+  const banks = getAvailableBanks();
+  return banks.find(b => b.bankId === bankId);
+}
+
 export function getAvailableBanks(): BankMetadata[] {
   const files = readdirSync(questionsDir).filter(f => f.endsWith('.json'));
   return files.map(f => {

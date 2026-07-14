@@ -5,12 +5,31 @@ interface DozentPanelProps {
   onLogout: () => void;
 }
 
+interface ExamDomain {
+  id: string;
+  label: string;
+  weight: number;
+  categories: string[];
+}
+
+interface ExamInfo {
+  passPercent: number;
+  totalQuestions: number;
+  durationMinutes: number;
+  passingScore: number;
+  scaleMin: number;
+  scaleMax: number;
+  info: string;
+  domains?: ExamDomain[];
+}
+
 interface QuestionBank {
   bankId: string;
   label: string;
   description: string;
   questionCount: number;
   categories: Array<{ id: string; label: string; icon: string; count: number }>;
+  exam?: ExamInfo;
 }
 
 interface Session {
@@ -495,7 +514,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
           totalQuestions: gameMode === 'exam' ? undefined : questionCount,
           categories: gameMode === 'exam' ? undefined : selectedCategories,
           gameMode: gameMode,
-          questionBank: gameMode === 'exam' ? 'clf-c02-complete' : selectedBank,
+          questionBank: selectedBank,
         }),
       });
 
@@ -791,7 +810,7 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                         <div className="text-3xl mb-2">🎓</div>
                         <div className="font-bold text-white">Exam</div>
                         <div className="text-sm text-white/60 mt-1">
-                          AWS CLF-C02 · 65 Fragen · 90 Min
+                          {currentBank?.exam ? `${currentBank.exam.totalQuestions} Fragen · ${currentBank.exam.durationMinutes} Min` : 'Nicht verfügbar'}
                         </div>
                       </button>
                     </div>
@@ -803,11 +822,19 @@ export function DozentPanel({ onLogout }: DozentPanelProps) {
                       <div className="flex items-start gap-3">
                         <div className="text-3xl">🎓</div>
                         <div className="flex-1 text-sm text-white/80 space-y-1">
-                          <div><strong>AWS CLF-C02 — Exam</strong></div>
-                          <div>📝 65 Fragen · ⏱️ 90 Minuten · 🎯 Bestehen ab 700/1000</div>
-                          <div>📊 Alle 4 AWS-Domänen anteilig (16/19/22/8)</div>
-                          <div>🚫 Keine Erklärungen während der Prüfung</div>
-                          <div>💤 Resumable — Spieler können pausieren und später fortsetzen</div>
+                          {currentBank?.exam ? (
+                            <>
+                              <div><strong>{currentBank.label} — Exam</strong></div>
+                              <div>📝 {currentBank.exam.totalQuestions} Fragen · ⏱️ {currentBank.exam.durationMinutes} Minuten · 🎯 Bestehen ab {currentBank.exam.passingScore}/{currentBank.exam.scaleMax}</div>
+                              {currentBank.exam.domains && (
+                                <div>📊 {currentBank.exam.domains.length} Prüfungsdomänen anteilig ({currentBank.exam.domains.map(d => d.weight).join('/')})</div>
+                              )}
+                              <div>🚫 Keine Erklärungen während der Prüfung</div>
+                              <div>💤 Resumable — Spieler können pausieren und später fortsetzen</div>
+                            </>
+                          ) : (
+                            <div className="text-yellow-300">⚠️ Die ausgewählte Fragenbank hat keine Prüfungskonfiguration.</div>
+                          )}
                         </div>
                       </div>
                     </div>

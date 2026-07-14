@@ -18,12 +18,26 @@ interface ExamQuestion {
   references?: string[];
 }
 
+interface ExamInfo {
+  passPercent: number;
+  totalQuestions: number;
+  durationMinutes: number;
+  passingScore: number;
+  scaleMin: number;
+  scaleMax: number;
+  info: string;
+  domains?: Array<{ id: string; label: string; weight: number; categories: string[] }>;
+}
+
 interface ExamGameSessionProps {
   sessionCode: string;
   totalQuestions: number;
   playerId: string;
   nickname: string;
   emoji: string;
+  questionBank?: string;
+  bankLabel?: string;
+  examInfo?: ExamInfo;
 }
 
 type Stage = 'loading' | 'pre-exam' | 'in-progress' | 'submitting' | 'results';
@@ -68,6 +82,9 @@ export function ExamGameSession({
   totalQuestions: initialTotalQuestions,
   playerId,
   nickname,
+  questionBank: _questionBank,
+  bankLabel,
+  examInfo,
 }: ExamGameSessionProps) {
   const [stage, setStage] = useState<Stage>('loading');
   const [examStartedAt, setExamStartedAt] = useState<number | null>(null);
@@ -179,7 +196,7 @@ export function ExamGameSession({
   // Restart the exam with a freshly sampled question set. Server resamples,
   // overrides player.question_ids, and clears all progress.
   const handleRestart = useCallback(async () => {
-    if (!confirm('Erneut versuchen? Du bekommst eine neue Auswahl von 65 Fragen. Dein bisheriges Ergebnis wird verworfen.')) {
+    if (!confirm(`Erneut versuchen? Du bekommst eine neue Auswahl von ${totalQuestions} Fragen. Dein bisheriges Ergebnis wird verworfen.`)) {
       return;
     }
     setStage('loading');
@@ -321,19 +338,35 @@ export function ExamGameSession({
   }
 
   if (stage === 'pre-exam') {
+    const passingText = examInfo
+      ? `Bestehen ab ${examInfo.passingScore}/${examInfo.scaleMax} (≈ ${Math.round(examInfo.passingScore / examInfo.scaleMax * (examInfo.totalQuestions ?? totalQuestions))} richtig)`
+      : `Bestehen ab 700/1000`;
+
     return (
       <div className="min-h-screen bg-cb-dark flex items-center justify-center p-4">
         <div className="max-w-2xl bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 p-8 text-white shadow-2xl">
           <div className="text-center mb-6">
             <div className="text-6xl mb-2">🎓</div>
-            <h1 className="text-3xl font-bold">AWS CLF-C02</h1>
+            <h1 className="text-3xl font-bold">{bankLabel ?? 'Prüfungssimulation'}</h1>
             <p className="text-lg opacity-80">Prüfungssimulation</p>
           </div>
 
           <div className="space-y-3 mb-8 text-base">
             <div>📝 <strong>{totalQuestions} Fragen</strong></div>
             <div>⏱️ <strong>{durationMinutes} Minuten Zeit</strong></div>
-            <div>🎯 <strong>Bestehen ab 700/1000</strong> (≈ 44 richtig)</div>
+            <div>🎯 <strong>{passingText}</strong></div>
+            {examInfo?.domains && (
+              <div>
+                📊 <strong>{examInfo.domains.length} Prüfungsdomänen:</strong>
+                <ul className="list-disc list-inside ml-2 mt-1 text-sm opacity-80 space-y-0.5">
+                  {examInfo.domains.map(d => (
+                    <li key={d.id}>
+                      {d.label} ({d.weight}%)
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div>🚫 <strong>Keine Erklärungen während der Prüfung</strong> — Auswertung erst am Ende.</div>
             <div>⬆️ <strong>Keine Rückkehr zu beantworteten Fragen.</strong></div>
             <div>💤 <strong>Pause möglich</strong> — du kannst das Fenster schließen und später weitermachen; die Zeit läuft weiter.</div>

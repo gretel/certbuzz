@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { queries } from '../db/queries.js';
 import { shuffleArray } from '../utils/helpers.js';
-import { getQuestions, getExamInfo } from '../questions/questionBank.js';
+import { getQuestions, getExamInfo, getQuestionBankMeta } from '../questions/questionBank.js';
 
 const router = Router();
 
@@ -31,6 +31,8 @@ router.get('/:code', (req, res) => {
       };
     }).filter(Boolean);
 
+    const bankMeta = getQuestionBankMeta(session.questionBank);
+
     res.json({
       sessionCode: session.sessionCode,
       status: session.status,
@@ -40,6 +42,7 @@ router.get('/:code', (req, res) => {
       gameState: session.gameState,
       currentQuestionIndex: session.currentQuestionIndex,
       questionBank: session.questionBank,
+      bankLabel: bankMeta?.label ?? session.questionBank,
       examInfo: getExamInfo(session.questionBank),
     });
   } catch (error) {
