@@ -142,7 +142,26 @@ export function GameSession() {
     // Join the session room for leaderboard updates
     socket.emit('join-session', code);
 
-    socket.on('answer-result', (data: { correct: boolean; correctAnswers: string[] }) => {
+    socket.on('answer-result', (data: { correct: boolean; alreadyAnswered?: boolean; correctAnswers: string[] }) => {
+      // Already answered this question before — skip silently, no points
+      if (data.alreadyAnswered) {
+        setShowFeedback(false);
+        setCurrentQuestionIndex((prev) => {
+          const nextIndex = prev + 1;
+          if (sessionData && nextIndex < sessionData.questions.length) {
+            const nextQuestion = sessionData.questions[nextIndex];
+            if (nextQuestion?.type === 'order') {
+              setSelectedAnswers(nextQuestion.options.map(o => o.id));
+            } else {
+              setSelectedAnswers([]);
+            }
+          }
+          return nextIndex;
+        });
+        setStartTime(Date.now());
+        return;
+      }
+
       setIsCorrect(data.correct);
       setCorrectAnswers(data.correctAnswers);
       setShowFeedback(true);
@@ -207,13 +226,21 @@ export function GameSession() {
       sessionStorage.setItem(`session_${code}_emoji`, data.emoji);
       localStorage.setItem('lastNickname', joinNickname);
 
-      // Pre-populate order questions with default order
-      if (sessionData && sessionData.questions.length > 0) {
-        const firstQuestion = sessionData.questions[0];
-        if (firstQuestion?.type === 'order') {
-          setSelectedAnswers(firstQuestion.options.map(o => o.id));
+      // Restore progress for returning players
+      try {
+        const statsRes = await fetch(`/api/player/${data.playerId}/stats`);
+        if (statsRes.ok) {
+          const stats = await statsRes.json();
+          const savedIndex = stats.currentQuestion ?? 0;
+          if (savedIndex > 0 && savedIndex < (sessionData?.totalQuestions ?? 0)) {
+            setCurrentQuestionIndex(savedIndex);
+            // Pre-populate order questions at the restored index
+            if (sessionData && sessionData.questions[savedIndex]?.type === 'order') {
+              setSelectedAnswers(sessionData.questions[savedIndex].options.map(o => o.id));
+            }
+          }
         }
-      }
+      } catch { /* non-critical */ }
     } catch (err) {
       // Auto-join failed — show join form (do nothing, playerId stays null)
       console.warn('Auto-join failed:', err);

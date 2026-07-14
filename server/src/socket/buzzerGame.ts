@@ -374,12 +374,12 @@ export function handleBuzzerAnswer(
     // Transition to next question after 5 seconds
     transitionToNextQuestion(io, sessionCode);
   } else {
-    // Wrong answer - add to eliminated answers
-    selectedAnswers.forEach(a => {
-      if (!gameState.eliminatedAnswers.includes(a)) {
+    // Wrong answer - add to eliminated answers (only the actually wrong ones)
+    for (const a of selectedAnswers) {
+      if (!question.correctAnswers.includes(a) && !gameState.eliminatedAnswers.includes(a)) {
         gameState.eliminatedAnswers.push(a);
       }
-    });
+    }
 
     // Save wrong answer
     queries.saveAnswer({

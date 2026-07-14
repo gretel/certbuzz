@@ -98,6 +98,16 @@ export function setupSocketHandlers(io: Server) {
           return;
         }
 
+        // Dedup: prevent replaying the same question for double points
+        if (queries.getPlayerAnswerByQuestion(playerId, questionId)) {
+          socket.emit('answer-result', {
+            correct: false,
+            alreadyAnswered: true,
+            correctAnswers: question.correctAnswers,
+          });
+          return;
+        }
+
         const isCorrect = checkAnswer(selectedAnswers, question.correctAnswers, question.type);
 
         const newCorrect = player.correctAnswers + (isCorrect ? 1 : 0);
@@ -129,6 +139,7 @@ export function setupSocketHandlers(io: Server) {
         // Send feedback to player
         socket.emit('answer-result', {
           correct: isCorrect,
+          alreadyAnswered: false,
           correctAnswers: question.correctAnswers,
         });
 
