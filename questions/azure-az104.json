@@ -6,34 +6,34 @@
     "exam": {
       "passPercent": 70,
       "totalQuestions": 60,
-      "durationMinutes": 120,
+      "durationMinutes": 100,
       "passingScore": 700,
       "scaleMin": 100,
       "scaleMax": 1000,
-      "info": "Die Prüfung umfasst 40–60 Fragen. Mindestpunktzahl: 700/1000 (ca. 70%). Fragetypen: Multiple Choice, Mehrfachantwort, Drag-and-Drop. Raten ohne Abzüge möglich.",
+      "info": "100 Minuten Zeit · 40–60 Fragen · Bestehen ab 700/1000 · Multiple Choice, Mehrfachantwort, Drag-and-Drop. Kein Punkteabzug für Raten.",
       "domains": [
         {
           "id": "manage-identity",
           "label": "Manage Azure identities and governance",
-          "weight": 24,
+          "weight": 25,
           "categories": ["identity-governance"]
         },
         {
           "id": "implement-storage",
           "label": "Implement and manage storage",
-          "weight": 16,
+          "weight": 18,
           "categories": ["storage"]
         },
         {
           "id": "deploy-compute",
           "label": "Deploy and manage Azure compute resources",
-          "weight": 24,
+          "weight": 25,
           "categories": ["compute"]
         },
         {
-          "id": "configure-networking",
-          "label": "Configure and manage virtual networking",
-          "weight": 24,
+          "id": "implement-networking",
+          "label": "Implement and manage virtual networking",
+          "weight": 20,
           "categories": ["networking"]
         },
         {
