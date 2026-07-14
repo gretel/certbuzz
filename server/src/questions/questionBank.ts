@@ -91,8 +91,14 @@ export function getQuestions(bankId: string): Question[] {
   return loadBank(bankId).questions;
 }
 
-export function getQuestion(bankId: string, questionId: string): Question | undefined {
-  return loadBank(bankId).questions.find(q => q.id === questionId);
+export function getQuestion(bankId: string, questionId: string, lang?: string): Question | undefined {
+  const effectiveBankId = lang ? `${bankId}-${lang}` : bankId;
+  try {
+    return loadBank(effectiveBankId).questions.find(q => q.id === questionId);
+  } catch {
+    // Fall back to default bank if language-specific bank not found
+    return loadBank(bankId).questions.find(q => q.id === questionId);
+  }
 }
 
 export function getCategories(bankId: string): Array<{ id: string; label: string; icon: string; count: number }> {

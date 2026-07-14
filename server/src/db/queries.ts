@@ -29,6 +29,7 @@ export interface Player {
   finishedAt?: number;
   examStartedAt?: number | null;
   questionIds?: string[] | null;
+  lang?: string;
 }
 
 export interface PlayerAnswer {
@@ -135,6 +136,7 @@ export const queries = {
       finishedAt: row[9] as number | undefined,
       examStartedAt: row[10] as number | null,
       questionIds: rawQuestionIds ? JSON.parse(rawQuestionIds) : null,
+      lang: (row[12] as string) ?? 'de',
     };
   },
 
@@ -229,6 +231,7 @@ export const queries = {
       finishedAt: row[9] as number | undefined,
       examStartedAt: row[10] as number | null,
       questionIds: rawQuestionIds ? JSON.parse(rawQuestionIds) : null,
+      lang: (row[12] as string) ?? 'de',
     };
   },
 
@@ -297,6 +300,7 @@ export const queries = {
         finishedAt: row[9] as number | undefined,
         examStartedAt: row[10] as number | null,
         questionIds: rawQuestionIds ? JSON.parse(rawQuestionIds) : null,
+        lang: (row[12] as string) ?? 'de',
       };
     });
   },
@@ -507,6 +511,17 @@ export const queries = {
   },
 
   // Store a per-player exam question list (used by exam-restart for fresh sampling)
+  setPlayerLang: (playerId: string, lang: string) => {
+    const db = getDatabase();
+    db.run(
+      `UPDATE players
+       SET lang = ?, last_activity = ?
+       WHERE player_id = ?`,
+      [lang, Date.now(), playerId]
+    );
+    saveDatabase();
+  },
+
   setPlayerQuestionIds: (playerId: string, questionIds: string[]) => {
     const db = getDatabase();
     db.run(

@@ -96,6 +96,7 @@ export function ExamGameSession({
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [results, setResults] = useState<ExamResults | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [selectedLang, setSelectedLang] = useState<'de' | 'en'>('de');
   // Fetched per-player so retakes can swap questions without leaving the page
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [totalQuestions, setTotalQuestions] = useState<number>(initialTotalQuestions);
@@ -166,7 +167,11 @@ export function ExamGameSession({
 
   const handleStartExam = async () => {
     try {
-      const res = await fetch(`/api/player/${playerId}/exam-start`, { method: 'POST' });
+      const res = await fetch(`/api/player/${playerId}/exam-start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lang: selectedLang }),
+      });
       if (!res.ok) throw new Error(`exam-start HTTP ${res.status}`);
       const data = await res.json();
       setExamStartedAt(data.examStartedAt);
@@ -370,6 +375,33 @@ export function ExamGameSession({
             <div>🚫 <strong>Keine Erklärungen während der Prüfung</strong> — Auswertung erst am Ende.</div>
             <div>⬆️ <strong>Keine Rückkehr zu beantworteten Fragen.</strong></div>
             <div>💤 <strong>Pause möglich</strong> — du kannst das Fenster schließen und später weitermachen; die Zeit läuft weiter.</div>
+          </div>
+
+          {/* Language selector */}
+          <div className="mb-6">
+            <p className="text-sm text-white/60 mb-2 text-center">Sprache / Language:</p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => setSelectedLang('de')}
+                className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                  selectedLang === 'de'
+                    ? 'bg-cb-accent text-white'
+                    : 'bg-white/10 text-white/60 hover:bg-white/20'
+                }`}
+              >
+                🇩🇪 Deutsch
+              </button>
+              <button
+                onClick={() => setSelectedLang('en')}
+                className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                  selectedLang === 'en'
+                    ? 'bg-cb-accent text-white'
+                    : 'bg-white/10 text-white/60 hover:bg-white/20'
+                }`}
+              >
+                🇬🇧 English
+              </button>
+            </div>
           </div>
 
           <button

@@ -218,6 +218,20 @@ export async function initializeDatabase() {
     }
   }
 
+  // Migration: Add lang column to players for exam language selection
+  const playerColsLang = db.exec(`PRAGMA table_info(players)`);
+  const hasLang = playerColsLang.length > 0 &&
+    playerColsLang[0].values.some((row: any) => row[1] === 'lang');
+  if (!hasLang) {
+    console.log('🔄 Migrating database: adding players.lang...');
+    try {
+      db.run(`ALTER TABLE players ADD COLUMN lang TEXT NOT NULL DEFAULT 'de'`);
+      console.log('✅ players.lang migration complete');
+    } catch (e) {
+      console.error('❌ players.lang migration failed:', e);
+    }
+  }
+
   saveDatabase();
   console.log('✅ Database initialized');
 }

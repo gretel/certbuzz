@@ -136,9 +136,11 @@ router.get('/:playerId/exam-state', (req, res) => {
 });
 
 // POST /api/player/:playerId/exam-start — anchor the timer
+// Accept optional lang body param: { lang: 'de' | 'en' }
 router.post('/:playerId/exam-start', (req, res) => {
   try {
     const { playerId } = req.params;
+    const { lang } = req.body;
     const player = queries.getPlayer(playerId);
     if (!player) return res.status(404).json({ error: 'player not found' });
 
@@ -146,6 +148,11 @@ router.post('/:playerId/exam-start', (req, res) => {
     if (!session) return res.status(404).json({ error: 'session not found' });
     if (session.gameMode !== 'exam') {
       return res.status(400).json({ error: 'not an exam session' });
+    }
+
+    // Store language preference if provided
+    if (lang && (lang === 'de' || lang === 'en')) {
+      queries.setPlayerLang(playerId, lang);
     }
 
     if (!player.examStartedAt) {

@@ -34,10 +34,11 @@ export function getPlayerExamQuestions(playerId: string): Question[] {
   const session = queries.getSession(player.sessionCode);
   if (!session) throw new Error('session not found');
 
+  const lang = player.lang ?? 'de';
   const ids = getEffectivePlayerQuestionIds(playerId);
   const questions: Question[] = [];
   for (const id of ids) {
-    const q = getQuestion(session.questionBank, id);
+    const q = getQuestion(session.questionBank, id, lang);
     if (q) questions.push(q);
   }
   return questions;
@@ -120,7 +121,8 @@ export function submitExamAnswer(payload: ExamAnswerPayload): ExamAnswerResult {
   if (!player) return { ok: false, error: 'player not found' };
   if (player.finishedAt) return { ok: false, error: 'exam already finished' };
 
-  const question = getQuestion(session.questionBank, payload.questionId);
+  const lang = player.lang ?? 'de';
+  const question = getQuestion(session.questionBank, payload.questionId, lang);
   if (!question) return { ok: false, error: 'question not found' };
 
   // Idempotency: if the player already answered this question, no-op
@@ -156,6 +158,8 @@ function computeResults(playerId: string): ExamResultsPayload {
   const session = queries.getSession(player.sessionCode);
   if (!session) throw new Error('session not found');
 
+  const lang = player.lang ?? 'de';
+
   const exam = getExamInfo(session.questionBank);
   if (!exam || !exam.domains) {
     throw new Error(`bank '${session.questionBank}' has no exam metadata`);
@@ -178,7 +182,7 @@ function computeResults(playerId: string): ExamResultsPayload {
   // Per-domain breakdown
   const byDomain = (exam.domains as ExamDomain[]).map(dom => {
     const domAnswers = answers.filter(a => {
-      const q = getQuestion(session.questionBank, a.questionId);
+      const q = getQuestion(session.questionBank, a.questionId, lang);
       return q && dom.categories.includes(q.category);
     });
     return {
@@ -191,7 +195,7 @@ function computeResults(playerId: string): ExamResultsPayload {
 
   // Full review list (questions WITH correctAnswers so the client can highlight)
   const review = answers.map(a => {
-    const q = getQuestion(session.questionBank, a.questionId);
+    const q = getQuestion(session.questionBank, a.questionId, lang);
     if (!q) throw new Error(`question ${a.questionId} not found`);
     return {
       question: q,
