@@ -85,8 +85,27 @@ tar cz \
     package.json package-lock.json .env.example \
     | ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "azureuser@$IP" "
 set -e
+
+DATA_DIR="\$HOME/certbuzz-data"
+
+# Preserve database before replacing app code
+mkdir -p \$DATA_DIR
+if [ -f $REMOTE_DIR/database.db ]; then
+    cp $REMOTE_DIR/database.db \$DATA_DIR/database.db
+    echo '   backed up existing database'
+elif [ -f \$DATA_DIR/database.db ]; then
+    echo '   database already in persistent location'
+fi
+
+# Extract new app code
 mkdir -p $REMOTE_DIR && cd $REMOTE_DIR
 tar xz
+
+# Restore database if it was in the old location
+if [ -f \$DATA_DIR/database.db ] && [ ! -f $REMOTE_DIR/database.db ]; then
+    cp \$DATA_DIR/database.db $REMOTE_DIR/database.db
+    echo '   restored database'
+fi
 
 cd $REMOTE_DIR/server && npm ci --silent
 cd $REMOTE_DIR
@@ -99,6 +118,7 @@ sed -i 's|# ALLOWED_ORIGINS=https://your-domain.com|ALLOWED_ORIGINS=https://'"${
 sed -i 's/^PORT=8000/PORT=8000/' .env
 grep -q '^HOST=' .env || echo 'HOST=0.0.0.0' >> .env
 grep -q '^NODE_ENV=' .env || echo 'NODE_ENV=production' >> .env
+grep -q '^DATABASE_PATH=' .env || echo "DATABASE_PATH=\$HOME/certbuzz-data/database.db" >> .env
 
 pm2 delete certbuzz 2>/dev/null || true
 pm2 start server/dist/server.js --name certbuzz

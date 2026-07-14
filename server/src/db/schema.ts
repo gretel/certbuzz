@@ -6,7 +6,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbPath = path.join(__dirname, '../../database.db');
+// Allow overriding via DATABASE_PATH env var (e.g. /home/azureuser/certbuzz-data/database.db)
+// so deployments can keep the database on a persistent path outside the app tree.
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../database.db');
 
 let db: Database | null = null;
 
